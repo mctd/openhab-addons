@@ -47,7 +47,7 @@ This binding wraps the KLF200 API and as such, should be able to support all of 
 |1|Scene|**Yes**| Discovers scenes and allows execution.
 |2|Blind | Yes | 
 |3 | Interior Venetian Blind | *No* | 
-|4 | Roller Shutter | *No*  | 
+|4 | Roller Shutter | **Yes**  | 
 |5 | Vertical Exterior Awning | *No*  | 
 |6 | Window Opener | *No*  | 
 |7 | Garage Door Opener |  *No* | 
