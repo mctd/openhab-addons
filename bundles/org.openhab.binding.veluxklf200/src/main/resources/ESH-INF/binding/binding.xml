@@ -4,7 +4,7 @@
 	xsi:schemaLocation="https://openhab.org/schemas/binding/v1.0.0 https://openhab.org/schemas/binding-1.0.0.xsd">
 
 	<name>VeluxKLF200 Binding</name>
-	<description>This is the binding for VeluxKLF200.</description>
+	<description>This binding enables control of Velux devices that are associated with a KLF200 unit running firmware v2.x. The binding enables full control of individual devices as well as scenes.</description>
 	<author>Emmanuel Bachschmidt</author>
 
 </binding:binding>
