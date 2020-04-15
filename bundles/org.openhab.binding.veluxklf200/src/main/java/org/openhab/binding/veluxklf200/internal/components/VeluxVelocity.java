@@ -16,22 +16,22 @@ package org.openhab.binding.veluxklf200.internal.components;
 public enum VeluxVelocity {
 
     /** default. */
-    DEFAULT(0, "Default"),
+    DEFAULT((byte) 0, "Default"),
 
     /** silent. */
-    SILENT(1, "Silent"),
+    SILENT((byte) 1, "Silent"),
 
     /** fast. */
-    FAST(2, "Fast"),
+    FAST((byte) 2, "Fast"),
 
     /** unknown. */
-    UNKNOWN(254, "Unknown"),
+    UNKNOWN((byte) 254, "Unknown"),
 
     /** not available. */
-    NOT_AVAILABLE(255, "Not Available");
+    NOT_AVAILABLE((byte) 255, "Not Available");
 
     /** The velocity code. */
-    private int velocityCode;
+    private byte velocityCode;
 
     /** The display velocity. */
     private String displayVelocity;
@@ -40,11 +40,11 @@ public enum VeluxVelocity {
      * Instantiates a new velux velocity.
      *
      * @param code
-     *                            the code
+     *            the code
      * @param displayVelocity
-     *                            the display velocity
+     *            the display velocity
      */
-    private VeluxVelocity(int code, String displayVelocity) {
+    private VeluxVelocity(byte code, String displayVelocity) {
         this.velocityCode = code;
         this.displayVelocity = displayVelocity;
     }
@@ -54,7 +54,7 @@ public enum VeluxVelocity {
      *
      * @return the velocity code
      */
-    public int getVelocityCode() {
+    public byte getVelocityCode() {
         return this.velocityCode;
     }
 
@@ -71,10 +71,10 @@ public enum VeluxVelocity {
      * Creates the from code.
      *
      * @param code
-     *                 the code
+     *            the code
      * @return the velux velocity
      */
-    public static VeluxVelocity createFromCode(int code) {
+    public static VeluxVelocity createFromCode(byte code) {
         switch (code) {
             case 0:
                 return DEFAULT;
@@ -82,7 +82,7 @@ public enum VeluxVelocity {
                 return SILENT;
             case 2:
                 return FAST;
-            case 254:
+            case (byte) 254:
                 return NOT_AVAILABLE;
             default:
                 return UNKNOWN;

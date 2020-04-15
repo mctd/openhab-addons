@@ -16,33 +16,33 @@ package org.openhab.binding.veluxklf200.internal.components;
 public enum VeluxNodeVariation {
 
     /** The not set. */
-    NOT_SET(0),
+    NOT_SET((byte) 0),
 
     /** The tophung. */
-    TOPHUNG(1),
+    TOPHUNG((byte) 1),
 
     /** The kip. */
-    KIP(2),
+    KIP((byte) 2),
 
     /** The flat roof. */
-    FLAT_ROOF(3),
+    FLAT_ROOF((byte) 3),
 
     /** The sky light. */
-    SKY_LIGHT(4),
+    SKY_LIGHT((byte) 4),
 
     /** The unknown. */
-    UNKNOWN(-1);
+    UNKNOWN((byte) -1);
 
     /** The variation code. */
-    private int variationCode;
+    private byte variationCode;
 
     /**
      * Instantiates a new velux node variation.
      *
      * @param code
-     *                 the code
+     *            the code
      */
-    private VeluxNodeVariation(int code) {
+    private VeluxNodeVariation(byte code) {
         this.variationCode = code;
     }
 
@@ -51,7 +51,7 @@ public enum VeluxNodeVariation {
      *
      * @return the variation code
      */
-    public int getVariationCode() {
+    public byte getVariationCode() {
         return this.variationCode;
     }
 
@@ -59,11 +59,11 @@ public enum VeluxNodeVariation {
      * Creates the.
      *
      * @param c
-     *              the c
+     *            the c
      * @return the velux node variation
      */
-    public static VeluxNodeVariation create(int c) {
-        switch (c) {
+    public static VeluxNodeVariation createFromCode(byte code) {
+        switch (code) {
             case 0:
                 return NOT_SET;
             case 1:

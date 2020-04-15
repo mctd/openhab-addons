@@ -16,25 +16,20 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * The Class KLFCMD_GetNode.
+ * Get information on a node.
  *
- * @author MFK - Initial Contribution
+ * @author emmanuel
  */
 public class KlfCmdGetNodeInformation extends BaseKLFCommand {
 
-    /** Logging. */
     private final Logger logger = LoggerFactory.getLogger(KlfCmdGetNodeInformation.class);
-
-    /** The node id. */
     private byte nodeId;
-
-    /** The node. */
     private VeluxNode node;
 
     /**
-     * Instantiates a new KLFCM D get node.
+     * Default constructor.
      *
-     * @param nodeId the node id
+     * @param nodeId The node ID
      */
     public KlfCmdGetNodeInformation(byte nodeId) {
         super();
@@ -59,13 +54,8 @@ public class KlfCmdGetNodeInformation extends BaseKLFCommand {
         return this.node;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.openhab.binding.veluxklf200.internal.commands.BaseKLFCommand#handleResponse(byte[])
-     */
     @Override
-    protected void handleResponseImpl(KLFGatewayCommands responseCommand, byte[] data) {
+    protected boolean handleResponseImpl(KLFGatewayCommands responseCommand, byte[] data) {
         switch (responseCommand) {
             case GW_GET_NODE_INFORMATION_CFM:
                 if (data[FIRSTBYTE] == 0) {
@@ -76,79 +66,51 @@ public class KlfCmdGetNodeInformation extends BaseKLFCommand {
                     logger.error("Command has been rejected by the KLF200 unit.");
                     this.commandStatus = CommandStatus.ERROR;
                 }
-                break;
+                return true;
             case GW_GET_NODE_INFORMATION_NTF:
                 logger.trace("Get Node: {}", KLFUtils.formatBytes(data));
-                VeluxNode node = new VeluxNode(KLFUtils.extractOneByte(data[FIRSTBYTE]), // NodeID
-                        KLFUtils.extractTwoBytes(data[FIRSTBYTE + 1], data[FIRSTBYTE + 2]), // Order
-                        KLFUtils.extractOneByte(data[FIRSTBYTE + 3]), // Placement
+                VeluxNode node = new VeluxNode(KLFUtils.extractOneByte(data, FIRSTBYTE), // NodeID
+                        KLFUtils.extractTwoBytes(data, FIRSTBYTE + 1), // Order
+                        KLFUtils.extractOneByte(data, FIRSTBYTE + 3), // Placement
                         KLFUtils.extractUTF8String(data, FIRSTBYTE + 4, FIRSTBYTE + 67), // Name
-                        KLFUtils.extractOneByte(data[FIRSTBYTE + 68]), // Velocity
-                        KLFUtils.extractTwoBytes(data[FIRSTBYTE + 69], data[FIRSTBYTE + 70]), // nodeType
-                        KLFUtils.extractOneByte(data[FIRSTBYTE + 75]), // buildNumber
-                        KLFUtils.extractTwoBytes(data[FIRSTBYTE + 85], data[FIRSTBYTE + 86]), // currentPosition
-                        KLFUtils.extractTwoBytes(data[FIRSTBYTE + 87], data[FIRSTBYTE + 88]), // targetPosition
-                        KLFUtils.extractTwoBytes(data[FIRSTBYTE + 89], data[FIRSTBYTE + 90]), // FP1
-                        KLFUtils.extractTwoBytes(data[FIRSTBYTE + 91], data[FIRSTBYTE + 92]), // FP2
-                        KLFUtils.extractTwoBytes(data[FIRSTBYTE + 93], data[FIRSTBYTE + 94]), // FP3
-                        KLFUtils.extractTwoBytes(data[FIRSTBYTE + 95], data[FIRSTBYTE + 96]), // FP4
-                        KLFUtils.extractTwoBytes(data[FIRSTBYTE + 97], data[FIRSTBYTE + 98]), // remainingTime
-                        KLFUtils.extractUnsignedInt32(data[FIRSTBYTE + 99], data[FIRSTBYTE + 100],
-                                data[FIRSTBYTE + 101], data[FIRSTBYTE + 102]), // lastCommand
-                        KLFUtils.extractOneByte(data[FIRSTBYTE + 71]), // Product
-                                                                       // group
-                        KLFUtils.extractOneByte(data[FIRSTBYTE + 72]), // Product
-                                                                       // type
-                        KLFUtils.extractOneByte(data[FIRSTBYTE + 73]), // Node
-                                                                       // variation
-                        KLFUtils.extractOneByte(data[FIRSTBYTE + 74]), // Power Mode
-                        KLFUtils.extractOneByte(data[FIRSTBYTE + 84]), // State
-                        String.valueOf(KLFUtils.extractFourBytes(data[FIRSTBYTE + 76], data[FIRSTBYTE + 77],
-                                data[FIRSTBYTE + 78], data[FIRSTBYTE + 79])) // serial
-                                                                             // number
+                        KLFUtils.extractOneByte(data, FIRSTBYTE + 68), // Velocity
+                        KLFUtils.extractTwoBytes(data, FIRSTBYTE + 69), // NodeTypeSubType
+                        KLFUtils.extractOneByte(data, FIRSTBYTE + 71), // Product group
+                        KLFUtils.extractOneByte(data, FIRSTBYTE + 72), // Product type
+                        KLFUtils.extractOneByte(data, FIRSTBYTE + 73), // Node variation
+                        KLFUtils.extractOneByte(data, FIRSTBYTE + 74), // Power Mode
+                        KLFUtils.extractOneByte(data, FIRSTBYTE + 75), // buildNumber
+                        String.valueOf(KLFUtils.extractFourBytes(data, FIRSTBYTE + 76)), // serial number
+                        KLFUtils.extractOneByte(data, FIRSTBYTE + 84), // State
+                        KLFUtils.extractTwoBytes(data, FIRSTBYTE + 85), // currentPosition
+                        KLFUtils.extractTwoBytes(data, FIRSTBYTE + 87), // targetPosition
+                        KLFUtils.extractTwoBytes(data, FIRSTBYTE + 89), // FP1
+                        KLFUtils.extractTwoBytes(data, FIRSTBYTE + 91), // FP2
+                        KLFUtils.extractTwoBytes(data, FIRSTBYTE + 93), // FP3
+                        KLFUtils.extractTwoBytes(data, FIRSTBYTE + 95), // FP4
+                        KLFUtils.extractTwoBytes(data, FIRSTBYTE + 97), // remainingTime
+                        KLFUtils.extractUnsignedInt32(data, FIRSTBYTE + 99) // lastCommand
                 );
                 logger.trace("Retrieved information successfully for node '" + node.getName() + "'.");
                 this.node = node;
                 this.commandStatus = CommandStatus.COMPLETE;
-                break;
+                return true;
             default:
-                // This should not happen. If it does, the most likely cause is that
-                // the KLFCommandStructure has not been configured or implemented
-                // correctly.
-                this.commandStatus = CommandStatus.ERROR;
-                logger.error("Processing requested for a KLF response code (command code) that is not supported: {}.",
-                        responseCommand.getCode());
-                break;
+                return false;
         }
-
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.openhab.binding.veluxklf200.internal.commands.BaseKLFCommand#getKLFCommandStructure()
-     */
     @Override
     public KLFCommandStructure getKLFCommandStructure() {
         return KLFCommandStructure.GET_NODE_INFORMATION;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.openhab.binding.veluxklf200.internal.commands.BaseKLFCommand#pack()
-     */
     @Override
     protected byte[] pack() {
         setMainNode(this.nodeId);
         return new byte[] { this.nodeId };
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.openhab.binding.veluxklf200.internal.commands.BaseKLFCommand#extractNode(byte[])
-     */
     @Override
     protected byte extractNode(KLFGatewayCommands responseCommand, byte[] data) {
         switch (responseCommand) {

@@ -211,61 +211,56 @@ public class KLFUtils {
     }
 
     /**
-     * Convert a byte to an int.
+     * Extract one byte from data array.
      *
-     * @param one
-     *            The byte to be extracted
-     * @return int representation
+     * @param data
+     *            The data array
+     * @param position
+     *            Position of the byte to extract
+     * @return the byte
      */
-    public static int extractOneByte(byte one) {
-        return (one & 0xff);
+    public static byte extractOneByte(byte[] data, int position) {
+        return (byte) (data[position] & 0xff);
     }
 
     /**
-     * Convert two bytes into an int.
+     * Extract two bytes from data array as short.
      *
-     * @param one
-     *            First byte
-     * @param two
-     *            Second byte
-     * @return int representation.
+     * @param data
+     *            The data array
+     * @param start
+     *            Position of the first byte to extract
+     * @return short representation.
      */
-    public static int extractTwoBytes(byte one, byte two) {
-        return 0x00 << 24 | 0x00 << 16 | (one & 0xff) << 8 | (two & 0xff);
+    public static short extractTwoBytes(byte[] data, int start) {
+        return (short) (((data[start] & 0xff) << 8) | (data[start + 1] & 0xff));
     }
 
     /**
-     * Extract four bytes.
+     * Extract four bytes from data array as int.
      *
-     * @param one
-     *            the one
-     * @param two
-     *            the two
-     * @param three
-     *            the three
-     * @param four
-     *            the four
-     * @return the int representation of the 4 bytes
+     * @param data
+     *            The data array
+     * @param start
+     *            Position of the first byte to extract
+     * @return int representation of the 4 bytes
      */
-    public static int extractFourBytes(byte one, byte two, byte three, byte four) {
-        return one << 24 | (two & 0xff) << 16 | (three & 0xff) << 8 | (four & 0xff);
+    public static int extractFourBytes(byte[] data, int start) {
+        return data[start] << 24 | (data[start + 1] & 0xff) << 16 | (data[start + 2] & 0xff) << 8
+                | (data[start + 3] & 0xff);
     }
 
     /**
-     * Extract unsigned int 32.
+     * Extract four bytes as unsigned int 32.
      *
-     * @param one
-     *            the one
-     * @param two
-     *            the two
-     * @param three
-     *            the three
-     * @param four
-     *            the four
+     * @param data
+     *            The data array
+     * @param start
+     *            Position of the first byte to extract
      * @return the long
      */
-    public static long extractUnsignedInt32(byte one, byte two, byte three, byte four) {
-        ByteBuffer b = ByteBuffer.wrap(new byte[] { one, two, three, four });
+    public static long extractUnsignedInt32(byte[] data, int start) {
+        ByteBuffer b = ByteBuffer.wrap(new byte[] { data[start], data[start + 1], data[start + 2], data[start + 3] });
         return b.getInt();
     }
 

@@ -22,9 +22,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Manages sending of commands to the KLF200.
+ * Send activating command direct to one or more io-homecontrol® nodes.
  *
- * @author MFK - Initial Contribution
+ * @author emmanuel
  */
 public class KlfCmdSendCommand extends BaseKLFCommand {
 
@@ -37,14 +37,11 @@ public class KlfCmdSendCommand extends BaseKLFCommand {
     /** Used to tell the unit to stop actuating. */
     public static final short STOP_PARAMETER = (short) 0xD200;
 
-    /** Logging. */
     private final Logger logger = LoggerFactory.getLogger(KlfCmdSendCommand.class);
-
-    /** List of instructions to be sent with this command. */
     private List<VeluxCommandInstruction> commands;
 
     /**
-     * Constructor varient that creates a command with a single instruction to
+     * Constructor variant that creates a command with a single instruction to
      * send.
      *
      * @param nodeId
@@ -62,7 +59,7 @@ public class KlfCmdSendCommand extends BaseKLFCommand {
     }
 
     /**
-     * Constructor varient that creates a command with a single instruction to
+     * Constructor variant that creates a command with a single instruction to
      * send.
      *
      * @param instruction
@@ -75,7 +72,7 @@ public class KlfCmdSendCommand extends BaseKLFCommand {
     }
 
     /**
-     * Constructor varient that creates a command with a list of instructions to
+     * Constructor variant that creates a command with a list of instructions to
      * send to the KLF200.
      *
      * @param instructions
@@ -87,17 +84,11 @@ public class KlfCmdSendCommand extends BaseKLFCommand {
         commands.addAll(instructions);
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see
-     * com.velux.klf200.internal.commands.BaseKLFCommand#handleResponse(byte[])
-     */
     @Override
-    protected void handleResponseImpl(KLFGatewayCommands responseCommand, byte[] data) {
+    protected boolean handleResponseImpl(KLFGatewayCommands responseCommand, byte[] data) {
         switch (responseCommand) {
             case GW_COMMAND_SEND_CFM:
-                int sessionId = KLFUtils.extractTwoBytes(data[FIRSTBYTE], data[FIRSTBYTE + 1]);
+                int sessionId = KLFUtils.extractTwoBytes(data, FIRSTBYTE);
                 byte status = data[FIRSTBYTE + 2];
                 switch (status) {
                     case CMD_STATUS_REJECTED:
@@ -114,54 +105,36 @@ public class KlfCmdSendCommand extends BaseKLFCommand {
                         this.commandStatus = CommandStatus.ERROR;
                         break;
                 }
-                break;
+                return true;
             case GW_COMMAND_RUN_STATUS_NTF:
-                VeluxRunStatus runStatus = VeluxRunStatus.create(data[FIRSTBYTE + 7]);
+                VeluxRunStatus runStatus = VeluxRunStatus.createFromCode(data[FIRSTBYTE + 7]);
                 VeluxStatusReply statusReply = VeluxStatusReply.create(data[FIRSTBYTE + 8]);
                 logger.debug(
                         "GW_COMMAND_RUN_STATUS_NTF Notification for Node {}, relating to function parameter {}, Session: {}, Run status is: {}, Command status is: {} ",
-                        data[FIRSTBYTE + 3], KLFUtils.extractTwoBytes(data[FIRSTBYTE], data[FIRSTBYTE + 1]),
-                        data[FIRSTBYTE + 4], runStatus, statusReply);
-                break;
+                        data[FIRSTBYTE + 3], KLFUtils.extractTwoBytes(data, FIRSTBYTE), data[FIRSTBYTE + 4], runStatus,
+                        statusReply);
+                return true;
             case GW_COMMAND_REMAINING_TIME_NTF:
                 logger.debug(
                         "GW_COMMAND_REMAINING_TIME_NTF Notification for Node {}, session: {}, relating to function parameter {}, time remaining to complete is {} seconds",
-                        data[FIRSTBYTE + 2], KLFUtils.extractTwoBytes(data[FIRSTBYTE], data[FIRSTBYTE + 1]),
-                        data[FIRSTBYTE + 3], KLFUtils.extractTwoBytes(data[FIRSTBYTE + 4], data[FIRSTBYTE + 5]));
-                break;
+                        data[FIRSTBYTE + 2], KLFUtils.extractTwoBytes(data, FIRSTBYTE), data[FIRSTBYTE + 3],
+                        KLFUtils.extractTwoBytes(data, FIRSTBYTE + 4));
+                return true;
             case GW_SESSION_FINISHED_NTF:
                 logger.debug("Processing of the command with session: {} is complete.",
-                        KLFUtils.extractTwoBytes(data[FIRSTBYTE], data[FIRSTBYTE + 1]));
+                        KLFUtils.extractTwoBytes(data, FIRSTBYTE));
                 this.commandStatus = CommandStatus.COMPLETE;
-                break;
+                return true;
             default:
-                // This should not happen. If it does, the most likely cause is that
-                // the KLFCommandStructure has not been configured or implemented
-                // correctly.
-                this.commandStatus = CommandStatus.ERROR;
-                logger.error("Processing requested for a KLF response code (command code) that is not supported: {}.",
-                        responseCommand.getCode());
-                break;
+                return false;
         }
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see
-     * com.velux.klf200.internal.commands.BaseKLFCommand#getKLFCommandStructure
-     * ()
-     */
     @Override
     public KLFCommandStructure getKLFCommandStructure() {
         return KLFCommandStructure.SEND_NODE_COMMAND;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see com.velux.klf200.internal.commands.BaseKLFCommand#pack()
-     */
     @Override
     protected byte[] pack() {
         byte[] data = new byte[66];
@@ -193,15 +166,9 @@ public class KlfCmdSendCommand extends BaseKLFCommand {
         return data;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see
-     * com.velux.klf200.internal.commands.BaseKLFCommand#extractSession(byte[])
-     */
     @Override
     protected int extractSession(KLFGatewayCommands responseCommand, byte[] data) {
-        return KLFUtils.extractTwoBytes(data[FIRSTBYTE], data[FIRSTBYTE + 1]);
+        return KLFUtils.extractTwoBytes(data, FIRSTBYTE);
     }
 
 }

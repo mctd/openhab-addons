@@ -16,24 +16,24 @@ package org.openhab.binding.veluxklf200.internal.components;
 public enum VeluxRunStatus {
 
     /** The execution completed. */
-    EXECUTION_COMPLETED(0),
+    EXECUTION_COMPLETED((byte) 0),
     /** The execution failed. */
-    EXECUTION_FAILED(1),
+    EXECUTION_FAILED((byte) 1),
     /** The execution active. */
-    EXECUTION_ACTIVE(2),
+    EXECUTION_ACTIVE((byte) 2),
     /** The unknown. */
-    UNKNOWN(99);
+    UNKNOWN((byte) 99);
 
     /** The status code. */
-    private int statusCode;
+    private byte statusCode;
 
     /**
      * Instantiates a new velux run status.
      *
      * @param statusCode
-     *                       the status code
+     *            the status code
      */
-    private VeluxRunStatus(int statusCode) {
+    private VeluxRunStatus(byte statusCode) {
         this.statusCode = statusCode;
     }
 
@@ -42,7 +42,7 @@ public enum VeluxRunStatus {
      *
      * @return the status code
      */
-    public int getStatusCode() {
+    public byte getStatusCode() {
         return this.statusCode;
     }
 
@@ -50,10 +50,10 @@ public enum VeluxRunStatus {
      * Creates the.
      *
      * @param code
-     *                 the code
+     *            the code
      * @return the velux run status
      */
-    public static VeluxRunStatus create(byte code) {
+    public static VeluxRunStatus createFromCode(byte code) {
         switch (code) {
             case 0:
                 return EXECUTION_COMPLETED;

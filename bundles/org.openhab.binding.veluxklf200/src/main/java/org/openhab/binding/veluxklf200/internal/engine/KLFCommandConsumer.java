@@ -55,13 +55,10 @@ class KLFCommandConsumer implements Runnable {
                 // Pick a command from the queue (block until a command is available)
                 BaseKLFCommand command = this.processor.getCommandQueue().take();
                 synchronized (command) {
-                    if ((command.getKLFCommandStructure().isNodeSpecific())
-                            && (!command.getKLFCommandStructure().isSessionRequired())
-                            && isSimilarInProgress(command)) {
+                    if (isSimilarInProgress(command)) {
                         // The current command is node specific, does not use a session, and there is a similar
-                        // command in progress. There is a risk a collision, and the KLF200 getting confused by
-                        // which request to process respond to. We will put the command back to queue, waiting
-                        // for the one in progress to complete
+                        // command in progress. There is a collision risk, and the KLF200 could get confused. Will put
+                        // the command back to queue, waiting for the one in progress to complete
                         logger.debug("Similar node specific command already executing, delaying execution: {}",
                                 command);
                         if (!this.processor.getCommandQueue().offerFirst(command)) {
@@ -84,7 +81,7 @@ class KLFCommandConsumer implements Runnable {
                 this.queueShutdown = true;
             }
         }
-        logger.info("The command consumer thread is shuting down.");
+        logger.debug("The command consumer thread is shuting down.");
         try {
             // Closing socket so the watchdog can detect something went wrong
             this.processor.klfRawSocket.close();
@@ -104,6 +101,14 @@ class KLFCommandConsumer implements Runnable {
      * @return True if there is a similar command in progress, false otherwise.
      */
     private boolean isSimilarInProgress(BaseKLFCommand current) {
+        if (current.getKLFCommandStructure().isSessionRequired()) {
+            return false;
+        }
+
+        if (!current.getKLFCommandStructure().isNodeSpecific()) {
+            return false;
+        }
+
         Iterator<BaseKLFCommand> iterator = this.processor.getCommandsInProgress().iterator();
         while (iterator.hasNext()) {
             BaseKLFCommand inProgress = iterator.next();

@@ -26,7 +26,6 @@ import org.eclipse.smarthome.core.thing.ThingStatus;
 import org.eclipse.smarthome.core.thing.ThingStatusDetail;
 import org.eclipse.smarthome.core.thing.binding.BaseBridgeHandler;
 import org.eclipse.smarthome.core.types.Command;
-import org.eclipse.smarthome.core.types.RefreshType;
 import org.eclipse.smarthome.core.types.UnDefType;
 import org.openhab.binding.veluxklf200.internal.VeluxKLF200V2BindingConstants;
 import org.openhab.binding.veluxklf200.internal.VeluxKLF200V2Configuration;
@@ -72,7 +71,7 @@ public class KLF200BridgeHandler extends BaseBridgeHandler implements KLFEventLi
     }
 
     /*
-     * Only thing that bridge actually maintains is the connectivity item. Once connected, this is set to ON.
+     * Handle a command.
      *
      * @see
      * org.eclipse.smarthome.core.thing.binding.ThingHandler#handleCommand(org.eclipse.smarthome.core.thing.ChannelUID,
@@ -81,18 +80,6 @@ public class KLF200BridgeHandler extends BaseBridgeHandler implements KLFEventLi
     @Override
     public void handleCommand(ChannelUID channelUID, Command command) {
         logger.debug("Handling bridge command: {} for channel: {}", command, channelUID);
-
-        if (command == RefreshType.REFRESH) {
-            switch (channelUID.getId()) {
-                case VeluxKLF200V2BindingConstants.BRIDGE_CONNECTIVITY:
-                    if ((klf200 != null) && (klf200.isUpAndRunning())) {
-                        updateState(channelUID.getId(), OnOffType.ON);
-                    } else {
-                        updateState(channelUID.getId(), OnOffType.OFF);
-                    }
-                    break;
-            }
-        }
     }
 
     /*
@@ -121,24 +108,10 @@ public class KLF200BridgeHandler extends BaseBridgeHandler implements KLFEventLi
             return;
         }
 
-        // updateStatus(ThingStatus.UNKNOWN);
-
         this.klf200 = new KLFCommandProcessor(this, config.hostname, config.port, config.password);
         // Register the handler as an event listener
         klf200.registerEventListener(this);
-
         klf200.initialize();
-
-        /*
-         * // Run the remainder of the post init tasks asynchronously.
-         * scheduler.execute(new Runnable() {
-         *
-         * @Override
-         * public void run() {
-         * updateBridgeProperties();
-         * }
-         * });
-         */
     }
 
     @Override
@@ -177,7 +150,7 @@ public class KLF200BridgeHandler extends BaseBridgeHandler implements KLFEventLi
      * Periodic refresh of the status of each item that has been configured in OH.
      * See {@link initialize()} comments for further information.
      */
-    public void refreshKnownDevices() {
+    private void refreshKnownDevices() {
         logger.debug("Refreshing all KLF200 devices");
         if (klf200 != null && klf200.isUpAndRunning()) {
             List<Thing> things = getThing().getThings();
@@ -193,18 +166,18 @@ public class KLF200BridgeHandler extends BaseBridgeHandler implements KLFEventLi
                                 (byte) Integer.valueOf(t.getUID().getId()).intValue());
                         this.klf200.executeCommand(getNodeInfoCmd);
                         if (getNodeInfoCmd.getStatus() == CommandStatus.COMPLETE) {
-                            if (getNodeInfoCmd.getNode().getCurrentPosition().isUnknown()) {
+                            Integer pctClosed = getNodeInfoCmd.getNode().getCurrentPosition().getPosition();
+                            org.eclipse.smarthome.core.types.State itemState = UnDefType.UNDEF;
+                            if (pctClosed == null) {
                                 logger.debug(
                                         "Node '{}' position is currently unknown. Need to wait for an activation for KLF200 to learn its position.",
                                         getNodeInfoCmd.getNode().getName());
-                                updateState(channel.getUID(), UnDefType.UNDEF);
                             } else {
-                                int pctClosed = getNodeInfoCmd.getNode().getCurrentPosition()
-                                        .getPercentageClosedAsInt();
                                 logger.debug("Node '{}' is currently {}% closed.", getNodeInfoCmd.getNode().getName(),
                                         pctClosed);
-                                updateState(channel.getUID(), new PercentType(pctClosed));
+                                itemState = new PercentType(pctClosed);
                             }
+                            updateState(channel.getUID(), itemState);
                         } else {
                             logger.error("Failed to retrieve information about node {}, error detail: {}",
                                     getNodeInfoCmd.getNodeId(), getNodeInfoCmd.getStatus().getErrorDetail());
@@ -375,22 +348,24 @@ public class KLF200BridgeHandler extends BaseBridgeHandler implements KLFEventLi
 
                 if (state == VeluxState.DONE) {
                     if (positionChannel != null) {
-                        if (currentPosition.isUnknown()) {
+                        Integer pctClosed = currentPosition.getPosition();
+                        org.eclipse.smarthome.core.types.State itemState = UnDefType.UNDEF;
+                        if (pctClosed == null) {
                             logger.debug(
                                     "'{}' position is currently unknown. Need to wait for an activation for KLF200 to learn its position.",
                                     thing.getLabel());
-                            updateState(positionChannel.getUID(), UnDefType.UNDEF);
                         } else {
-                            int pctClosed = currentPosition.getPercentageClosedAsInt();
+
                             logger.debug("'{}' is currently {}% closed.", thing.getLabel(), pctClosed);
-                            updateState(positionChannel.getUID(), new PercentType(pctClosed));
+                            itemState = new PercentType(pctClosed);
                         }
+                        updateState(positionChannel.getUID(), itemState);
                     }
 
                 }
             }
         } else {
-            logger.info("Received an event for a non-configured Thing (NodeId: {})", nodeId);
+            logger.debug("Received an event for a non-configured Thing (NodeId: {})", nodeId);
         }
     }
 

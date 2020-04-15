@@ -17,12 +17,12 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.smarthome.config.discovery.AbstractDiscoveryService;
 import org.eclipse.smarthome.config.discovery.DiscoveryResult;
 import org.eclipse.smarthome.config.discovery.DiscoveryResultBuilder;
+import org.eclipse.smarthome.core.thing.ThingTypeUID;
 import org.eclipse.smarthome.core.thing.ThingUID;
 import org.openhab.binding.veluxklf200.internal.VeluxKLF200V2BindingConstants;
 import org.openhab.binding.veluxklf200.internal.commands.KlfCmdGetAllNodes;
 import org.openhab.binding.veluxklf200.internal.commands.KlfCmdGetAllScenes;
 import org.openhab.binding.veluxklf200.internal.components.VeluxNode;
-import org.openhab.binding.veluxklf200.internal.components.VeluxNodeType;
 import org.openhab.binding.veluxklf200.internal.components.VeluxScene;
 import org.openhab.binding.veluxklf200.internal.engine.KLFCommandProcessor;
 import org.openhab.binding.veluxklf200.internal.handler.KLF200BridgeHandler;
@@ -32,6 +32,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Responsible for discovering all of the devices that are available on the KLF200 bridge.
  *
+ * @author Emmanuel Bachschmidt - made more generic
  * @author MFK - Initial Contribution
  */
 @NonNullByDefault
@@ -106,60 +107,36 @@ public class KLF200DiscoveryService extends AbstractDiscoveryService {
      * @param bridgeUID bridge UID
      */
     private void discoverKLF200Things(KLFCommandProcessor klf200, ThingUID bridgeUID) {
-        discoverRollershutters(klf200, bridgeUID);
-        discoverBlinds(klf200, bridgeUID);
+        discoverNodes(klf200, bridgeUID);
         discoverScenes(klf200, bridgeUID);
     }
 
-    // TODO discover every Things using getNodes instead of getNodeByType and build Things with a factory
     /**
-     * Executes a KLFCMD_GetAllNodes to get a list of all nodes on the KLF200. This is then filtered to retrieve only
-     * the nodes that we are interested in. At this time, that is 'Vertical Interior Blinds'. Over time, it is expected
-     * that this list will grow to include other types of devices.
+     * Executes a KLFCMD_GetAllNodes to get a list of all nodes on the KLF200.
      *
      * @param klf200 CommandProcessor
      * @param bridgeUID bridge UID
      */
-    private void discoverRollershutters(KLFCommandProcessor klf200, ThingUID bridgeUID) {
+    private void discoverNodes(KLFCommandProcessor klf200, ThingUID bridgeUID) {
         KlfCmdGetAllNodes nodes = new KlfCmdGetAllNodes();
         klf200.executeCommand(nodes);
-        for (Iterator<VeluxNode> it = nodes.getNodeByType(VeluxNodeType.ROLLER_SHUTTER).iterator(); it.hasNext();) {
+
+        for (Iterator<VeluxNode> it = nodes.getNodes().iterator(); it.hasNext();) {
             VeluxNode n = it.next();
-            logger.info("Found rollershutter '{}', node: {}", n.getName(), n.getNodeId());
-            ThingUID thingUID = new ThingUID(VeluxKLF200V2BindingConstants.THING_TYPE_VELUX_ROLLER_SHUTTER, bridgeUID,
-                    String.valueOf(n.getNodeId()));
+            logger.info("Found node '{}', name: '{}' of type '{}'", n.getNodeId(), n.getName(), n.getNodeTypeSubType());
 
-            DiscoveryResult discoveryResult = DiscoveryResultBuilder.create(thingUID)
-                    .withProperties(getDiscoveredBlindProperties(n)).withBridge(bridgeUID).withLabel(n.getName())
-                    .build();
+            ThingTypeUID thingTypeUID = n.getNodeTypeSubType().getThingTypeUID();
+            if (thingTypeUID == null) {
+                logger.warn("Discovered a thing that cannot be handled: {}", n.getNodeTypeSubType());
+            } else {
+                ThingUID thingUID = new ThingUID(n.getNodeTypeSubType().getThingTypeUID(), bridgeUID,
+                        String.valueOf(n.getNodeId()));
+                DiscoveryResult discoveryResult = DiscoveryResultBuilder.create(thingUID)
+                        .withProperties(getDiscoveredBlindProperties(n)).withBridge(bridgeUID).withLabel(n.getName())
+                        .build();
 
-            thingDiscovered(discoveryResult);
-        }
-    }
-
-    /**
-     * Executes a KLFCMD_GetAllNodes to get a list of all nodes on the KLF200. This is then filtered to retrieve only
-     * the nodes that we are interested in. At this time, that is 'Vertical Interior Blinds'. Over time, it is expected
-     * that this list will grow to include other types of devices.
-     *
-     * @param klf200 CommandProcessor
-     * @param bridgeUID bridge UID
-     */
-    private void discoverBlinds(KLFCommandProcessor klf200, ThingUID bridgeUID) {
-        KlfCmdGetAllNodes nodes = new KlfCmdGetAllNodes();
-        klf200.executeCommand(nodes);
-        for (Iterator<VeluxNode> it = nodes.getNodeByType(VeluxNodeType.VERTICAL_INTERIOR_BLINDS).iterator(); it
-                .hasNext();) {
-            VeluxNode n = it.next();
-            logger.info("Found velux blind '{}', node: {}", n.getName(), n.getNodeId());
-            ThingUID thingUID = new ThingUID(VeluxKLF200V2BindingConstants.THING_TYPE_VELUX_BLIND, bridgeUID,
-                    String.valueOf(n.getNodeId()));
-
-            DiscoveryResult discoveryResult = DiscoveryResultBuilder.create(thingUID)
-                    .withProperties(getDiscoveredBlindProperties(n)).withBridge(bridgeUID).withLabel(n.getName())
-                    .build();
-
-            thingDiscovered(discoveryResult);
+                thingDiscovered(discoveryResult);
+            }
         }
     }
 
@@ -174,7 +151,7 @@ public class KLF200DiscoveryService extends AbstractDiscoveryService {
         klf200.executeCommand(scenes);
         for (Iterator<VeluxScene> it = scenes.getScenes().iterator(); it.hasNext();) {
             VeluxScene s = it.next();
-            logger.info("Found scene '{}', Called: {}", s.getSceneId(), s.getSceneName());
+            logger.info("Found scene '{}', Called: '{}'", s.getSceneId(), s.getSceneName());
             ThingUID thingUID = new ThingUID(VeluxKLF200V2BindingConstants.THING_TYPE_VELUX_SCENE, bridgeUID,
                     String.valueOf(s.getSceneId()));
 

@@ -68,23 +68,25 @@ public class KLF200ShutterLikeHandler extends KLF200BaseThingHandler {
         String thingLabel = getThing().getLabel();
 
         if (command == RefreshType.REFRESH) {
-            logger.debug("Handling state refresh command for {}, Id: {}.", thingLabel, nodeId);
+            logger.debug("Received refresh command for channel {} of {} (Id: {}).", channelUID.getId(), thingLabel,
+                    nodeId);
             switch (channelUID.getId()) {
                 case VeluxKLF200V2BindingConstants.VELUX_POSITION_CHANNEL_ID: {
                     logger.debug("Updating state for {}, Id: {}", thingLabel, nodeId);
                     KlfCmdGetNodeInformation getNodeInfoCmd = new KlfCmdGetNodeInformation((byte) nodeId);
                     getKLFCommandProcessor().executeCommand(getNodeInfoCmd);
                     if (getNodeInfoCmd.getStatus() == CommandStatus.COMPLETE) {
-                        if (getNodeInfoCmd.getNode().getCurrentPosition().isUnknown()) {
+                        Integer pctClosed = getNodeInfoCmd.getNode().getCurrentPosition().getPosition();
+                        org.eclipse.smarthome.core.types.State itemState = UnDefType.UNDEF;
+                        if (pctClosed == null) {
                             logger.debug(
                                     "{}, Id: {} position is currently unknown. Need to wait for an activation for KLF200 to learn its position.",
                                     thingLabel, nodeId);
-                            updateState(channelUID, UnDefType.UNDEF);
                         } else {
-                            int pctClosed = getNodeInfoCmd.getNode().getCurrentPosition().getPercentageClosedAsInt();
                             logger.debug("{}, Id: {} is currently {}% closed.", thingLabel, nodeId, pctClosed);
-                            updateState(channelUID, new PercentType(pctClosed));
+                            itemState = new PercentType(pctClosed);
                         }
+                        updateState(channelUID, itemState);
                     } else {
                         logger.error("Failed to retrieve information about node {}, error detail: {}",
                                 getNodeInfoCmd.getNodeId(), getNodeInfoCmd.getStatus().getErrorDetail());
@@ -92,7 +94,7 @@ public class KLF200ShutterLikeHandler extends KLF200BaseThingHandler {
                     break;
                 }
                 default: {
-                    logger.error("Unknown channel: {}", channelUID.getId());
+                    logger.debug("Nothing to refresh on channel: {}", channelUID.getId());
                     break;
                 }
             }
@@ -100,13 +102,11 @@ public class KLF200ShutterLikeHandler extends KLF200BaseThingHandler {
             logger.debug("Handling state change command for {}, Id: {}.", thingLabel, nodeId);
             switch (channelUID.getId()) {
                 case VeluxKLF200V2BindingConstants.VELUX_POSITION_CHANNEL_ID: {
-                    logger.info("Trigger movement for {} to position '{}'.", thingLabel, command);
+                    logger.debug("Trigger movement for {} to position '{}'.", thingLabel, command);
 
+                    short targetPosition = KlfCmdSendCommand.STOP_PARAMETER;
                     if ((command instanceof StopMoveType) && (command == StopMoveType.STOP)) {
                         logger.debug("Attempting to stop actuation of {}, Id:{}.", thingLabel, nodeId);
-                        getKLFCommandProcessor()
-                                .executeCommandAsync(new KlfCmdSendCommand(new VeluxCommandInstruction((byte) nodeId,
-                                        KlfCmdSendCommand.MAIN_PARAMETER, KlfCmdSendCommand.STOP_PARAMETER)));
                     } else {
                         int targetPctClosed;
                         if (command == UpDownType.DOWN) {
@@ -119,12 +119,25 @@ public class KLF200ShutterLikeHandler extends KLF200BaseThingHandler {
                             logger.error("Invalid command value: {}", command);
                             return;
                         }
+                        targetPosition = new VeluxPosition(targetPctClosed).toKLFCode();
 
-                        logger.debug("Moving {}, Id:{} to {}% closed.", thingLabel, nodeId, targetPctClosed);
-                        getKLFCommandProcessor().executeCommandAsync(new KlfCmdSendCommand(
-                                new VeluxCommandInstruction((byte) nodeId, KlfCmdSendCommand.MAIN_PARAMETER,
-                                        VeluxPosition.setPercentClosed(targetPctClosed))));
+                        logger.debug("Sending command to move {}, (Id:{}) to {}% closed.", thingLabel, nodeId,
+                                targetPctClosed);
                     }
+
+                    /*
+                     * getKLFCommandProcessor()
+                     * .executeCommandAsync(new KlfCmdSetVelocity((byte) nodeId, VeluxVelocity.SILENT));
+                     */
+
+                    /*
+                     * getKLFCommandProcessor()
+                     * .executeCommandAsync(new KlfCmdSetName((byte) nodeId, "Volet Salon Gauche"));
+                     */
+
+                    getKLFCommandProcessor()
+                            .executeCommandAsync(new KlfCmdSendCommand(new VeluxCommandInstruction((byte) nodeId,
+                                    KlfCmdSendCommand.MAIN_PARAMETER, targetPosition)));
                     break;
                 }
                 default: {

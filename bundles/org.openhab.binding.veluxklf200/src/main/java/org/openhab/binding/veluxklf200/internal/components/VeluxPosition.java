@@ -8,57 +8,43 @@
  */
 package org.openhab.binding.veluxklf200.internal.components;
 
-import org.openhab.binding.veluxklf200.internal.utility.KLFUtils;
-
 /**
  * Helper class to help translate the position values of a velux node into more
- * readable / usable references.
+ * readable / usable references. KLF returns position from 0x0000 (OPEN) to 0xC800 (CLOSED).
  *
+ * @author Emmanuel Bachschmidt - refactoring
  * @author MFK - Initial Contribution
  */
 public class VeluxPosition {
 
     /** The Constant POSITION_OPEN. */
-    public static final short POSITION_OPEN = (short) 0x0000;
-
-    /** The Constant POSITION_CLOSED. */
-    public static final short POSITION_CLOSED = (short) 0xC800;
+    private static final short POSITION_OPEN = (short) 0x0000;
 
     /** The Constant PCT_POSITION_INC. */
-    public static final short PCT_POSITION_INC = (short) 0x200;
+    private static final short PCT_POSITION_INC = (short) 0x200;
 
     /** The Constant POSITION_UNKNOWN. */
-    protected static final int POSITION_UNKNOWN = 0xF7FF;
+    private static final short POSITION_UNKNOWN = (short) 0xF7FF;
 
-    /** The position. */
-    private int position;
-
-    /** Indicates that this position value refers to an unknown position */
-    private boolean unknown;
+    /** The position (percent closed), null if unknown. */
+    private Integer position;
 
     /**
      * Instantiates a new velux position.
      *
      * @param position
-     *            the position
+     *            the position (expressed in percent closed)
      */
-    public VeluxPosition(short position) {
-        this.position = position & 0xFFFF;
-        if (POSITION_UNKNOWN == this.position) {
-            this.unknown = true;
+    public VeluxPosition(Integer position) {
+        if (position == null) {
+            this.position = position;
+        } else if (position < 0) {
+            this.position = 0;
+        } else if (position > 100) {
+            this.position = 100;
         } else {
-            this.unknown = false;
+            this.position = position;
         }
-    }
-
-    /**
-     * Indicates whether the position is known or unknown. Should be called by any client before making use of the
-     * position value to first determine if the position is actually valid
-     *
-     * @return True if the position is unknown, False otherwise.
-     */
-    public boolean isUnknown() {
-        return this.unknown;
     }
 
     /*
@@ -68,103 +54,40 @@ public class VeluxPosition {
      */
     @Override
     public String toString() {
-        if (POSITION_UNKNOWN == this.position) {
+        if (this.position == null) {
             return "Unknown";
         }
-        return getPercentageOpen() + " Open";
+        return this.position + "% closed";
     }
-
-    /**
-     * Gets the percentage open.
-     *
-     * @return the percentage open
-     */
-    /*
-     * public String getPercentageOpen() {
-     * if (POSITION_UNKNOWN == this.position) {
-     * return "Unknown";
-     * }
-     * return "" + (100 - (this.position / PCT_POSITION_INC)) + "%";
-     * }
-     */
 
     /**
      * Gets the percentage closed.
      *
-     * @return the percentage closed
+     * @return the percentage closed, null if unknown
      */
-    /*
-     * public String getPercentageClosed() {
-     * if (POSITION_UNKNOWN == this.position) {
-     * return "Unknown";
-     * }
-     * return "" + (this.position / PCT_POSITION_INC) + "%";
-     * }
-     */
+    public Integer getPosition() {
+        return this.position;
+    }
 
-    /**
-     * Gets the percentage closed.
-     *
-     * @return the percentage closed
-     */
-    public int getPercentageClosedAsInt() {
-        if (POSITION_UNKNOWN == this.position) {
-            return -1;
+    public short toKLFCode() {
+        if (this.position == null) {
+            return POSITION_UNKNOWN;
+        } else {
+            return (short) (POSITION_OPEN + ((short) (this.position * PCT_POSITION_INC)));
         }
-        return (this.position / PCT_POSITION_INC);
     }
 
     /**
-     * Sets the percent open.
-     *
-     * @param pct
-     *            the pct
-     * @return the short
-     */
-    public static short setPercentOpen(int pct) {
-        if (pct < 0) {
-            return POSITION_CLOSED;
-        } else if (pct > 100) {
-            return POSITION_OPEN;
-        }
-        return (short) (POSITION_CLOSED - ((short) (pct * PCT_POSITION_INC)));
-    }
-
-    /**
-     * Sets the percent closed.
-     *
-     * @param pct
-     *            the pct
-     * @return the short
-     */
-    public static short setPercentClosed(int pct) {
-        if (pct < 0) {
-            return POSITION_OPEN;
-        } else if (pct > 100) {
-            return POSITION_CLOSED;
-        }
-        return (short) (POSITION_OPEN + ((short) (pct * PCT_POSITION_INC)));
-    }
-
-    /**
-     * Gets the raw position of the velux node. Clients must interpret in the context of the type of node
-     *
-     * @return The raw position of the node.
-     */
-    public short getPosition() {
-        return (short) this.position;
-    }
-
-    /**
-     * Creates the.
+     * Creates the Position representation from KLF code.
      *
      * @param b1
-     *            the b 1
+     *            position byte 1
      * @param b2
-     *            the b 2
+     *            position byte 2
      * @return the velux position
      */
-    public static VeluxPosition create(byte b1, byte b2) {
-        return new VeluxPosition((short) KLFUtils.extractTwoBytes(b1, b2));
+    public static VeluxPosition createFromCode(short klfPosition) {
+        Integer position = (klfPosition == POSITION_UNKNOWN) ? null : (klfPosition & 0xffff) / PCT_POSITION_INC;
+        return new VeluxPosition(position);
     }
 }

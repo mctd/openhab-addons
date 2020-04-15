@@ -16,7 +16,7 @@ package org.openhab.binding.veluxklf200.internal.components;
 public class VeluxScene {
 
     /** The scene id. */
-    private int sceneId;
+    private byte sceneId;
 
     /** The scene name. */
     private String sceneName;
@@ -25,11 +25,11 @@ public class VeluxScene {
      * Instantiates a new velux scene.
      *
      * @param sceneId
-     *                      the scene id
+     *            the scene id
      * @param sceneName
-     *                      the scene name
+     *            the scene name
      */
-    public VeluxScene(int sceneId, String sceneName) {
+    public VeluxScene(byte sceneId, String sceneName) {
         this.sceneId = sceneId;
         this.sceneName = sceneName;
     }
@@ -39,7 +39,7 @@ public class VeluxScene {
      *
      * @return the scene id
      */
-    public int getSceneId() {
+    public byte getSceneId() {
         return sceneId;
     }
 

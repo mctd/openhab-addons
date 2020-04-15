@@ -8,6 +8,9 @@
  */
 package org.openhab.binding.veluxklf200.internal.components;
 
+import org.eclipse.smarthome.core.thing.ThingTypeUID;
+import org.openhab.binding.veluxklf200.internal.VeluxKLF200V2BindingConstants;
+
 /**
  * Indicates a type of velux node.
  *
@@ -16,64 +19,65 @@ package org.openhab.binding.veluxklf200.internal.components;
 public enum VeluxNodeType {
 
     /** The interior venetian blind. */
-    INTERIOR_VENETIAN_BLIND("Interior Venetian Blind", 0, ""),
+    INTERIOR_VENETIAN_BLIND("Interior Venetian Blind", (byte) 0, "",
+            VeluxKLF200V2BindingConstants.THING_TYPE_VELUX_BLIND),
 
     /** The roller shutter. */
-    ROLLER_SHUTTER("Roller Shutter", 0, ""),
+    ROLLER_SHUTTER("Roller Shutter", (byte) 0, "", VeluxKLF200V2BindingConstants.THING_TYPE_VELUX_ROLLER_SHUTTER),
 
     /** The vertical exterior awning. */
-    VERTICAL_EXTERIOR_AWNING("Vertical Exterior Awning", 0, ""),
+    VERTICAL_EXTERIOR_AWNING("Vertical Exterior Awning", (byte) 0, "", null),
 
     /** The window opener. */
-    WINDOW_OPENER("Window Opener", 0, ""),
+    WINDOW_OPENER("Window Opener", (byte) 0, "", null),
 
     /** The garage door opener. */
-    GARAGE_DOOR_OPENER("Garage Door Opener", 0, ""),
+    GARAGE_DOOR_OPENER("Garage Door Opener", (byte) 0, "", null),
 
     /** The light. */
-    LIGHT("Light", 0, ""),
+    LIGHT("Light", (byte) 0, "", null),
 
     /** The gate opener. */
-    GATE_OPENER("Gate Opener", 0, ""),
+    GATE_OPENER("Gate Opener", (byte) 0, "", null),
 
     /** The door lock. */
-    DOOR_LOCK("Door Lock", 0, ""),
+    DOOR_LOCK("Door Lock", (byte) 0, "", null),
 
     /** The window lock. */
-    WINDOW_LOCK("Window Lock", 0, ""),
+    WINDOW_LOCK("Window Lock", (byte) 0, "", null),
 
     /** The vertical interior blinds. */
-    VERTICAL_INTERIOR_BLINDS("Vertical Interior Blinds", 0, ""),
+    VERTICAL_INTERIOR_BLINDS("Vertical Interior Blinds", (byte) 0, "", null),
 
     /** The dual roller shutter. */
-    DUAL_ROLLER_SHUTTER("Dual Roller Shutter", 0, ""),
+    DUAL_ROLLER_SHUTTER("Dual Roller Shutter", (byte) 0, "", null),
 
     /** The on off switch. */
-    ON_OFF_SWITCH("On/Off Switch", 0, ""),
+    ON_OFF_SWITCH("On/Off Switch", (byte) 0, "", null),
 
     /** The horizontal awning. */
-    HORIZONTAL_AWNING("Horizontal Awning", 0, ""),
+    HORIZONTAL_AWNING("Horizontal Awning", (byte) 0, "", null),
 
     /** The exterior venetian blind. */
-    EXTERIOR_VENETIAN_BLIND("Exterior Venetian Blind", 0, ""),
+    EXTERIOR_VENETIAN_BLIND("Exterior Venetian Blind", (byte) 0, "", null),
 
     /** The louver blind. */
-    LOUVER_BLIND("Louver Blind", 0, ""),
+    LOUVER_BLIND("Louver Blind", (byte) 0, "", null),
 
     /** The curtain track. */
-    CURTAIN_TRACK("Curtain Track", 0, ""),
+    CURTAIN_TRACK("Curtain Track", (byte) 0, "", null),
 
     /** The ventilation point. */
-    VENTILATION_POINT("Ventilation Point", 0, ""),
+    VENTILATION_POINT("Ventilation Point", (byte) 0, "", null),
 
     /** The exterior heating. */
-    EXTERIOR_HEATING("Exterior Heating", 0, ""),
+    EXTERIOR_HEATING("Exterior Heating", (byte) 0, "", null),
 
     /** The swinging shutters. */
-    SWINGING_SHUTTERS("Swinging Shutters", 0, ""),
+    SWINGING_SHUTTERS("Swinging Shutters", (byte) 0, "", null),
 
     /** The unknown. */
-    UNKNOWN("Unknown Device", 0, "");
+    UNKNOWN("Unknown Device", (byte) 0, "", null);
 
     /** The display name. */
     private String displayName;
@@ -82,32 +86,39 @@ public enum VeluxNodeType {
     private String variationDescription;
 
     /** The variation code. */
-    private int variationCode;
+    private byte variationCode;
+
+    /** The thing type UID **/
+    private ThingTypeUID thingTypeUID;
 
     /**
      * Instantiates a new velux node type.
      *
      * @param displayName
-     *                                 the display name
+     *            the display name
      * @param variationCode
-     *                                 the variation code
+     *            the variation code
      * @param variationDescription
-     *                                 the variation description
+     *            the variation description
+     * @param thingTypeUID
+     *            the matching thing type UID
      */
-    private VeluxNodeType(String displayName, int variationCode, String variationDescription) {
+    private VeluxNodeType(String displayName, byte variationCode, String variationDescription,
+            ThingTypeUID thingTypeUID) {
         this.displayName = displayName;
         this.variationCode = variationCode;
         this.variationDescription = variationDescription;
+        this.thingTypeUID = thingTypeUID;
     }
 
     /**
      * Sets the variation code.
      *
      * @param code
-     *                 the code
+     *            the code
      * @return the velux node type
      */
-    private VeluxNodeType setVariationCode(int code) {
+    private VeluxNodeType setVariationCode(byte code) {
         this.variationCode = code;
         return this;
     }
@@ -116,7 +127,7 @@ public enum VeluxNodeType {
      * Sets the variation desc.
      *
      * @param desc
-     *                 the desc
+     *            the desc
      * @return the velux node type
      */
     private VeluxNodeType setVariationDesc(String desc) {
@@ -147,33 +158,42 @@ public enum VeluxNodeType {
      *
      * @return the variation code
      */
-    public int getVariationCode() {
+    public byte getVariationCode() {
         return variationCode;
+    }
+
+    /**
+     * Gets the matching ThingTypeUID
+     *
+     * @return the matching ThingTypeUID
+     */
+    public ThingTypeUID getThingTypeUID() {
+        return this.thingTypeUID;
     }
 
     /**
      * Creates the from code.
      *
      * @param code
-     *                 the code
+     *            the code
      * @return the velux node type
      */
-    public static VeluxNodeType createFromCode(int code) {
+    public static VeluxNodeType createFromCode(short code) {
         switch (code) {
             case 0x0040:
                 return INTERIOR_VENETIAN_BLIND;
             case 0x0080:
                 return ROLLER_SHUTTER;
             case 0x0081:
-                return ROLLER_SHUTTER.setVariationCode(1).setVariationDesc("Adjustable Slats Rolling Shutter");
+                return ROLLER_SHUTTER.setVariationCode((byte) 1).setVariationDesc("Adjustable Slats Rolling Shutter");
             case 0x0082:
-                return ROLLER_SHUTTER.setVariationCode(2).setVariationDesc("With Projection");
+                return ROLLER_SHUTTER.setVariationCode((byte) 2).setVariationDesc("With Projection");
             case 0x00C0:
                 return VERTICAL_EXTERIOR_AWNING;
             case 0x0100:
-                return WINDOW_OPENER.setVariationCode(0);
+                return WINDOW_OPENER.setVariationCode((byte) 0);
             case 0x0101:
-                return WINDOW_OPENER.setVariationCode(1).setVariationDesc("With Integrated Rain Sensor");
+                return WINDOW_OPENER.setVariationCode((byte) 1).setVariationDesc("With Integrated Rain Sensor");
             case 0x0140:
                 return GARAGE_DOOR_OPENER;
             case 0x017A:
@@ -181,7 +201,7 @@ public enum VeluxNodeType {
             case 0x0180:
                 return LIGHT;
             case 0x01BA:
-                return LIGHT.setVariationCode(1).setVariationDesc("Only Supporting On/Off");
+                return LIGHT.setVariationCode((byte) 1).setVariationDesc("Only Supporting On/Off");
             case 0x01C0:
                 return GATE_OPENER;
             case 0x01FA:
@@ -207,11 +227,11 @@ public enum VeluxNodeType {
             case 0x0500:
                 return VENTILATION_POINT;
             case 0x0501:
-                return VENTILATION_POINT.setVariationCode(1).setVariationDesc("Air Inlet");
+                return VENTILATION_POINT.setVariationCode((byte) 1).setVariationDesc("Air Inlet");
             case 0x0502:
-                return VENTILATION_POINT.setVariationCode(2).setVariationDesc("Air Transfer");
+                return VENTILATION_POINT.setVariationCode((byte) 2).setVariationDesc("Air Transfer");
             case 0x0503:
-                return VENTILATION_POINT.setVariationCode(3).setVariationDesc("Air Outlet");
+                return VENTILATION_POINT.setVariationCode((byte) 3).setVariationDesc("Air Outlet");
             case 0x0540:
                 return EXTERIOR_HEATING;
             case 0x057A:
@@ -219,7 +239,7 @@ public enum VeluxNodeType {
             case 0x0600:
                 return SWINGING_SHUTTERS;
             case 0x0601:
-                return SWINGING_SHUTTERS.setVariationCode(1)
+                return SWINGING_SHUTTERS.setVariationCode((byte) 1)
                         .setVariationDesc("With Independent Handling of the Leaves");
             default:
                 return UNKNOWN;

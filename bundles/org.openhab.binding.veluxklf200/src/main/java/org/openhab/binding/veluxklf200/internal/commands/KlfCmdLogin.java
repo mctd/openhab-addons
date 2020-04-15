@@ -15,22 +15,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Command to perform a login operation on the KLF200 unit. Specifically, a
- * GW_PASSWORD_ENTER_REQ is sent with the password and then handle and interpret
- * a GW_PASSWORD_ENTER_RES response to determine if the login was successful.
+ * Enter password to authenticate request.
  *
- * @author MFK - Initial Contribution
+ * @author emmanuel
  */
 public class KlfCmdLogin extends BaseKLFCommand {
 
-    /** Logging. */
     private final Logger logger = LoggerFactory.getLogger(KlfCmdLogin.class);
-
-    /** Password for the KLF200 unit. */
-    String password;
+    private String password;
 
     /**
-     * Constructor, expects the {@link password} to be supplied.
+     * Default constructor.
      *
      * @param password
      *            Password for the KLF200 unit.
@@ -40,26 +35,13 @@ public class KlfCmdLogin extends BaseKLFCommand {
         this.password = password;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see
-     * com.velux.klf200.internal.commands.BaseKLFCommand#getKLFCommandStructure
-     * ()
-     */
     @Override
     public KLFCommandStructure getKLFCommandStructure() {
         return KLFCommandStructure.LOGIN;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see
-     * com.velux.klf200.internal.commands.BaseKLFCommand#handleResponse(byte[])
-     */
     @Override
-    protected void handleResponseImpl(KLFGatewayCommands responseCommand, byte[] data) {
+    protected boolean handleResponseImpl(KLFGatewayCommands responseCommand, byte[] data) {
         switch (responseCommand) {
             case GW_PASSWORD_ENTER_CFM:
                 logger.trace("Handling GW_PASSWORD_ENTER_CFM with payload {}", KLFUtils.formatBytes(data));
@@ -70,23 +52,12 @@ public class KlfCmdLogin extends BaseKLFCommand {
                     // Authentication failed.
                     this.commandStatus = CommandStatus.ERROR;
                 }
-                break;
+                return true;
             default:
-                // This should not happen. If it does, the most likely cause is that
-                // the KLFCommandStructure has not been configured or implemented
-                // correctly.
-                this.commandStatus = CommandStatus.ERROR;
-                logger.error("Processing requested for a KLF response code (command code) that is not supported: {}.",
-                        responseCommand.getCode());
-                break;
+                return false;
         }
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see com.velux.klf200.internal.commands.BaseKLFCommand#isValid()
-     */
     @Override
     public boolean isValid() {
         if ((null == this.password) || (this.password.length() < 1) || (this.password.length() > 32)) {
@@ -96,14 +67,6 @@ public class KlfCmdLogin extends BaseKLFCommand {
         return true;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see com.velux.klf200.internal.commands.BaseKLFCommand#pack()
-     *
-     * Encodes the password into a byte array with a fixed length of 32 bytes.
-     * If the password is shorter than this, the array is padded with zero's.
-     */
     @Override
     protected byte[] pack() {
         byte[] data = new byte[32];

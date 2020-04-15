@@ -46,9 +46,9 @@ public enum VeluxErrorResponse {
      * Instantiates a new velux error response.
      *
      * @param code
-     *                   the code
+     *            the code
      * @param reason
-     *                   the reason
+     *            the reason
      */
     private VeluxErrorResponse(int code, String reason) {
         this.errorCode = code;
@@ -77,10 +77,10 @@ public enum VeluxErrorResponse {
      * Creates the.
      *
      * @param code
-     *                 the code
+     *            the code
      * @return the velux error response
      */
-    public static VeluxErrorResponse create(byte code) {
+    public static VeluxErrorResponse createFromCode(byte code) {
         switch (code) {
             case 0:
                 return UNDEFINED;

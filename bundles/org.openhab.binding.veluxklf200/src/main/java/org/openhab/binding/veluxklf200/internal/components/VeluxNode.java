@@ -19,40 +19,49 @@ import java.util.Date;
 public class VeluxNode {
 
     /** The node id. */
-    private int nodeId;
+    private byte nodeId;
 
     /**
-     * The order in which the node occurrs in the system (as defined on the
-     * KLF200).
+     * The order in which the node occurrs in the system (as defined on the KLF200).
      */
-    private int order;
+    private short order;
 
     /**
-     * Indicates the placement of the node as defined by the KLF200. Placement
-     * can be used to store a room group index or house group index number.
+     * Indicates the placement of the node as defined by the KLF200. Placement can be used to store a room group index
+     * or house group index number.
      */
-    private int placement;
+    private byte placement;
 
     /** The name of the node. */
     private String name;
 
     /**
-     * Indicates the velocity the node is operating at (eg: Default, Silent
-     * etc..).
+     * Indicates the velocity the node is operating at (eg: Default, Silent, etc..).
      */
     private VeluxVelocity velocity;
 
     /** The type of node. */
-    private VeluxNodeType nodeType;
+    private VeluxNodeType nodeTypeSubType;
 
-    /** The blind number. */
-    private int blindNumber;
+    /** The product group. */
+    private byte productGroup;
+
+    /** The product type. */
+    private byte productType;
+
+    // NodeVariation byte ?
+
+    /** The power mode. */
+    private VeluxPowerMode powerMode;
+
+    /** The build number. */
+    private byte buildNumber;
 
     /** The serial number. */
     private String serialNumber;
 
-    /** The build number. */
-    private int buildNumber;
+    /** The state. */
+    private VeluxState state;
 
     /** The current position. */
     private VeluxPosition currentPosition;
@@ -78,20 +87,8 @@ public class VeluxNode {
     /** The last command. */
     private Date lastCommand;
 
-    /** The product group. */
-    private int productGroup;
-
-    /** The product type. */
-    private int productType;
-
     /** The node variation. */
     private VeluxNodeVariation nodeVariation;
-
-    /** The power mode. */
-    private VeluxPowerMode powerMode;
-
-    /** The state. */
-    private VeluxState state;
 
     /**
      * Instantiates a new velux node.
@@ -103,74 +100,75 @@ public class VeluxNode {
      * Instantiates a new velux node.
      *
      * @param nodeId
-     *                               the node id
+     *            the node id
      * @param order
-     *                               the order
+     *            the order
      * @param placement
-     *                               the placement
+     *            the placement
      * @param name
-     *                               the name
+     *            the name
      * @param veluxVelocity
-     *                               the velux velocity
-     * @param nodeType
-     *                               the node type
-     * @param buildNumber
-     *                               the build number
-     * @param currentPosition
-     *                               the current position
-     * @param targetPosition
-     *                               the target position
-     * @param FP1currentPosition
-     *                               the FP 1 current position
-     * @param FP2currentPosition
-     *                               the FP 2 current position
-     * @param FP3currentPosition
-     *                               the FP 3 current position
-     * @param FP4currentPosition
-     *                               the FP 4 current position
-     * @param remainingTime
-     *                               the remaining time
-     * @param lastCommand
-     *                               the last command
+     *            the velux velocity
+     * @param nodeTypeSubType
+     *            the node type
      * @param productGroup
-     *                               the product group
+     *            the product group
      * @param productType
-     *                               the product type
+     *            the product type
      * @param nodeVariation
-     *                               the node variation
+     *            the node variation
      * @param powerMode
-     *                               the power mode
-     * @param state
-     *                               the state
+     *            the power mode
+     * @param buildNumber
+     *            the build number
      * @param serialNumber
-     *                               the serial number
+     *            the serial number
+     * @param state
+     *            the state
+     * @param currentPosition
+     *            the current position
+     * @param targetPosition
+     *            the target position
+     * @param FP1currentPosition
+     *            the FP 1 current position
+     * @param FP2currentPosition
+     *            the FP 2 current position
+     * @param FP3currentPosition
+     *            the FP 3 current position
+     * @param FP4currentPosition
+     *            the FP 4 current position
+     * @param remainingTime
+     *            the remaining time
+     * @param lastCommand
+     *            the last command
      */
-    public VeluxNode(int nodeId, int order, int placement, String name, int veluxVelocity, int nodeType,
-            int buildNumber, int currentPosition, int targetPosition, int FP1currentPosition, int FP2currentPosition,
-            int FP3currentPosition, int FP4currentPosition, int remainingTime, long lastCommand, int productGroup,
-            int productType, int nodeVariation, int powerMode, int state, String serialNumber) {
+    public VeluxNode(byte nodeId, short order, byte placement, String name, byte veluxVelocity, short nodeTypeSubType,
+            byte productGroup, byte productType, byte nodeVariation, byte powerMode, byte buildNumber,
+            String serialNumber, byte state, short currentPosition, short targetPosition, short FP1currentPosition,
+            short FP2currentPosition, short FP3currentPosition, short FP4currentPosition, short remainingTime,
+            long lastCommand) {
         this();
         this.nodeId = nodeId;
         this.order = order;
         this.placement = placement;
         this.name = name;
         this.velocity = VeluxVelocity.createFromCode(veluxVelocity);
-        this.nodeType = VeluxNodeType.createFromCode(nodeType);
-        this.buildNumber = buildNumber;
-        this.currentPosition = new VeluxPosition((short) currentPosition);
-        this.targetPosition = new VeluxPosition((short) targetPosition);
-        this.fP1currentPosition = new VeluxPosition((short) FP1currentPosition);
-        this.fP2currentPosition = new VeluxPosition((short) FP2currentPosition);
-        this.fP3currentPosition = new VeluxPosition((short) FP3currentPosition);
-        this.fP4currentPosition = new VeluxPosition((short) FP4currentPosition);
-        this.remainingTime = remainingTime;
-        this.lastCommand = new java.util.Date(lastCommand * 1000);
+        this.nodeTypeSubType = VeluxNodeType.createFromCode(nodeTypeSubType);
         this.productGroup = productGroup;
         this.productType = productType;
-        this.nodeVariation = VeluxNodeVariation.create(nodeVariation);
-        this.powerMode = VeluxPowerMode.create(powerMode);
-        this.state = VeluxState.create(state);
+        this.nodeVariation = VeluxNodeVariation.createFromCode(nodeVariation);
+        this.powerMode = VeluxPowerMode.createFromCode(powerMode);
+        this.buildNumber = buildNumber;
         this.serialNumber = serialNumber;
+        this.state = VeluxState.createFromCode(state);
+        this.currentPosition = VeluxPosition.createFromCode(currentPosition);
+        this.targetPosition = VeluxPosition.createFromCode(targetPosition);
+        this.fP1currentPosition = VeluxPosition.createFromCode(FP1currentPosition);
+        this.fP2currentPosition = VeluxPosition.createFromCode(FP2currentPosition);
+        this.fP3currentPosition = VeluxPosition.createFromCode(FP3currentPosition);
+        this.fP4currentPosition = VeluxPosition.createFromCode(FP4currentPosition);
+        this.remainingTime = remainingTime;
+        this.lastCommand = new java.util.Date(lastCommand * 1000);
     }
 
     /*
@@ -186,8 +184,7 @@ public class VeluxNode {
         ret += "\nPlacement: " + placement;
         ret += "\nName: " + name;
         ret += "\nVelocity: " + velocity.getDisplayVelocity();
-        ret += "\nNode Type: " + nodeType.getDisplayName();
-        ret += "\nBlind Number: " + blindNumber;
+        ret += "\nNode Type: " + nodeTypeSubType.getDisplayName();
         ret += "\nCurrent Position: " + currentPosition;
         ret += "\nTarget Position: " + targetPosition;
         ret += "\nFP1 Current Position: " + fP1currentPosition;
@@ -252,21 +249,12 @@ public class VeluxNode {
     }
 
     /**
-     * Gets the node type.
+     * Gets the node type sub type.
      *
      * @return the node type
      */
-    public VeluxNodeType getNodeType() {
-        return nodeType;
-    }
-
-    /**
-     * Gets the blind number.
-     *
-     * @return the blind number
-     */
-    public int getBlindNumber() {
-        return blindNumber;
+    public VeluxNodeType getNodeTypeSubType() {
+        return nodeTypeSubType;
     }
 
     /**

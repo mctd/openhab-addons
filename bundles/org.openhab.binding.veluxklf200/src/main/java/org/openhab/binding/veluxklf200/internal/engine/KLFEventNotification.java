@@ -64,34 +64,26 @@ public class KLFEventNotification {
                 logger.trace("Handling Notification for {}.", responseCommand);
 
                 byte nodeId = data[BaseKLFCommand.FIRSTBYTE];
-                VeluxState state = VeluxState.create(data[BaseKLFCommand.FIRSTBYTE + 1]);
-                VeluxPosition currentPosition = VeluxPosition.create(data[BaseKLFCommand.FIRSTBYTE + 2],
-                        data[BaseKLFCommand.FIRSTBYTE + 3]);
-                VeluxPosition targetPosition = VeluxPosition.create(data[BaseKLFCommand.FIRSTBYTE + 4],
-                        data[BaseKLFCommand.FIRSTBYTE + 5]);
-                VeluxPosition fp1CurrentPosition = VeluxPosition.create(data[BaseKLFCommand.FIRSTBYTE + 6],
-                        data[BaseKLFCommand.FIRSTBYTE + 7]);
-                VeluxPosition fp2CurrentPosition = VeluxPosition.create(data[BaseKLFCommand.FIRSTBYTE + 8],
-                        data[BaseKLFCommand.FIRSTBYTE + 9]);
-                VeluxPosition fp3CurrentPosition = VeluxPosition.create(data[BaseKLFCommand.FIRSTBYTE + 10],
-                        data[BaseKLFCommand.FIRSTBYTE + 11]);
-                VeluxPosition fp4CurrentPosition = VeluxPosition.create(data[BaseKLFCommand.FIRSTBYTE + 12],
-                        data[BaseKLFCommand.FIRSTBYTE + 13]);
-                int remainingTime = KLFUtils.extractTwoBytes(data[BaseKLFCommand.FIRSTBYTE + 14],
-                        data[BaseKLFCommand.FIRSTBYTE + 15]);
-                long timestamp = KLFUtils.extractUnsignedInt32(data[BaseKLFCommand.FIRSTBYTE + 16],
-                        data[BaseKLFCommand.FIRSTBYTE + 17], data[BaseKLFCommand.FIRSTBYTE + 18],
-                        data[BaseKLFCommand.FIRSTBYTE + 19]);
+                VeluxState state = VeluxState.createFromCode(data[BaseKLFCommand.FIRSTBYTE + 1]);
+                VeluxPosition currentPosition = VeluxPosition
+                        .createFromCode(KLFUtils.extractTwoBytes(data, BaseKLFCommand.FIRSTBYTE + 2));
+                VeluxPosition targetPosition = VeluxPosition
+                        .createFromCode(KLFUtils.extractTwoBytes(data, BaseKLFCommand.FIRSTBYTE + 4));
+                VeluxPosition fp1CurrentPosition = VeluxPosition
+                        .createFromCode(KLFUtils.extractTwoBytes(data, BaseKLFCommand.FIRSTBYTE + 6));
+                VeluxPosition fp2CurrentPosition = VeluxPosition
+                        .createFromCode(KLFUtils.extractTwoBytes(data, BaseKLFCommand.FIRSTBYTE + 8));
+                VeluxPosition fp3CurrentPosition = VeluxPosition
+                        .createFromCode(KLFUtils.extractTwoBytes(data, BaseKLFCommand.FIRSTBYTE + 10));
+                VeluxPosition fp4CurrentPosition = VeluxPosition
+                        .createFromCode(KLFUtils.extractTwoBytes(data, BaseKLFCommand.FIRSTBYTE + 12));
+                int remainingTime = KLFUtils.extractTwoBytes(data, BaseKLFCommand.FIRSTBYTE + 14);
+                long timestamp = KLFUtils.extractUnsignedInt32(data, BaseKLFCommand.FIRSTBYTE + 16);
 
                 logger.debug(
                         "Node {} position changed, state: {}, current position: {} closed, target position:{} closed, fp1CurrentPosition: {}, fp2CurrentPosition: {}, fp3CurrentPosition: {}, fp4CurrentPosition: {}, time remaining: {} seconds, timestamp: {}",
-                        nodeId, state, currentPosition.getPercentageClosed(), targetPosition.getPercentageClosed(),
-                        fp1CurrentPosition, fp2CurrentPosition, fp3CurrentPosition, fp4CurrentPosition, remainingTime,
-                        timestamp);
-                logger.info(
-                        "Node {} position changed, state: {}, current position: {}% closed, target position:{}% closed, time remaining: {} seconds",
-                        nodeId, state, currentPosition.getPercentageClosed(), targetPosition.getPercentageClosed(),
-                        remainingTime);
+                        nodeId, state, currentPosition.toString(), targetPosition.toString(), fp1CurrentPosition,
+                        fp2CurrentPosition, fp3CurrentPosition, fp4CurrentPosition, remainingTime, timestamp);
 
                 for (KLFEventListener listen : listeners) {
                     listen.handleEvent(nodeId, state, currentPosition, targetPosition, fp1CurrentPosition,

@@ -15,54 +15,42 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * The Class KLFCMD_GetVersion.
+ * Request version information.
  *
- * @author MFK - Initial Contribution
+ * @author emmanuel
  */
 public class KlfCmdGetVersion extends BaseKLFCommand {
 
-    /** The logger. */
     private Logger logger = LoggerFactory.getLogger(KlfCmdGetVersion.class);
-
-    /** The software version. */
     private String softwareVersion;
-
-    /** The hardware version. */
     private String hardwareVersion;
-
-    /** The product type. */
     private String productType;
-
-    /** The product group. */
     private String productGroup;
+    private final byte REMOTE_CONTROL = 14;
+    private final byte KLF200_PRODUCT_TYPE = 3;
 
     /**
-     * Instantiates a new KLFCM D get version.
+     * Default constructor.
      */
     public KlfCmdGetVersion() {
         super();
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.openhab.binding.veluxklf200.internal.commands.BaseKLFCommand#handleResponse(byte[])
-     */
     @Override
-    protected void handleResponseImpl(KLFGatewayCommands responseCommand, byte[] data) {
+    protected boolean handleResponseImpl(KLFGatewayCommands responseCommand, byte[] data) {
         switch (responseCommand) {
             case GW_GET_VERSION_CFM:
-                this.softwareVersion = (KLFUtils.extractOneByte(data[FIRSTBYTE]) & 0xFF) + ".";
-                this.softwareVersion += (KLFUtils.extractOneByte(data[FIRSTBYTE + 1]) & 0xFF) + ".";
-                this.softwareVersion += (KLFUtils.extractOneByte(data[FIRSTBYTE + 2]) & 0xFF) + ".";
-                this.softwareVersion += (KLFUtils.extractOneByte(data[FIRSTBYTE + 3]) & 0xFF) + ".";
-                this.softwareVersion += (KLFUtils.extractOneByte(data[FIRSTBYTE + 4]) & 0xFF) + ".";
-                this.softwareVersion += (KLFUtils.extractOneByte(data[FIRSTBYTE + 5]) & 0xFF);
+                this.softwareVersion = (KLFUtils.extractOneByte(data, FIRSTBYTE) & 0xFF) + ".";
+                this.softwareVersion += (KLFUtils.extractOneByte(data, FIRSTBYTE + 1) & 0xFF) + ".";
+                this.softwareVersion += (KLFUtils.extractOneByte(data, FIRSTBYTE + 2) & 0xFF) + ".";
+                this.softwareVersion += (KLFUtils.extractOneByte(data, FIRSTBYTE + 3) & 0xFF) + ".";
+                this.softwareVersion += (KLFUtils.extractOneByte(data, FIRSTBYTE + 4) & 0xFF) + ".";
+                this.softwareVersion += (KLFUtils.extractOneByte(data, FIRSTBYTE + 5) & 0xFF);
 
                 this.hardwareVersion = "" + (data[FIRSTBYTE + 6] & 0xFF);
 
                 switch (data[FIRSTBYTE + 7]) {
-                    case 14:
+                    case REMOTE_CONTROL:
                         this.productGroup = "Remote Control";
                         break;
                     default:
@@ -70,24 +58,18 @@ public class KlfCmdGetVersion extends BaseKLFCommand {
                 }
 
                 switch (data[FIRSTBYTE + 8]) {
-                    case 3:
+                    case KLF200_PRODUCT_TYPE:
                         this.productType = "KLF200";
                         break;
                     default:
                         this.productType = "Unknown";
                 }
                 this.commandStatus = CommandStatus.COMPLETE;
-                break;
+                logger.debug("Request version completed. Version is {}", this.getSoftwareVersion());
+                return true;
             default:
-                // This should not happen. If it does, the most likely cause is that
-                // the KLFCommandStructure has not been configured or implemented
-                // correctly.
-                this.commandStatus = CommandStatus.ERROR;
-                logger.error("Processing requested for a KLF response code (command code) that is not supported: {}.",
-                        responseCommand.getCode());
-                break;
+                return false;
         }
-
     }
 
     /**
@@ -126,21 +108,11 @@ public class KlfCmdGetVersion extends BaseKLFCommand {
         return productGroup;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.openhab.binding.veluxklf200.internal.commands.BaseKLFCommand#getKLFCommandStructure()
-     */
     @Override
     public KLFCommandStructure getKLFCommandStructure() {
         return KLFCommandStructure.GET_VERSION;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.openhab.binding.veluxklf200.internal.commands.BaseKLFCommand#pack()
-     */
     @Override
     protected byte[] pack() {
         return new byte[] {};

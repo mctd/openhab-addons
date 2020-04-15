@@ -13,7 +13,7 @@ package org.openhab.binding.veluxklf200.internal.commands.structure;
  * Enum representation of the logical grouping of commands that can be sent and
  * received from the KLF200 unit.
  *
- * @author MFK - Initial Contribution
+ * @author emmanuel
  */
 public enum KLFCommandStructure {
     //@formatter:off
@@ -21,9 +21,9 @@ public enum KLFCommandStructure {
      * The nothing. This is a dummy command to terminate the consumers. It is
      * never actually sent to the KLF200 unit.
      */
-    NOTHING(
-            "Dummy command used by the queue manager",
-            "POISON_PILL",
+    TERMINATE(
+            "Used to terminate the queue manager",
+            "TERMINATE",
             null,
             new KLFGatewayCommands[] {},
             KLFCommandStructure.MASK_NO_REQS
@@ -87,6 +87,36 @@ public enum KLFCommandStructure {
                     KLFGatewayCommands.GW_SESSION_FINISHED_NTF
                 },
             KLFCommandStructure.MASK_AUTH_REQD | KLFCommandStructure.MASK_SESSION_REQD
+            ),
+
+    SET_NODE_VELOCITY(
+            "Set a node velocity",
+            "GW_SET_NODE_VELOCITY_REQ",
+            KLFGatewayCommands.GW_SET_NODE_VELOCITY_REQ,
+            new KLFGatewayCommands[] {
+                    KLFGatewayCommands.GW_SET_NODE_VELOCITY_CFM,
+                },
+            KLFCommandStructure.MASK_AUTH_REQD | KLFCommandStructure.MASK_NODE_SPECIFIC
+            ),
+
+    SET_NODE_NAME(
+            "Set a node name",
+            "GW_SET_NODE_NAME_REQ",
+            KLFGatewayCommands.GW_SET_NODE_NAME_REQ,
+            new KLFGatewayCommands[] {
+                    KLFGatewayCommands.GW_SET_NODE_NAME_CFM,
+                },
+            KLFCommandStructure.MASK_AUTH_REQD | KLFCommandStructure.MASK_NODE_SPECIFIC
+            ),
+
+    REBOOT(
+            "Reboots the KLF200",
+            "GW_REBOOT_REQ",
+            KLFGatewayCommands.GW_REBOOT_REQ,
+            new KLFGatewayCommands[] {
+                    KLFGatewayCommands.GW_REBOOT_CFM,
+                },
+            KLFCommandStructure.MASK_AUTH_REQD
             ),
 
     /** Get list of scenes configured on the KLF200. */
@@ -160,9 +190,9 @@ public enum KLFCommandStructure {
             },
             KLFCommandStructure.MASK_AUTH_REQD
             ),
-    /** Set Time */
+
     ENABLE_HOUSE_STATUS_MONITOR(
-            "Enables house status monitoring on the KLF200",
+            "Enables house status monitor on the KLF200",
             "GW_HOUSE_STATUS_MONITOR_ENABLE_REQ",
             KLFGatewayCommands.GW_HOUSE_STATUS_MONITOR_ENABLE_REQ,
             new KLFGatewayCommands[] {
@@ -170,7 +200,7 @@ public enum KLFCommandStructure {
             },
             KLFCommandStructure.MASK_AUTH_REQD
             );
-    //@formatter:on
+
 
     /** Bit mask to indicate that commmand has no requirements */
     public static final int MASK_NO_REQS = 0b0000;

@@ -14,66 +14,39 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Command to enable the HomeStatus monitor on the KLF200
+ * Enables HomeStatus monitor.
  *
- * @author MFK - Initial Contribution
+ * @author emmanuel
  */
 public class KlfCmdEnableHomeStatusMonitor extends BaseKLFCommand {
 
-    /** Logging. */
     private final Logger logger = LoggerFactory.getLogger(KlfCmdEnableHomeStatusMonitor.class);
 
     /**
-     * Constructor
+     * Default constructor.
      *
      */
     public KlfCmdEnableHomeStatusMonitor() {
         super();
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see
-     * com.velux.klf200.internal.commands.BaseKLFCommand#getKLFCommandStructure
-     * ()
-     */
     @Override
     public KLFCommandStructure getKLFCommandStructure() {
         return KLFCommandStructure.ENABLE_HOUSE_STATUS_MONITOR;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see
-     * com.velux.klf200.internal.commands.BaseKLFCommand#handleResponse(byte[])
-     */
     @Override
-    protected void handleResponseImpl(KLFGatewayCommands responseCommand, byte[] data) {
+    protected boolean handleResponseImpl(KLFGatewayCommands responseCommand, byte[] data) {
         switch (responseCommand) {
             case GW_HOUSE_STATUS_MONITOR_ENABLE_CFM:
-                logger.debug("Completed enabling of the Home Status Monitor.");
+                logger.debug("Home Status Monitor enal.");
                 this.commandStatus = CommandStatus.COMPLETE;
-                break;
+                return true;
             default:
-                // This should not happen. If it does, the most likely cause is that
-                // the KLFCommandStructure has not been configured or implemented
-                // correctly.
-                this.commandStatus = CommandStatus.ERROR;
-                logger.error("Processing requested for a KLF response that is not supported: {}.", responseCommand);
-                break;
+                return false;
         }
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see com.velux.klf200.internal.commands.BaseKLFCommand#pack()
-     *
-     * Encodes the password into a byte array with a fixed length of 32 bytes.
-     * If the password is shorter than this, the array is padded with zero's.
-     */
     @Override
     protected byte[] pack() {
         return new byte[] {};

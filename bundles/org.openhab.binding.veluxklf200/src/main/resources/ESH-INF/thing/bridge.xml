@@ -7,12 +7,12 @@
 	<bridge-type id="klf200-bridge">
 		<label>Velux KLF200 Bridge</label>
 		<description>This bridge connects to a Velux KLF200 device running firmware version 2.x.</description>
-		<channels>
-			<channel id="connection_status" typeId="connection_status">
+		<!--<channels>
+            <channel id="connection_status" typeId="connection_status">
 				<label>Connected</label>
 				<description>Indicates whether or not the connection to the KLF200 is active.</description>
 			</channel>
-		</channels>
+		</channels> -->
 		<config-description>
 			<parameter name="hostname" type="text" required="true">
 				<label>IP / Hostname</label>
@@ -21,7 +21,7 @@
 			<parameter name="password" type="text" required="true">
 				<context>password</context>
 				<label>Password</label>
-				<description>Note, if you have not set the password, by default it is the wlan password printed on the underside of the KLF200.</description>
+				<description>If you have not changed the password, it is the wlan password printed on the underside of the KLF200 unit.</description>
 			</parameter>
 			<parameter name="port" type="integer" required="true">
 				<label>Socket Port</label>

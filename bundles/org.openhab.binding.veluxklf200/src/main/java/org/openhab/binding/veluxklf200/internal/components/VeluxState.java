@@ -16,36 +16,36 @@ package org.openhab.binding.veluxklf200.internal.components;
 public enum VeluxState {
 
     /** The non executing. */
-    NON_EXECUTING(0),
+    NON_EXECUTING((byte) 0),
 
     /** The error executing. */
-    ERROR_EXECUTING(1),
+    ERROR_EXECUTING((byte) 1),
 
     /** The not used. */
-    NOT_USED(2),
+    NOT_USED((byte) 2),
 
     /** The awaiting power. */
-    AWAITING_POWER(3),
+    AWAITING_POWER((byte) 3),
 
     /** The executing. */
-    EXECUTING(4),
+    EXECUTING((byte) 4),
 
     /** The done. */
-    DONE(5),
+    DONE((byte) 5),
 
     /** The unknown. */
-    UNKNOWN(255);
+    UNKNOWN((byte) 255);
 
     /** The state code. */
-    private int stateCode;
+    private byte stateCode;
 
     /**
      * Instantiates a new velux state.
      *
      * @param code
-     *                 the code
+     *            the code
      */
-    private VeluxState(int code) {
+    private VeluxState(byte code) {
         this.stateCode = code;
     }
 
@@ -54,7 +54,7 @@ public enum VeluxState {
      *
      * @return the state code
      */
-    public int getStateCode() {
+    public byte getStateCode() {
         return this.stateCode;
     }
 
@@ -62,10 +62,10 @@ public enum VeluxState {
      * Creates the.
      *
      * @param code
-     *                 the code
+     *            the code
      * @return the velux state
      */
-    public static VeluxState create(int code) {
+    public static VeluxState createFromCode(byte code) {
         switch (code) {
             case 0:
                 return NON_EXECUTING;

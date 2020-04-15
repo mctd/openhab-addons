@@ -19,20 +19,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Command to retrieve the list of scenes on the KLF200 unit.
+ * Get all scenes.
  *
- * @author MFK - Initial Contribution
+ * @author emmanuel
  */
 public class KlfCmdGetAllScenes extends BaseKLFCommand {
 
-    /** Logging. */
     private final Logger logger = LoggerFactory.getLogger(KlfCmdGetAllScenes.class);
-
-    /** Holds all of the scenes that have been discovered. */
     private List<VeluxScene> scenes;
 
     /**
-     * Constructor.
+     * Default constructor.
      */
     public KlfCmdGetAllScenes() {
         super();
@@ -40,73 +37,48 @@ public class KlfCmdGetAllScenes extends BaseKLFCommand {
     }
 
     /**
-     * Gets the list of nodes that have been discovered as a result of executing
-     * the command.
+     * Gets the list of discovered scenes.
      *
-     * @return List of nodes
+     * @return List of scenes
      */
     public List<VeluxScene> getScenes() {
         return this.scenes;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see
-     * com.velux.klf200.internal.commands.BaseKLFCommand#handleResponse(byte[])
-     */
     @Override
-    protected void handleResponseImpl(KLFGatewayCommands responseCommand, byte[] data) {
+    protected boolean handleResponseImpl(KLFGatewayCommands responseCommand, byte[] data) {
         switch (responseCommand) {
             case GW_GET_SCENE_LIST_CFM:
                 int scenesExpected = data[FIRSTBYTE];
-                logger.info("Command executing, expecting data for {} scenes.", scenesExpected);
+                logger.debug("Command executing, expecting data for {} scenes.", scenesExpected);
                 if (0 == scenesExpected) {
                     this.commandStatus = CommandStatus.COMPLETE;
                 }
-                break;
+                return true;
             case GW_GET_SCENE_LIST_NTF:
                 int scenesFound = data[FIRSTBYTE];
-                logger.info("Command recieved data for {} scenes.", scenesFound);
+                logger.debug("Command recieved data for {} scenes.", scenesFound);
                 int framePos = FIRSTBYTE + 1;
                 for (int i = 0; i < scenesFound; ++i) {
-                    logger.info("Found scene Id:{} - {}", data[framePos],
+                    logger.debug("Found scene Id:{} - {}", data[framePos],
                             KLFUtils.extractUTF8String(data, framePos + 1, framePos + 64));
                     this.scenes.add(new VeluxScene(data[framePos],
                             KLFUtils.extractUTF8String(data, framePos + 1, framePos + 64)));
                     framePos += 65;
                 }
                 this.commandStatus = CommandStatus.COMPLETE;
-                break;
+                return true;
             default:
-                // This should not happen. If it does, the most likely cause is that
-                // the KLFCommandStructure has not been configured or implemented
-                // correctly.
-                this.commandStatus = CommandStatus.ERROR;
-                logger.error("Processing requested for a KLF response code (command code) that is not supported: {}.",
-                        responseCommand.getCode());
-                break;
+                return false;
         }
 
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see
-     * com.velux.klf200.internal.commands.BaseKLFCommand#getKLFCommandStructure
-     * ()
-     */
     @Override
     public KLFCommandStructure getKLFCommandStructure() {
         return KLFCommandStructure.GET_ALL_SCENES;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see com.velux.klf200.internal.commands.BaseKLFCommand#pack()
-     */
     @Override
     protected byte[] pack() {
         return new byte[] {};

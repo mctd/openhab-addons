@@ -58,19 +58,20 @@ class KLFResponseConsumer implements Runnable {
                     byte[] data = new byte[messageLength];
                     System.arraycopy(temp, 0, data, 0, messageLength);
 
-                    logger.trace("Received response: {}", KLFUtils.formatBytes(data));
+                    logger.trace("Received response (raw): {}", KLFUtils.formatBytes(data));
 
                     byte decoded[] = KLFUtils.slipRFC1055decode(data);
                     KLFGatewayCommands responseCommand = KLFGatewayCommands
-                            .fromCode(KLFUtils.decodeKLFCommand(decoded));
+                            .fromNumber(KLFUtils.decodeKLFCommand(decoded));
                     // TODO: handle responseCommand==null (in case the response command is not yet implemented)
 
-                    logger.debug("Received response: {}: {}", responseCommand, KLFUtils.formatBytes(decoded));
+                    logger.trace("Received response (decoded): {}: {}", responseCommand, KLFUtils.formatBytes(decoded));
 
                     if ((decoded != null) && (BaseKLFCommand.validateKLFResponse(decoded))) {
                         if (KLFGatewayCommands.GW_ERROR_NTF == responseCommand) {
                             // General error notification received
-                            VeluxErrorResponse error = VeluxErrorResponse.create(data[BaseKLFCommand.FIRSTBYTE]);
+                            VeluxErrorResponse error = VeluxErrorResponse
+                                    .createFromCode(data[BaseKLFCommand.FIRSTBYTE]);
                             logger.error("Error Notification Recieved: {}", error);
                             handleGeneralError(error);
                         } else {
@@ -139,10 +140,11 @@ class KLFResponseConsumer implements Runnable {
             }
         }
         logger.warn("The response consumer has been shutdown.");
-        try {
-            // Notify the command consumer he should suicide
-            processor.getCommandQueue().offerFirst(new KlfCmdTerminate());
 
+        // Ask the command consumer to terminate
+        processor.getCommandQueue().offerFirst(new KlfCmdTerminate());
+
+        try {
             // Closing socket so the watchdog can detect something went wrong
             processor.klfRawSocket.close();
         } catch (IOException e) {

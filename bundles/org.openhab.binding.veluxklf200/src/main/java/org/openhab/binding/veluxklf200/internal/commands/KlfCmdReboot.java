@@ -8,42 +8,33 @@
  */
 package org.openhab.binding.veluxklf200.internal.commands;
 
-import java.time.Instant;
-
 import org.openhab.binding.veluxklf200.internal.commands.structure.KLFCommandStructure;
 import org.openhab.binding.veluxklf200.internal.commands.structure.KLFGatewayCommands;
-import org.openhab.binding.veluxklf200.internal.utility.KLFUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Request to set UTC time.
+ * Reboots the KLF200 unit.
  *
  * @author emmanuel
  */
-public class KlfCmdSetTime extends BaseKLFCommand {
+public class KlfCmdReboot extends BaseKLFCommand {
 
-    private final Logger logger = LoggerFactory.getLogger(KlfCmdSetTime.class);
+    private final Logger logger = LoggerFactory.getLogger(KlfCmdReboot.class);
 
     /**
      * Default constructor.
      *
      */
-    public KlfCmdSetTime() {
+    public KlfCmdReboot() {
         super();
-    }
-
-    @Override
-    public KLFCommandStructure getKLFCommandStructure() {
-        return KLFCommandStructure.SET_TIME;
     }
 
     @Override
     protected boolean handleResponseImpl(KLFGatewayCommands responseCommand, byte[] data) {
         switch (responseCommand) {
-            case GW_SET_UTC_CFM:
-                this.commandStatus = CommandStatus.COMPLETE;
-                logger.debug("Set time acknowledged.");
+            case GW_REBOOT_CFM:
+                logger.debug("Reboot accepted.");
                 return true;
             default:
                 return false;
@@ -51,7 +42,12 @@ public class KlfCmdSetTime extends BaseKLFCommand {
     }
 
     @Override
+    public KLFCommandStructure getKLFCommandStructure() {
+        return KLFCommandStructure.REBOOT;
+    }
+
+    @Override
     protected byte[] pack() {
-        return KLFUtils.longToBytes(Instant.now().getEpochSecond());
+        return new byte[] {};
     }
 }

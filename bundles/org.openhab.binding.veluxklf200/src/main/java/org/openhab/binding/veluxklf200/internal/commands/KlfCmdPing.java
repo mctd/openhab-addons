@@ -14,23 +14,22 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Performs a 'ping' of the KLF200 unit. This command is typically used to keep
- * the KLF200's socket connection alive. After a period of approximately 15
- * minutes of inactivity, the KLF200 unit shuts down its sockets. Periodically
- * sending this command will keep this from happening.
+ * Request the state of the gateway. Used as a keepalive ping.
  *
- * @author MFK - Initial Contribution
+ * @author emmanuel
  */
 public class KlfCmdPing extends BaseKLFCommand {
 
-    /** Logging. */
     private final Logger logger = LoggerFactory.getLogger(KlfCmdPing.class);
-
-    /** The gateway state. */
     private String gatewayState;
-
-    /** The gateway sub state. */
     private String gatewaySubState;
+
+    /**
+     * Default constructor.
+     */
+    public KlfCmdPing() {
+        super();
+    }
 
     /**
      * Gets the gateway state.
@@ -41,21 +40,8 @@ public class KlfCmdPing extends BaseKLFCommand {
         return gatewayState + "::" + gatewaySubState;
     }
 
-    /**
-     * Constructor.
-     */
-    public KlfCmdPing() {
-        super();
-    }
-
-    /*
-     * (non-Javadoc)
-     *
-     * @see
-     * com.velux.klf200.internal.commands.BaseKLFCommand#handleResponse(byte[])
-     */
     @Override
-    protected void handleResponseImpl(KLFGatewayCommands responseCommand, byte[] data) {
+    protected boolean handleResponseImpl(KLFGatewayCommands responseCommand, byte[] data) {
         switch (responseCommand) {
             case GW_GET_STATE_CFM:
                 switch (data[FIRSTBYTE]) {
@@ -108,35 +94,18 @@ public class KlfCmdPing extends BaseKLFCommand {
                         break;
                 }
                 this.commandStatus = CommandStatus.COMPLETE;
-                break;
+                logger.debug("Get state successful. State: {}", this.getGatewayState());
+                return true;
             default:
-                // This should not happen. If it does, the most likely cause is that
-                // the KLFCommandStructure has not been configured or implemented
-                // correctly.
-                this.commandStatus = CommandStatus.ERROR;
-                logger.error("Processing requested for a KLF response code (command code) that is not supported: {}.",
-                        responseCommand.getCode());
-                break;
+                return false;
         }
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see
-     * com.velux.klf200.internal.commands.BaseKLFCommand#getKLFCommandStructure
-     * ()
-     */
     @Override
     public KLFCommandStructure getKLFCommandStructure() {
         return KLFCommandStructure.PING;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see com.velux.klf200.internal.commands.BaseKLFCommand#pack()
-     */
     @Override
     protected byte[] pack() {
         return new byte[] {};

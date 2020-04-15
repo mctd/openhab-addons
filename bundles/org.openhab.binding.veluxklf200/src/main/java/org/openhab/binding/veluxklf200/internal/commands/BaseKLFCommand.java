@@ -292,11 +292,11 @@ public abstract class BaseKLFCommand {
     public byte[] getRawKLFCommand() {
         byte data[] = pack();
         if (null == data) {
-            logger.error("Invalid data packet. A null data packet is not valid.");
+            logger.error("Error: null data packet is not valid.");
             return null;
         }
         if (data.length > 250) {
-            logger.error("Invalid data packet size. Max permissable is 250 bytes, recieved {} bytes: {}", data.length,
+            logger.error("Error: max data size is 250 bytes, recieved {} bytes: {}", data.length,
                     KLFUtils.formatBytes(data));
             return null;
         } else {
@@ -304,8 +304,8 @@ public abstract class BaseKLFCommand {
             byte[] message = new byte[data.length + 5];
             message[0] = SUPPORTED_PROTOCOL;
             message[1] = (byte) (3 + data.length);
-            message[2] = (byte) (getKLFCommandStructure().getCommand().getCode() >>> 8);
-            message[3] = (byte) getKLFCommandStructure().getCommand().getCode();
+            message[2] = (byte) (getKLFCommandStructure().getCommand().getNumber() >>> 8);
+            message[3] = (byte) getKLFCommandStructure().getCommand().getNumber();
             message[4 + data.length] = 0;
             System.arraycopy(data, 0, message, 4, data.length);
             for (byte b : message) {
@@ -339,7 +339,10 @@ public abstract class BaseKLFCommand {
      */
     public final void handleResponse(KLFGatewayCommands responseCommand, byte[] data) {
         logger.trace("Handling {} response with data: {}", responseCommand, KLFUtils.formatBytes(data));
-        this.handleResponseImpl(responseCommand, data);
+        if (!this.handleResponseImpl(responseCommand, data)) {
+            this.commandStatus = CommandStatus.ERROR;
+            logger.error("Command number not supported: {}.", responseCommand.getNumber());
+        }
     }
 
     /**
@@ -351,8 +354,10 @@ public abstract class BaseKLFCommand {
      *
      * @param responseCommand The response command to handle
      * @param data Data received from the KLF unit.
+     *
+     * @return true if successfully handled, false otherwise
      */
-    protected abstract void handleResponseImpl(KLFGatewayCommands responseCommand, byte[] data);
+    protected abstract boolean handleResponseImpl(KLFGatewayCommands responseCommand, byte[] data);
 
     /**
      * Must be implemented by a sub-class so as to specify the relationship with

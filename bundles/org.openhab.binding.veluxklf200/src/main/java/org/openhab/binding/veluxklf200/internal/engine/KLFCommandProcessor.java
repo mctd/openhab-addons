@@ -80,7 +80,7 @@ public class KLFCommandProcessor {
     /**
      * Delay that Watchdog thread should observe between communication checks.
      */
-    static final int WATCHDOG_DELAY = 10000;
+    static final int WATCHDOG_DELAY = 2000;
 
     /** The hostname or IP address of the KLF200 unit. */
     private String host;
@@ -173,7 +173,7 @@ public class KLFCommandProcessor {
      * @param port
      *            The TCP port of the KLF200 unit.
      * @param password
-     *            The password for connecting to the KLF200 unit.
+     *            The password of the KLF200 unit.
      */
     public KLFCommandProcessor(KLF200BridgeHandler bridgeHandler, String host, int port, String password) {
         this.bridgeHandler = bridgeHandler;
@@ -203,32 +203,32 @@ public class KLFCommandProcessor {
      *         runtime exceptions will be thrown.
      */
     public void initialize() {
-        // startCommunication();
-
-        // Watchdog thread
+        // Start the watchdog thread
         watchdogThread = new Thread("KLFWatchdog") {
             @Override
             public void run() {
                 logger.debug("Starting the watchdog thread (Id: {}).", Thread.currentThread().getId());
-                while (!communicationStopped) {
-                    logger.trace("Checking if communication is up.");
-                    if (klfRawSocket == null || !klfRawSocket.isConnected() || klfRawSocket.isClosed()) {
-                        // Assuming connection is down if socket is either null, not connected or closed.
-                        logger.info("Communication down, restarting it");
-                        restartCommunication();
-                    } else {
-                        logger.trace("Communication is up.");
-                    }
 
+                startCommunication();
+
+                while (!communicationStopped) {
                     try {
                         sleep(WATCHDOG_DELAY);
                     } catch (InterruptedException e) {
                         logger.warn("Watchdog sleeping has been interrupted.");
                     }
+
+                    logger.trace("Checking if communication is up.");
+                    if (klfRawSocket == null || !klfRawSocket.isConnected() || klfRawSocket.isClosed()) {
+                        // Assuming connection is down if socket is either null, not connected or closed.
+                        logger.warn("Communication to KLF200 down, restarting it");
+                        stopCommunication();
+                        startCommunication();
+                    }
                 }
 
                 stopCommunication();
-                logger.info("Stopping the watchdog thread.");
+                logger.debug("Watchdog thread terminating.");
             }
         };
         watchdogThread.start();
@@ -250,10 +250,11 @@ public class KLFCommandProcessor {
      *
      * @throws Exception
      */
-    private synchronized String startCommunication() {
+    private synchronized void startCommunication() {
         logger.debug("Starting communication.");
         if (isCommunicationUp()) {
-            return "Communication already up. Please stop it first.";
+            logger.error("Communication already up. Please stop it first.");
+            return;
         }
 
         logger.debug("Attempting to create an SSL connection to KLF200 host {} on port {}.", host, port);
@@ -271,23 +272,26 @@ public class KLFCommandProcessor {
             klfOutputStream = new DataOutputStream(klfRawSocket.getOutputStream());
             klfInputStream = new DataInputStream(klfRawSocket.getInputStream());
         } catch (NoSuchAlgorithmException | KeyManagementException | IOException e) {
-
             if (klfRawSocket != null) {
                 try {
-                    klfOutputStream.close();
-                } catch (IOException e1) {
-                    // TODO Auto-generated catch block
-                    logger.debug("Error closing klfOutputStream. Not really a problem.");
+                    klfRawSocket.close();
+                } catch (Exception e1) {
+                    logger.debug("Error closing klfOutputStream: {}", e1.getMessage());
                 }
             }
+            klfRawSocket = null;
             klfOutputStream = null;
-            String err = String.format("Unable to connect to KLF200 host {} on port {}. Reason: {}", host, port,
+            klfInputStream = null;
+            String err = String.format("Unable to connect to KLF200 host %s on port %d. Reason: %s", host, port,
                     e.getMessage());
             logger.error(err);
-            return err;
+            bridgeHandler.updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.COMMUNICATION_ERROR, err);
+            return;
         }
 
-        logger.info("Successfully established an SSL connection to KLF200 host {} on port {}.", host, port);
+        logger.debug("Successfully established an SSL connection to KLF200 host {} on port {}.", host, port);
+
+        // bridgeHandler.updateStatus(ThingStatus.ONLINE, ThingStatusDetail.NONE, null);
 
         // Start the consumer threads
         responseConsumerThread = new Thread(new KLFResponseConsumer(this), "KLFResponseConsumer");
@@ -305,7 +309,10 @@ public class KLFCommandProcessor {
             logger.info("Successfully logged in to the KLF200 unit @ {}:{}", host, port);
             isLoggedIn = true;
         } else {
-            return "Unable to login to the KLF200 unit with password supplied.";
+            String errMsg = "Unable to login to the KLF200 unit with password supplied.";
+            logger.error(errMsg);
+            bridgeHandler.updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.COMMUNICATION_ERROR, errMsg);
+            return;
         }
 
         // Refresh Bridge Properties and Node status
@@ -325,15 +332,15 @@ public class KLFCommandProcessor {
             }
         }, 1000 * KEEPALIVE_PING_FREQ, 1000 * KEEPALIVE_PING_FREQ);
 
-        return null;
+        bridgeHandler.updateStatus(ThingStatus.ONLINE, ThingStatusDetail.NONE, null);
     }
 
     /**
      * Stops the communication to KLF200
      */
     private synchronized void stopCommunication() {
-        logger.info("Stopping KLF200 communication.");
-        bridgeHandler.updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.NONE, "Shut down");
+        logger.debug("Stopping KLF200 communication.");
+        bridgeHandler.updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.NONE, "Shutting down");
 
         // Don't ask the command consumer to suicide if it didn't even started once
         if (commandConsumerThread != null) {
@@ -384,20 +391,7 @@ public class KLFCommandProcessor {
         this.processingList.clear();
 
         logger.debug("communication with KLF200 stopped");
-    }
-
-    private synchronized void restartCommunication() {
-        logger.debug("Restarting KLF200 communication.");
-        if (isCommunicationUp()) {
-            stopCommunication();
-        }
-
-        String err = startCommunication();
-        if (err == null) {
-            bridgeHandler.updateStatus(ThingStatus.ONLINE, ThingStatusDetail.NONE, null);
-        } else {
-            bridgeHandler.updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.COMMUNICATION_ERROR, err);
-        }
+        bridgeHandler.updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.NONE, "Stopped");
     }
 
     /**
@@ -406,9 +400,10 @@ public class KLFCommandProcessor {
      * @return true if command processor is running, false otherwise.
      */
     public boolean isUpAndRunning() {
-        boolean ret = commandConsumerThread != null && commandConsumerThread.isAlive() && responseConsumerThread != null
-                && responseConsumerThread.isAlive();
+        boolean ret = !communicationStopped && commandConsumerThread != null && commandConsumerThread.isAlive()
+                && responseConsumerThread != null && responseConsumerThread.isAlive();
         if (!ret) {
+            logger.trace("communicationStopped: {}", communicationStopped);
             logger.trace("commandConsumerThread: {}", commandConsumerThread);
             logger.trace("commandConsumerThread.isAlive(): {}", commandConsumerThread.isAlive());
             logger.trace("responseConsumerThread: {}", responseConsumerThread);
@@ -431,7 +426,7 @@ public class KLFCommandProcessor {
      * processing queues and threads.
      */
     public void shutdown() {
-        logger.info("Shutting down the command processor.");
+        logger.debug("Shutting down the command processor.");
 
         this.communicationStopped = true;
         try {
@@ -456,9 +451,9 @@ public class KLFCommandProcessor {
     public boolean executeCommandAsync(BaseKLFCommand command) {
         logger.trace("executeCommandAsync({})", command);
 
-        // Check initialize, except for login command
-        if (command.getKLFCommandStructure().getCommand() != KLFGatewayCommands.GW_PASSWORD_ENTER_REQ
-                && !this.isLoggedIn) {
+        // Check if initialized, except for login command
+        if (!this.isLoggedIn
+                && command.getKLFCommandStructure().getCommand() != KLFGatewayCommands.GW_PASSWORD_ENTER_REQ) {
             logger.error("Attempt to perform a command {} before the command processor was logged in.",
                     command.getKLFCommandStructure().getDisplayCode());
         }
@@ -513,15 +508,20 @@ public class KLFCommandProcessor {
      *         successful or expected result.
      */
     public boolean executeCommand(BaseKLFCommand command, long timeout) {
+        logger.debug("Executing command {}", command.getKLFCommandStructure().getCommand());
         synchronized (command) {
             if (executeCommandAsync(command)) {
                 try {
                     logger.debug("Waiting for command {} to complete.", command.getKLFCommandStructure().getCommand());
                     command.wait(timeout);
-                    if ((command.getStatus() == CommandStatus.ERROR)
-                            || (command.getStatus() == CommandStatus.COMPLETE)) {
-                        // Processing complete (or finished due to error)
-                        logger.debug("Command {} has completed.", command.getKLFCommandStructure().getDisplayCode());
+                    // Processing complete (or finished due to error)
+                    if (command.getStatus() == CommandStatus.ERROR) {
+                        logger.warn("command {} terminated abnormally.",
+                                command.getKLFCommandStructure().getDisplayCode());
+                        return true;
+                    } else if (command.getStatus() == CommandStatus.COMPLETE) {
+                        logger.debug("Command {} completed successfully.",
+                                command.getKLFCommandStructure().getDisplayCode());
                         return true;
                     } else {
                         // Processing not completed within the allocated time

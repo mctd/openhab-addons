@@ -4,13 +4,13 @@
     xmlns:thing="https://openhab.org/schemas/thing-description/v1.0.0"
     xsi:schemaLocation="https://openhab.org/schemas/thing-description/v1.0.0 https://openhab.org/schemas/thing-description-1.0.0.xsd">
 
-	<channel-type id="connection_status">
+	<!-- <channel-type id="connection_status">
 		<item-type>Switch</item-type>
 		<label>Connected</label>
 		<description>Indicates whether or not the connection to the KLF200 is active.</description>
 		<category>Switch</category>
 		<state readOnly="true"></state>
-	</channel-type>
+	</channel-type> -->
 
 	<channel-type id="scene_trigger">
 		<item-type>Switch</item-type>

@@ -11,31 +11,23 @@ package org.openhab.binding.veluxklf200.internal.components;
 /**
  * Provides the information / parameters required to execute a command.
  *
- * @author MFK - Initial Contribution
+ * @author emmanuel
  */
 public class VeluxCommandInstruction {
 
-    /**
-     * Indicates the functional parameter of the device that the command is to
-     * be executed on. The 'main parameter' is parameter 0 (zero)
-     */
     private byte function;
-
-    /** Indicates the command / possition that should be sent to the function. */
     private short position;
-
-    /** Indicates the node on which the command is to be executed. */
     private byte nodeId;
 
     /**
-     * Instantiates a new velux command instruction.
+     * Instantiates a new Velux command instruction.
      *
      * @param nodeId
-     *                     the node id
+     *            the node ID to operate
      * @param function
-     *                     the function
+     *            the functional parameter to operate
      * @param position
-     *                     the position
+     *            the position
      */
     public VeluxCommandInstruction(byte nodeId, byte function, short position) {
         this.nodeId = nodeId;
@@ -53,7 +45,7 @@ public class VeluxCommandInstruction {
     }
 
     /**
-     * Gets the function.
+     * Gets the functional parameter to operate.
      *
      * @return the function
      */

@@ -55,7 +55,7 @@ public class VeluxKLF200V2BindingConstants {
     public static final String VELUX_LAST_MOVEMENT_CHANNEL_ID = "last_movement";
 
     /** Indicates whether the bridge is connected to the KLF200 */
-    public static final String BRIDGE_CONNECTIVITY = "connection_status";
+    // public static final String BRIDGE_CONNECTIVITY = "connection_status";
 
     /** All the supported thing types */
     public static final Set<ThingTypeUID> SUPPORTED_VELUX_KLF200_THING_TYPES_UIDS = Collections

@@ -15,48 +15,34 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * The Class KLFCMD_GetProtocol.
+ * Request KLF 200 API protocol version.
  *
- * @author MFK - Initial Contribution
+ * @author emmanuel
  */
 public class KlfCmdGetProtocol extends BaseKLFCommand {
 
-    /** The logger. */
     private Logger logger = LoggerFactory.getLogger(KlfCmdGetProtocol.class);
-
-    /** The protocol. */
     private String protocol;
 
     /**
-     * Instantiates a new KLFCM D get protocol.
+     * Default constructor.
      */
     public KlfCmdGetProtocol() {
         super();
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.openhab.binding.veluxklf200.internal.commands.BaseKLFCommand#handleResponse(byte[])
-     */
     @Override
-    protected void handleResponseImpl(KLFGatewayCommands responseCommand, byte[] data) {
+    protected boolean handleResponseImpl(KLFGatewayCommands responseCommand, byte[] data) {
         switch (responseCommand) {
             case GW_GET_PROTOCOL_VERSION_CFM:
-                this.protocol = "" + KLFUtils.extractTwoBytes(data[FIRSTBYTE], data[FIRSTBYTE + 1]);
-                this.protocol += "." + KLFUtils.extractTwoBytes(data[FIRSTBYTE + 2], data[FIRSTBYTE + 3]);
+                this.protocol = "" + KLFUtils.extractTwoBytes(data, FIRSTBYTE);
+                this.protocol += "." + KLFUtils.extractTwoBytes(data, FIRSTBYTE + 2);
                 this.commandStatus = CommandStatus.COMPLETE;
-                break;
+                logger.debug("Get protocol command completed. Protocol is {}", this.getProtocol());
+                return true;
             default:
-                // This should not happen. If it does, the most likely cause is that
-                // the KLFCommandStructure has not been configured or implemented
-                // correctly.
-                this.commandStatus = CommandStatus.ERROR;
-                logger.error("Processing requested for a KLF response code (command code) that is not supported: {}.",
-                        responseCommand.getCode());
-                break;
+                return false;
         }
-
     }
 
     /**
@@ -68,21 +54,11 @@ public class KlfCmdGetProtocol extends BaseKLFCommand {
         return this.protocol;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.openhab.binding.veluxklf200.internal.commands.BaseKLFCommand#getKLFCommandStructure()
-     */
     @Override
     public KLFCommandStructure getKLFCommandStructure() {
         return KLFCommandStructure.GET_PROTOCOL;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.openhab.binding.veluxklf200.internal.commands.BaseKLFCommand#pack()
-     */
     @Override
     protected byte[] pack() {
         return new byte[] {};

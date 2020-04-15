@@ -18,24 +18,24 @@ package org.openhab.binding.veluxklf200.internal.components;
 public enum VeluxPowerMode {
 
     /** The always alive. */
-    ALWAYS_ALIVE(0),
+    ALWAYS_ALIVE((byte) 0),
 
     /** The low power. */
-    LOW_POWER(1),
+    LOW_POWER((byte) 1),
 
     /** The unknown. */
-    UNKNOWN(-1);
+    UNKNOWN((byte) -1);
 
     /** The power code. */
-    private int powerCode;
+    private byte powerCode;
 
     /**
      * Instantiates a new velux power mode.
      *
      * @param code
-     *                 the code
+     *            the code
      */
-    private VeluxPowerMode(int code) {
+    private VeluxPowerMode(byte code) {
         this.powerCode = code;
     }
 
@@ -44,18 +44,18 @@ public enum VeluxPowerMode {
      *
      * @return the power code
      */
-    public int getPowerCode() {
+    public byte getPowerCode() {
         return this.powerCode;
     }
 
     /**
-     * Creates the.
+     * Creates the Power Mode from code.
      *
      * @param code
-     *                 the code
+     *            the code
      * @return the velux power mode
      */
-    public static VeluxPowerMode create(int code) {
+    public static VeluxPowerMode createFromCode(byte code) {
         switch (code) {
             case 0:
                 return ALWAYS_ALIVE;
