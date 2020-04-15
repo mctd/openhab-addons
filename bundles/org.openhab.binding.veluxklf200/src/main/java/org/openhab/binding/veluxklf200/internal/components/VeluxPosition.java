@@ -79,24 +79,28 @@ public class VeluxPosition {
      *
      * @return the percentage open
      */
-    public String getPercentageOpen() {
-        if (POSITION_UNKNOWN == this.position) {
-            return "Unknown";
-        }
-        return "" + (100 - (this.position / PCT_POSITION_INC)) + "%";
-    }
+    /*
+     * public String getPercentageOpen() {
+     * if (POSITION_UNKNOWN == this.position) {
+     * return "Unknown";
+     * }
+     * return "" + (100 - (this.position / PCT_POSITION_INC)) + "%";
+     * }
+     */
 
     /**
      * Gets the percentage closed.
      *
      * @return the percentage closed
      */
-    public String getPercentageClosed() {
-        if (POSITION_UNKNOWN == this.position) {
-            return "Unknown";
-        }
-        return "" + (this.position / PCT_POSITION_INC) + "%";
-    }
+    /*
+     * public String getPercentageClosed() {
+     * if (POSITION_UNKNOWN == this.position) {
+     * return "Unknown";
+     * }
+     * return "" + (this.position / PCT_POSITION_INC) + "%";
+     * }
+     */
 
     /**
      * Gets the percentage closed.
