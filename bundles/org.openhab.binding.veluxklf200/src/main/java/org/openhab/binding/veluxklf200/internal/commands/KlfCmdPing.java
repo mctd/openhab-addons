@@ -93,7 +93,7 @@ public class KlfCmdPing extends BaseKLFCommand {
                         gatewaySubState = "Unknown";
                         break;
                 }
-                this.commandStatus = CommandStatus.COMPLETE;
+                this.setStatus(CommandStatus.COMPLETE);
                 logger.debug("Get state successful. State: {}", this.getGatewayState());
                 return true;
             default:
@@ -109,5 +109,20 @@ public class KlfCmdPing extends BaseKLFCommand {
     @Override
     protected byte[] pack() {
         return new byte[] {};
+    }
+
+    @Override
+    public boolean isSessionRequired() {
+        return false;
+    }
+
+    @Override
+    public boolean isNodeSpecific() {
+        return false;
+    }
+
+    @Override
+    public KLFGatewayCommands getCommand() {
+        return KLFGatewayCommands.GW_GET_STATE_REQ;
     }
 }

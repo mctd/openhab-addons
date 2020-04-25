@@ -9,11 +9,11 @@
 package org.openhab.binding.veluxklf200.internal;
 
 /**
- * The {@link VeluxKLF200V2Configuration} class contains fields mapping thing configuration parameters.
+ * The {@link BridgeConfiguration} class contains fields mapping thing configuration parameters.
  *
  * @author mctd - Initial contribution
  */
-public class VeluxKLF200V2Configuration {
+public class BridgeConfiguration {
     /** The hostname or IP address of the KLF200 unit. */
     public String hostname;
 

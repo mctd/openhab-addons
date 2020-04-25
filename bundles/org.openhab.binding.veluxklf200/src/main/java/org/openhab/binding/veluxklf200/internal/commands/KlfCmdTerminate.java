@@ -33,4 +33,25 @@ public class KlfCmdTerminate extends BaseKLFCommand {
     protected byte[] pack() {
         throw new NotImplementedException();
     }
+
+    @Override
+    public boolean isSessionRequired() {
+        return false;
+    }
+
+    @Override
+    public boolean isAuthRequired() {
+        return false;
+    }
+
+    @Override
+    public boolean isNodeSpecific() {
+        return false;
+    }
+
+    @Override
+    public KLFGatewayCommands getCommand() {
+        // TODO : this might leads to NullPointerError. Handle termination another way...
+        return null;
+    }
 }

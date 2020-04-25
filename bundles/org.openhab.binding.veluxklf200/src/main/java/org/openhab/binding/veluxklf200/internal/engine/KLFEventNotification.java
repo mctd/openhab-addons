@@ -23,11 +23,11 @@ import org.slf4j.LoggerFactory;
  * Under normal circumstances, the KLF200 will respond to commands that have
  * been sent to it. However, it will also issue responses (notifications) in the
  * case that something else on the network issued a command. For example, if a
- * remote control is used to operate a velux device, the KLF will issue
+ * remote control is used to operate a Velux device, the KLF will issue
  * notifications in respect of the devices movements. These are captured /
  * processed here.
  *
- * @author MFK - Initial Contribution
+ * @author emmanuel
  */
 public class KLFEventNotification {
 
@@ -49,7 +49,7 @@ public class KLFEventNotification {
     }
 
     /**
-     * Called by others to notify us that an event was recieved that we may be
+     * Called by others to notify us that an event was received that we may be
      * interested in.
      *
      * @param responseCode

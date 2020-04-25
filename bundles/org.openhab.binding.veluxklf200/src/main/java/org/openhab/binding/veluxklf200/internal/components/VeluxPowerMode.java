@@ -9,11 +9,11 @@
 package org.openhab.binding.veluxklf200.internal.components;
 
 /**
- * Indicates the power mode of the velux node. Typically if it is a mains
+ * Indicates the power mode of the Velux node. Typically if it is a mains
  * operated node, the power mode with be ALWAYS_ACTIVE, but for battery or
  * solar, LOW_POWER.
  *
- * @author MFK - Initial Contribution
+ * @author emmanuel
  */
 public enum VeluxPowerMode {
 
@@ -30,7 +30,7 @@ public enum VeluxPowerMode {
     private byte powerCode;
 
     /**
-     * Instantiates a new velux power mode.
+     * Instantiates a new Velux power mode.
      *
      * @param code
      *            the code
@@ -53,7 +53,7 @@ public enum VeluxPowerMode {
      *
      * @param code
      *            the code
-     * @return the velux power mode
+     * @return the Velux power mode
      */
     public static VeluxPowerMode createFromCode(byte code) {
         switch (code) {

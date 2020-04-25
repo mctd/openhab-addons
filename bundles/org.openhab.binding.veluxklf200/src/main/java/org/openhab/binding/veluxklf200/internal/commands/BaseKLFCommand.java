@@ -20,7 +20,7 @@ import org.slf4j.LoggerFactory;
  * Base class that all KLF commands should extend. Provides both abstraction and
  * common functions
  *
- * @author MFK - Initial Contribution
+ * @author emmanuel
  */
 public abstract class BaseKLFCommand {
 
@@ -33,9 +33,6 @@ public abstract class BaseKLFCommand {
     /** Constant to indicate that the 'priority' of the command being sent is 'normal'. */
     public static final byte CMD_PRIORITY_NORMAL = 3;
 
-    /** Constant to indicate the velocity a scene should be executed at. */
-    public static final byte CMD_VELOCITY_DEFAULT = 0;
-
     /** Constant position of the first byte of user data in a response from a KLF unit. */
     public static final int FIRSTBYTE = 4;
 
@@ -46,16 +43,16 @@ public abstract class BaseKLFCommand {
      * Denotes the status of a given command. Typically the main usable states
      * of note are COMPLETE and ERROR
      */
-    protected CommandStatus commandStatus;
+    private CommandStatus commandStatus;
 
     /**
      * The unique session identifier for this particular command instance.
      */
-    private short sessionId;
+    private Short sessionId = null;
 
     /**
      * Records the main / first node that a command is being executed for. This is used when reconciling responses
-     * recieved from the KLF200 in cases where there is no session defined by the KLF200 specification for the
+     * received from the KLF200 in cases where there is no session defined by the KLF200 specification for the
      * particular API command.
      */
     private byte mainNode;
@@ -72,15 +69,33 @@ public abstract class BaseKLFCommand {
      */
     protected BaseKLFCommand() {
         this.commandStatus = CommandStatus.CREATED;
-        if (this.getKLFCommandStructure().isSessionRequired()) {
-            // A session is required, so generate a pseudo-unique session ID
-            this.sessionId = KLFSession.getInstance().getSessionIdentifier();
-        } else {
-            // No session required
-            this.sessionId = 0;
-        }
+
         // Defaulted to NOT_REQUIRED, sub-class must specify by calling setMainNode() where relevant.
         this.mainNode = NOT_REQUIRED;
+    }
+
+    /**
+     * Indicates if the commands requires a session ID.
+     *
+     * @return true if command requires a session ID, false otherwise.
+     */
+    public abstract boolean isSessionRequired();
+
+    /**
+     * Indicates if the commands is specific to a particular node.
+     *
+     * @return true if command is related to a specific node, false otherwise.
+     */
+    public abstract boolean isNodeSpecific();
+
+    /**
+     * Indicates if the commands requires prior authentication. It returns true by default, must be overridden by
+     * subclass.
+     *
+     * @return true if command requires prior authentication, false otherwise.
+     */
+    public boolean isAuthRequired() {
+        return true;
     }
 
     /**
@@ -93,6 +108,16 @@ public abstract class BaseKLFCommand {
      *         this type of command.
      */
     public short getSessionID() {
+        if (this.sessionId == null) {
+            if (this.isSessionRequired()) {
+                // A session is required, so generate a pseudo-unique session ID
+                this.sessionId = KLFSession.getInstance().getNewSessionIdentifier();
+            } else {
+                // No session required
+                this.sessionId = 0;
+            }
+        }
+
         return this.sessionId;
     }
 
@@ -102,10 +127,10 @@ public abstract class BaseKLFCommand {
      * @return
      */
     public String formatSessionID() {
-        if (this.sessionId == 0) {
+        if (this.getSessionID() == 0) {
             return "NOT REQUIRED";
         }
-        return "(" + this.sessionId + ")";
+        return "(" + this.getSessionID() + ")";
     }
 
     /**
@@ -135,7 +160,7 @@ public abstract class BaseKLFCommand {
      */
     public void setStatus(CommandStatus status) {
         this.commandStatus = status;
-        logger.trace("Command {} status set to {}.", this.getKLFCommandStructure().getDisplayCode(), status);
+        logger.trace("Command {} status set to {}.", this.getCommand().name(), status);
     }
 
     /**
@@ -152,12 +177,12 @@ public abstract class BaseKLFCommand {
      */
     public boolean canHandleResponse(KLFGatewayCommands command, byte[] data) {
         if (getKLFCommandStructure().canHandle(command)) {
-            if (getKLFCommandStructure().isSessionRequired()) {
+            if (this.isSessionRequired()) {
                 if (this.getSessionID() == extractSession(command, data)) {
                     return true;
                 }
             } else {
-                if (getKLFCommandStructure().isNodeSpecific()) {
+                if (this.isNodeSpecific()) {
                     return canHandleNode(command, data);
                 } else {
                     return true;
@@ -166,6 +191,8 @@ public abstract class BaseKLFCommand {
         }
         return false;
     }
+
+    // protected boolean canHandle()
 
     /**
      * Gets the main node that this command is being executed for.
@@ -304,8 +331,8 @@ public abstract class BaseKLFCommand {
             byte[] message = new byte[data.length + 5];
             message[0] = SUPPORTED_PROTOCOL;
             message[1] = (byte) (3 + data.length);
-            message[2] = (byte) (getKLFCommandStructure().getCommand().getNumber() >>> 8);
-            message[3] = (byte) getKLFCommandStructure().getCommand().getNumber();
+            message[2] = (byte) (this.getCommand().getNumber() >>> 8);
+            message[3] = (byte) this.getCommand().getNumber();
             message[4 + data.length] = 0;
             System.arraycopy(data, 0, message, 4, data.length);
             for (byte b : message) {
@@ -382,6 +409,13 @@ public abstract class BaseKLFCommand {
      *         invalid.
      */
     protected abstract byte[] pack();
+
+    /**
+     * Gets the command representation.
+     *
+     * @return the command representation.
+     */
+    public abstract KLFGatewayCommands getCommand();
 
     /**
      * Must be implemented by a sub-class to retrieve a session parameter from a

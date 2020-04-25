@@ -9,11 +9,10 @@
 package org.openhab.binding.veluxklf200.internal.components;
 
 /**
- * Helper class to help translate the position values of a velux node into more
+ * Helper class to help translate the position values of a Velux node into more
  * readable / usable references. KLF returns position from 0x0000 (OPEN) to 0xC800 (CLOSED).
  *
- * @author Emmanuel Bachschmidt - refactoring
- * @author MFK - Initial Contribution
+ * @author emmanuel
  */
 public class VeluxPosition {
 
@@ -30,7 +29,7 @@ public class VeluxPosition {
     private Integer position;
 
     /**
-     * Instantiates a new velux position.
+     * Instantiates a new Velux position.
      *
      * @param position
      *            the position (expressed in percent closed)

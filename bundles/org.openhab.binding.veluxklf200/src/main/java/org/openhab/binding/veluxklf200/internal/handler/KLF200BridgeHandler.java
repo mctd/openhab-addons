@@ -8,15 +8,12 @@
  */
 package org.openhab.binding.veluxklf200.internal.handler;
 
-import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.smarthome.core.library.types.DateTimeType;
-import org.eclipse.smarthome.core.library.types.OnOffType;
 import org.eclipse.smarthome.core.library.types.PercentType;
 import org.eclipse.smarthome.core.thing.Bridge;
 import org.eclipse.smarthome.core.thing.Channel;
@@ -27,8 +24,8 @@ import org.eclipse.smarthome.core.thing.ThingStatusDetail;
 import org.eclipse.smarthome.core.thing.binding.BaseBridgeHandler;
 import org.eclipse.smarthome.core.types.Command;
 import org.eclipse.smarthome.core.types.UnDefType;
-import org.openhab.binding.veluxklf200.internal.VeluxKLF200V2BindingConstants;
-import org.openhab.binding.veluxklf200.internal.VeluxKLF200V2Configuration;
+import org.openhab.binding.veluxklf200.internal.BridgeConfiguration;
+import org.openhab.binding.veluxklf200.internal.VeluxKLF200BindingConstants;
 import org.openhab.binding.veluxklf200.internal.commands.CommandStatus;
 import org.openhab.binding.veluxklf200.internal.commands.KlfCmdEnableHomeStatusMonitor;
 import org.openhab.binding.veluxklf200.internal.commands.KlfCmdGetNodeInformation;
@@ -46,7 +43,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Bridge for managing the connection with the Velux KLF200 unit.
  *
- * @author MFK - Initial Contribution
+ * @author emmanuel
  */
 public class KLF200BridgeHandler extends BaseBridgeHandler implements KLFEventListener {
 
@@ -101,7 +98,7 @@ public class KLF200BridgeHandler extends BaseBridgeHandler implements KLFEventLi
     @Override
     public void initialize() {
         logger.debug("Initializing the KLF200 command processor.");
-        VeluxKLF200V2Configuration config = getConfigAs(VeluxKLF200V2Configuration.class);
+        BridgeConfiguration config = getConfigAs(BridgeConfiguration.class);
         String err = validateConfiguration(config);
         if (err != null) {
             updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.CONFIGURATION_ERROR, err);
@@ -117,7 +114,7 @@ public class KLF200BridgeHandler extends BaseBridgeHandler implements KLFEventLi
     @Override
     public void updateStatus(ThingStatus status, ThingStatusDetail statusDetail, @Nullable String description) {
         logger.trace("Bridge updateStatus({}, {}, {})", status, statusDetail, description);
-        VeluxKLF200V2Configuration config = getConfigAs(VeluxKLF200V2Configuration.class);
+        BridgeConfiguration config = getConfigAs(BridgeConfiguration.class);
 
         // Don't update status if it didn't change
         if (status != lastKnownState) {
@@ -155,12 +152,11 @@ public class KLF200BridgeHandler extends BaseBridgeHandler implements KLFEventLi
         if (klf200 != null && klf200.isUpAndRunning()) {
             List<Thing> things = getThing().getThings();
             for (Thing t : things) {
-                Channel channel = t.getChannel(VeluxKLF200V2BindingConstants.VELUX_POSITION_CHANNEL_ID);
+                Channel channel = t.getChannel(VeluxKLF200BindingConstants.ACTUATOR_MP_POSITION_CHANNEL_ID);
 
                 if (channel != null) {
-                    // TODO: handle every thing types. Idea : scan all things with channels of type "position" ?
-                    // Refresh all roller shutter
-                    if (VeluxKLF200V2BindingConstants.THING_TYPE_VELUX_ROLLER_SHUTTER.equals(t.getThingTypeUID())) {
+                    // Refresh all actuators
+                    if (VeluxKLF200BindingConstants.THING_TYPE_ACTUATOR.equals(t.getThingTypeUID())) {
                         logger.debug("Refreshing {} with Id {}", t, t.getUID().getId());
                         KlfCmdGetNodeInformation getNodeInfoCmd = new KlfCmdGetNodeInformation(
                                 (byte) Integer.valueOf(t.getUID().getId()).intValue());
@@ -185,12 +181,9 @@ public class KLF200BridgeHandler extends BaseBridgeHandler implements KLFEventLi
                     }
                 } else {
                     logger.error("Did not find a channel '{}' for Thing {}",
-                            VeluxKLF200V2BindingConstants.VELUX_POSITION_CHANNEL_ID, t.getUID());
+                            VeluxKLF200BindingConstants.ACTUATOR_MP_POSITION_CHANNEL_ID, t.getUID());
                 }
             }
-
-            // Also update the time in case the unit has been rebooted since the binding was loaded
-            klf200.executeCommand(new KlfCmdSetTime());
         } else {
             logger.warn("KLF200 is down, can't refresh devices.");
         }
@@ -277,7 +270,7 @@ public class KLF200BridgeHandler extends BaseBridgeHandler implements KLFEventLi
      * @param config config object
      * @return null in the case of validation passing, non-null if something was determined to be invalid.
      */
-    private String validateConfiguration(VeluxKLF200V2Configuration config) {
+    private String validateConfiguration(BridgeConfiguration config) {
         if (config.password == null) {
             return "A password must be specified. Please update the panel 'thing' configuration.";
         }
@@ -302,66 +295,29 @@ public class KLF200BridgeHandler extends BaseBridgeHandler implements KLFEventLi
     public void handleEvent(byte nodeId, VeluxState state, VeluxPosition currentPosition, VeluxPosition targetPosition,
             VeluxPosition fp1CurrentPosition, VeluxPosition fp2CurrentPosition, VeluxPosition fp3CurrentPosition,
             VeluxPosition fp4CurrentPosition, int timeRemaining, long timestamp) {
-        // Only process "DONE" events (TODO: should not as moving things is reported in non-DONE events)
         Thing thing = findThing(nodeId);
         if (thing != null) {
-            Channel positionChannel = thing.getChannel(VeluxKLF200V2BindingConstants.VELUX_POSITION_CHANNEL_ID);
+            Channel positionChannel = thing.getChannel(VeluxKLF200BindingConstants.ACTUATOR_MP_POSITION_CHANNEL_ID);
             if (positionChannel == null) {
                 logger.warn("Channel '{}' not found for thing '{}'",
-                        VeluxKLF200V2BindingConstants.VELUX_POSITION_CHANNEL_ID, thing.getLabel());
+                        VeluxKLF200BindingConstants.ACTUATOR_MP_POSITION_CHANNEL_ID, thing.getLabel());
             }
 
-            Channel movingChannel = thing.getChannel(VeluxKLF200V2BindingConstants.VELUX_MOVING_STATE_CHANNEL_ID);
-            if (movingChannel == null) {
-                logger.warn("Channel '{}' not found for thing '{}'",
-                        VeluxKLF200V2BindingConstants.VELUX_MOVING_STATE_CHANNEL_ID, thing.getLabel());
-            }
+            // Only process "DONE" events
+            if (state == VeluxState.DONE) {
+                if (positionChannel != null) {
+                    Integer pctClosed = currentPosition.getPosition();
+                    org.eclipse.smarthome.core.types.State itemState = UnDefType.UNDEF;
+                    if (pctClosed == null) {
+                        logger.debug(
+                                "'{}' position is currently unknown. Need to wait for an activation for KLF200 to learn its position.",
+                                thing.getLabel());
+                    } else {
 
-            Channel lastMovementChannel = thing
-                    .getChannel(VeluxKLF200V2BindingConstants.VELUX_LAST_MOVEMENT_CHANNEL_ID);
-            if (lastMovementChannel == null) {
-                logger.warn("Channel '{}' not found for thing '{}'",
-                        VeluxKLF200V2BindingConstants.VELUX_LAST_MOVEMENT_CHANNEL_ID, thing.getLabel());
-            }
-
-            if (state == VeluxState.NOT_USED) {
-                // do nothing
-            } else if (state == VeluxState.EXECUTING) {
-                // Setting moving channel to true
-                if (movingChannel != null) {
-                    logger.debug("Setting '{}' moving state to {}", thing.getLabel(), OnOffType.ON);
-                    updateState(movingChannel.getUID(), OnOffType.ON);
-                }
-
-                if (lastMovementChannel != null) {
-                    // Setting last movement timestamp to received timestamp
-                    DateTimeType now = new DateTimeType(ZonedDateTime.now());
-                    logger.debug("Setting '{}' last movement date to {}", thing.getLabel(), now);
-                    updateState(lastMovementChannel.getUID(), now);
-                }
-            } else {
-                if (movingChannel != null) {
-                    // Setting moving channel to false
-                    logger.debug("Setting '{}' moving state to {}", thing.getLabel(), OnOffType.OFF);
-                    updateState(movingChannel.getUID(), OnOffType.OFF);
-                }
-
-                if (state == VeluxState.DONE) {
-                    if (positionChannel != null) {
-                        Integer pctClosed = currentPosition.getPosition();
-                        org.eclipse.smarthome.core.types.State itemState = UnDefType.UNDEF;
-                        if (pctClosed == null) {
-                            logger.debug(
-                                    "'{}' position is currently unknown. Need to wait for an activation for KLF200 to learn its position.",
-                                    thing.getLabel());
-                        } else {
-
-                            logger.debug("'{}' is currently {}% closed.", thing.getLabel(), pctClosed);
-                            itemState = new PercentType(pctClosed);
-                        }
-                        updateState(positionChannel.getUID(), itemState);
+                        logger.debug("'{}' is currently {}% closed.", thing.getLabel(), pctClosed);
+                        itemState = new PercentType(pctClosed);
                     }
-
+                    updateState(positionChannel.getUID(), itemState);
                 }
             }
         } else {

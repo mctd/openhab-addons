@@ -13,7 +13,7 @@ package org.openhab.binding.veluxklf200.internal.utility;
  * identifier so that responses can be attributed to that particular session.
  * This is a helper singleton that provides unique session identifiers.
  *
- * @author MFK - Initial Contribution
+ * @author emmanuel
  */
 public class KLFSession {
 
@@ -34,11 +34,11 @@ public class KLFSession {
     }
 
     /**
-     * Gets the session identifier.
+     * Generates and returns a new session identifier.
      *
      * @return the session identifier
      */
-    public short getSessionIdentifier() {
+    public short getNewSessionIdentifier() {
         return this.session++;
     }
 

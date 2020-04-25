@@ -22,7 +22,6 @@ public enum KLFCommandStructure {
      * never actually sent to the KLF200 unit.
      */
     TERMINATE(
-            "Used to terminate the queue manager",
             "TERMINATE",
             null,
             new KLFGatewayCommands[] {},
@@ -31,7 +30,6 @@ public enum KLFCommandStructure {
 
     /** Login to the KLF. */
     LOGIN(
-            "Login to the KLF200 Gateway using a password.",
             "GW_PASSWORD_ENTER_REQ",
             KLFGatewayCommands.GW_PASSWORD_ENTER_REQ,
             new KLFGatewayCommands[] { KLFGatewayCommands.GW_PASSWORD_ENTER_CFM },
@@ -43,16 +41,14 @@ public enum KLFCommandStructure {
      * socket connection alive.
      */
     PING(
-            "Ping the gateway to get state information and keep the socket connection alive.",
             "GW_GET_STATE_REQ",
             KLFGatewayCommands.GW_GET_STATE_REQ,
             new KLFGatewayCommands[] { KLFGatewayCommands.GW_GET_STATE_CFM },
             KLFCommandStructure.MASK_AUTH_REQD
             ),
 
-    /** The get all node information. */
-    GET_ALL_NODE_INFORMATION(
-            "Query all of the nodes setup / configured on the KLF200 device.",
+    /** Gets all nodes information. */
+    GET_ALL_NODES_INFORMATION(
             "GW_GET_ALL_NODES_INFORMATION_REQ",
             KLFGatewayCommands.GW_GET_ALL_NODES_INFORMATION_REQ,
             new KLFGatewayCommands[] {
@@ -63,9 +59,20 @@ public enum KLFCommandStructure {
             KLFCommandStructure.MASK_AUTH_REQD
             ),
 
+    /** Get all groups. */
+    GET_ALL_GROUPS_INFORMATION(
+            "GW_GET_ALL_GROUPS_INFORMATION_REQ",
+            KLFGatewayCommands.GW_GET_ALL_GROUPS_INFORMATION_REQ,
+            new KLFGatewayCommands[] {
+                    KLFGatewayCommands.GW_GET_ALL_GROUPS_INFORMATION_CFM,
+                    KLFGatewayCommands.GW_GET_ALL_GROUPS_INFORMATION_NTF,
+                    KLFGatewayCommands.GW_GET_ALL_GROUPS_INFORMATION_FINISHED_NTF
+                },
+            KLFCommandStructure.MASK_AUTH_REQD
+            ),
+
     /** The individual node information. */
     GET_NODE_INFORMATION(
-            "Query specific node on the KLF200 device.",
             "GW_GET_NODE_INFORMATION_REQ",
             KLFGatewayCommands.GW_GET_NODE_INFORMATION_REQ,
             new KLFGatewayCommands[] {
@@ -77,7 +84,6 @@ public enum KLFCommandStructure {
 
     /** Send a command to a Velux node. */
     SEND_NODE_COMMAND(
-            "Send a command to a specific node on the KLF200 device.",
             "GW_COMMAND_SEND_REQ",
             KLFGatewayCommands.GW_COMMAND_SEND_REQ,
             new KLFGatewayCommands[] {
@@ -90,7 +96,6 @@ public enum KLFCommandStructure {
             ),
 
     SET_NODE_VELOCITY(
-            "Set a node velocity",
             "GW_SET_NODE_VELOCITY_REQ",
             KLFGatewayCommands.GW_SET_NODE_VELOCITY_REQ,
             new KLFGatewayCommands[] {
@@ -100,7 +105,6 @@ public enum KLFCommandStructure {
             ),
 
     SET_NODE_NAME(
-            "Set a node name",
             "GW_SET_NODE_NAME_REQ",
             KLFGatewayCommands.GW_SET_NODE_NAME_REQ,
             new KLFGatewayCommands[] {
@@ -110,7 +114,6 @@ public enum KLFCommandStructure {
             ),
 
     REBOOT(
-            "Reboots the KLF200",
             "GW_REBOOT_REQ",
             KLFGatewayCommands.GW_REBOOT_REQ,
             new KLFGatewayCommands[] {
@@ -121,7 +124,6 @@ public enum KLFCommandStructure {
 
     /** Get list of scenes configured on the KLF200. */
     GET_ALL_SCENES(
-            "Get a list of all scenes configured on the KLF200 unit.",
             "GW_GET_SCENE_LIST_REQ",
             KLFGatewayCommands.GW_GET_SCENE_LIST_REQ,
             new KLFGatewayCommands[] {
@@ -133,7 +135,6 @@ public enum KLFCommandStructure {
 
     /** Activate a scene. */
     ACTIVATE_SCENE(
-            "Activate a specific scene on the KLF200 unit.",
             "GW_ACTIVATE_SCENE_REQ",
             KLFGatewayCommands.GW_ACTIVATE_SCENE_REQ,
             new KLFGatewayCommands[] {
@@ -148,7 +149,6 @@ public enum KLFCommandStructure {
 
     /** Stop a scene during execution. */
     STOP_SCENE(
-            "Stop a specific scene on the KLF200 unit.",
             "GW_STOP_SCENE_REQ",
             KLFGatewayCommands.GW_STOP_SCENE_REQ,
             new KLFGatewayCommands[] {
@@ -160,7 +160,6 @@ public enum KLFCommandStructure {
 
     /** The get protocol. */
     GET_PROTOCOL(
-            "Gets protocol version information from the KLF200 unit.",
             "GW_GET_PROTOCOL_VERSION_REQ",
             KLFGatewayCommands.GW_GET_PROTOCOL_VERSION_REQ,
             new KLFGatewayCommands[] {
@@ -171,7 +170,6 @@ public enum KLFCommandStructure {
 
     /** The get version. */
     GET_VERSION(
-            "Gets software version information from the KLF200 unit.",
             "GW_GET_VERSION_REQ",
             KLFGatewayCommands.GW_GET_VERSION_REQ,
             new KLFGatewayCommands[] {
@@ -182,7 +180,6 @@ public enum KLFCommandStructure {
 
     /** Set Time */
     SET_TIME(
-            "Sets the time on the KLF200",
             "GW_SET_UTC_REQ",
             KLFGatewayCommands.GW_SET_UTC_REQ,
             new KLFGatewayCommands[] {
@@ -192,7 +189,6 @@ public enum KLFCommandStructure {
             ),
 
     ENABLE_HOUSE_STATUS_MONITOR(
-            "Enables house status monitor on the KLF200",
             "GW_HOUSE_STATUS_MONITOR_ENABLE_REQ",
             KLFGatewayCommands.GW_HOUSE_STATUS_MONITOR_ENABLE_REQ,
             new KLFGatewayCommands[] {
@@ -213,9 +209,6 @@ public enum KLFCommandStructure {
 
     /** Bit mask to indicate that a command is node specific */
     public static final int MASK_NODE_SPECIFIC = 0b0100;
-
-    /** Printable description of this command. */
-    private String description;
 
     /**
      * Indicates additional configuration / attributes of the command. Int represents a bit mask of possible values. See
@@ -252,10 +245,8 @@ public enum KLFCommandStructure {
      *            Indicates whether or not authentication is required before
      *            this command can be executed.
      */
-    private KLFCommandStructure(String description, String displayCode, KLFGatewayCommands command,
-            KLFGatewayCommands[] handledResponses, int attributes) {
+    private KLFCommandStructure(String displayCode, KLFGatewayCommands command, KLFGatewayCommands[] handledResponses, int attributes) {
 
-        this.description = description;
         this.displayCode = displayCode;
         this.command = command;
         this.handledResponses = handledResponses;
@@ -276,18 +267,10 @@ public enum KLFCommandStructure {
      *
      * @return true, if is auth is required
      */
-    public boolean isAuthRequired() {
+    /*public boolean isAuthRequired() {
         return (this.attributes & MASK_AUTH_REQD) == MASK_AUTH_REQD ? true : false;
-    }
+    }*/
 
-    /**
-     * Checks if a session parameter is required for this command.
-     *
-     * @return true, if is a session is required
-     */
-    public boolean isSessionRequired() {
-        return (this.attributes & MASK_SESSION_REQD) == MASK_SESSION_REQD ? true : false;
-    }
 
     /**
      * Checks attributes of the command to determine if the command itself is node specific. A node specific command
@@ -296,18 +279,9 @@ public enum KLFCommandStructure {
      *
      * @return true, if is a session is required
      */
-    public boolean isNodeSpecific() {
+    /*public boolean isNodeSpecific() {
         return (this.attributes & MASK_NODE_SPECIFIC) == MASK_NODE_SPECIFIC ? true : false;
-    }
-
-    /**
-     * Gets a printable description of this command.
-     *
-     * @return the description
-     */
-    public String getDescription() {
-        return description;
-    }
+    }*/
 
     /**
      * Gets the command code.

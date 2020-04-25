@@ -10,7 +10,7 @@ package org.openhab.binding.veluxklf200.internal.commands;
 
 import org.openhab.binding.veluxklf200.internal.commands.structure.KLFCommandStructure;
 import org.openhab.binding.veluxklf200.internal.commands.structure.KLFGatewayCommands;
-import org.openhab.binding.veluxklf200.internal.components.VeluxVelocity;
+import org.openhab.binding.veluxklf200.internal.status.Velocity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,7 +27,7 @@ public class KlfCmdSetVelocity extends BaseKLFCommand {
 
     private final Logger logger = LoggerFactory.getLogger(KlfCmdSetVelocity.class);
     private byte nodeId;
-    private VeluxVelocity velocity;
+    private Velocity velocity;
 
     /**
      * Default constructor.
@@ -37,7 +37,7 @@ public class KlfCmdSetVelocity extends BaseKLFCommand {
      * @param velocity
      *            The desired velocity for specified node.
      */
-    public KlfCmdSetVelocity(byte nodeId, VeluxVelocity velocity) {
+    public KlfCmdSetVelocity(byte nodeId, Velocity velocity) {
         super();
         this.nodeId = nodeId;
         this.velocity = velocity;
@@ -52,20 +52,20 @@ public class KlfCmdSetVelocity extends BaseKLFCommand {
                 switch (status) {
                     case CMD_STATUS_ACCEPTED:
                         logger.debug("Command accepted for node: {}", nodeId);
-                        this.commandStatus = CommandStatus.COMPLETE;
+                        this.setStatus(CommandStatus.COMPLETE);
                         break;
                     case CMD_ERROR_REQUEST_REJECTED:
                         logger.warn("The command was rejected for node {}.", nodeId);
-                        this.commandStatus = CommandStatus.ERROR;
+                        this.setStatus(CommandStatus.ERROR);
                         break;
                     case CMD_ERROR_INVALID_SYSTEM_TABLE_INDEX:
                         logger.warn("The command failed: invalid system table index {}.", nodeId);
-                        this.commandStatus = CommandStatus.ERROR;
+                        this.setStatus(CommandStatus.ERROR);
                         break;
                     default:
                         logger.error("An unknown confirmation code was recieved: {}, marking the command as ERROR.",
                                 status);
-                        this.commandStatus = CommandStatus.ERROR;
+                        this.setStatus(CommandStatus.ERROR);
                         break;
                 }
                 return true;
@@ -85,7 +85,7 @@ public class KlfCmdSetVelocity extends BaseKLFCommand {
 
         byte[] data = new byte[2];
         data[0] = this.nodeId;
-        data[1] = this.velocity.getVelocityCode();
+        data[1] = this.velocity.getCode();
 
         return data;
     }
@@ -99,5 +99,20 @@ public class KlfCmdSetVelocity extends BaseKLFCommand {
                 logger.error("Unknown response command.");
                 return BaseKLFCommand.NOT_REQUIRED;
         }
+    }
+
+    @Override
+    public boolean isSessionRequired() {
+        return false;
+    }
+
+    @Override
+    public boolean isNodeSpecific() {
+        return true;
+    }
+
+    @Override
+    public KLFGatewayCommands getCommand() {
+        return KLFGatewayCommands.GW_SET_NODE_VELOCITY_REQ;
     }
 }

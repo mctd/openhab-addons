@@ -33,7 +33,6 @@ import org.openhab.binding.veluxklf200.internal.commands.CommandStatus;
 import org.openhab.binding.veluxklf200.internal.commands.KlfCmdLogin;
 import org.openhab.binding.veluxklf200.internal.commands.KlfCmdPing;
 import org.openhab.binding.veluxklf200.internal.commands.KlfCmdTerminate;
-import org.openhab.binding.veluxklf200.internal.commands.structure.KLFGatewayCommands;
 import org.openhab.binding.veluxklf200.internal.handler.KLF200BridgeHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,67 +46,22 @@ import org.slf4j.LoggerFactory;
  * clients can submit a command and then notified when the processing has
  * completed.
  *
- * @author MFK - Initial Contribution
- * @author Guenther Schreiner - Re-use of some utility functions created for dealing with SLIP byte streams
+ * @author emmanuel
  */
 public class KLFCommandProcessor {
 
-    /** Logging. */
     private final Logger logger = LoggerFactory.getLogger(KLFCommandProcessor.class);
-
-    /** Socket connection timeout */
     private static final int CONNECTION_TIMEOUT = 10000;
-
-    /**
-     * Default amount of time to wait for a command to execute (in milliseconds)
-     * if an explicit timeout is not specified. The default is set to 60 seconds
-     * as it can take some time for a command to execute. For example, moving a
-     * blind from open to closed could take several seconds, particularly if the
-     * user mode is set to a comfort setting.
-     */
     private static final long DEFAULT_COMMAND_TIMEOUT = 60000;
-
-    /** How often (in seconds) to send a keep alive Ping to the KLF200 unit. */
     private static final int KEEPALIVE_PING_FREQ = 1 * 60 * 10;
-
-    /**
-     * Maximum number of commands that can be waiting to be processed in the
-     * queue. In theory, should never be exceeded, but if it is, clients will
-     * block until space is available in the queue.
-     */
-    static final int MAX_QUEUE_SIZE = 20;
-
-    /**
-     * Delay that Watchdog thread should observe between communication checks.
-     */
-    static final int WATCHDOG_DELAY = 2000;
-
-    /** The hostname or IP address of the KLF200 unit. */
+    private static final int MAX_QUEUE_SIZE = 20;
+    private static final int WATCHDOG_DELAY = 2000;
     private String host;
-
-    /** The socket port on the KLF200 unit. */
     private int port;
-
-    /** The password for the KLF200 unit. */
     private String password;
-
-    /** Timer for keepalive ping. */
     private Timer keepaliveTimer;
-
-    /**
-     * Set to indicate if the communication has intentionally been shut down and that the watchdog should not try to
-     * restart the control command socket
-     */
-    boolean communicationStopped = false;
-
-    /**
-     * Set to indicate that a successful login to the unit has occurred and is
-     * also used to ensure that a command that requires authentication is not
-     * executed if successful login has not been achieved or executed.
-     */
-    boolean isLoggedIn;
-
-    /** Queue of commands that are waiting to be processed by the KLF200 unit. */
+    private boolean communicationStopped = false;
+    private boolean loggedIn;
     private LinkedBlockingDeque<BaseKLFCommand> commandQueue;
 
     /**
@@ -183,6 +137,24 @@ public class KLFCommandProcessor {
         this.processingList = new CopyOnWriteArrayList<BaseKLFCommand>();
         this.commandQueue = new LinkedBlockingDeque<BaseKLFCommand>(MAX_QUEUE_SIZE);
         this.eventNotification = new KLFEventNotification();
+    }
+
+    /**
+     * Indicates communication status.
+     *
+     * @return True if communication is or should be stopped. True otherwise.
+     */
+    public boolean isCommunicationStopped() {
+        return this.communicationStopped;
+    }
+
+    /**
+     * Indicates if connection to KLF unit is authenticated.
+     *
+     * @return True if connection is authenticated, false otherwise.
+     */
+    public boolean isLoggedIn() {
+        return this.loggedIn;
     }
 
     CopyOnWriteArrayList<BaseKLFCommand> getCommandsInProgress() {
@@ -278,8 +250,9 @@ public class KLFCommandProcessor {
                 } catch (Exception e1) {
                     logger.debug("Error closing klfOutputStream: {}", e1.getMessage());
                 }
+                klfRawSocket = null;
             }
-            klfRawSocket = null;
+
             klfOutputStream = null;
             klfInputStream = null;
             String err = String.format("Unable to connect to KLF200 host %s on port %d. Reason: %s", host, port,
@@ -289,7 +262,7 @@ public class KLFCommandProcessor {
             return;
         }
 
-        logger.debug("Successfully established an SSL connection to KLF200 host {} on port {}.", host, port);
+        logger.info("Successfully established an SSL connection to KLF200 host {} on port {}.", host, port);
 
         // bridgeHandler.updateStatus(ThingStatus.ONLINE, ThingStatusDetail.NONE, null);
 
@@ -307,12 +280,13 @@ public class KLFCommandProcessor {
         KlfCmdLogin loginCommand = new KlfCmdLogin(password);
         if (executeCommand(loginCommand) && loginCommand.getStatus() == CommandStatus.COMPLETE) {
             logger.info("Successfully logged in to the KLF200 unit @ {}:{}", host, port);
-            isLoggedIn = true;
+            this.loggedIn = true;
         } else {
             String errMsg = "Unable to login to the KLF200 unit with password supplied.";
             logger.error(errMsg);
             bridgeHandler.updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.COMMUNICATION_ERROR, errMsg);
             return;
+            // TODO : this lets the socket open, the threads running, but not logged in !
         }
 
         // Refresh Bridge Properties and Node status
@@ -365,7 +339,7 @@ public class KLFCommandProcessor {
         }
         klfRawSocket = null;
 
-        isLoggedIn = false;
+        this.loggedIn = false;
 
         // join the consumer threads (wait for them to end)
         if (commandConsumerThread != null) {
@@ -449,27 +423,22 @@ public class KLFCommandProcessor {
      *         indicate that the queue is full.
      */
     public boolean executeCommandAsync(BaseKLFCommand command) {
-        logger.trace("executeCommandAsync({})", command);
-
-        // Check if initialized, except for login command
-        if (!this.isLoggedIn
-                && command.getKLFCommandStructure().getCommand() != KLFGatewayCommands.GW_PASSWORD_ENTER_REQ) {
-            logger.error("Attempt to perform a command {} before the command processor was logged in.",
-                    command.getKLFCommandStructure().getDisplayCode());
-        }
-        logger.trace("Adding command {} to the command queue.", command.getKLFCommandStructure().getDisplayCode());
+        // TODO : rather than executing async, we should always wait for a CFM reply (or GW_ERROR_NTF).
+        // All reads (CFM or NTF) must be done by a dedicated thread as it cannot be garantied that a NTF message does
+        // not come just after sending a REQ request.
+        // So if CFM or GW_ERROR_NTF message is receive, and notify the REQ command for completion (if match) ==> put
+        // the running command in a shared object that the read thread can access.
+        logger.trace("Adding command {} to the command queue.", command.getCommand().name());
 
         synchronized (command) {
             boolean ret = this.commandQueue.offer(command);
 
             if (ret) {
-                logger.trace("Command {} queued, awaiting processing.",
-                        command.getKLFCommandStructure().getDisplayCode());
+                logger.trace("Command {} queued, awaiting processing.", command.getCommand().name());
                 command.setStatus(CommandStatus.QUEUED);
             } else {
                 command.setStatus(CommandStatus.ERROR);
-                logger.error("Command {} could not be added to the queue.",
-                        command.getKLFCommandStructure().getDisplayCode());
+                logger.error("Command {} could not be added to the queue.", command.getCommand().name());
             }
             return ret;
         }
@@ -508,20 +477,18 @@ public class KLFCommandProcessor {
      *         successful or expected result.
      */
     public boolean executeCommand(BaseKLFCommand command, long timeout) {
-        logger.debug("Executing command {}", command.getKLFCommandStructure().getCommand());
+        logger.debug("Executing command {}", command.getCommand());
         synchronized (command) {
             if (executeCommandAsync(command)) {
                 try {
-                    logger.debug("Waiting for command {} to complete.", command.getKLFCommandStructure().getCommand());
+                    logger.debug("Waiting for command {} to complete.", command.getCommand());
                     command.wait(timeout);
                     // Processing complete (or finished due to error)
                     if (command.getStatus() == CommandStatus.ERROR) {
-                        logger.warn("command {} terminated abnormally.",
-                                command.getKLFCommandStructure().getDisplayCode());
+                        logger.warn("command {} terminated abnormally.", command.getCommand().name());
                         return true;
                     } else if (command.getStatus() == CommandStatus.COMPLETE) {
-                        logger.debug("Command {} completed successfully.",
-                                command.getKLFCommandStructure().getDisplayCode());
+                        logger.debug("Command {} completed successfully.", command.getCommand().name());
                         return true;
                     } else {
                         // Processing not completed within the allocated time

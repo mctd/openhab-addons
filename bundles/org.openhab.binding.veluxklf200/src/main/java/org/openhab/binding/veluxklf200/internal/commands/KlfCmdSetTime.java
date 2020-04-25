@@ -42,7 +42,7 @@ public class KlfCmdSetTime extends BaseKLFCommand {
     protected boolean handleResponseImpl(KLFGatewayCommands responseCommand, byte[] data) {
         switch (responseCommand) {
             case GW_SET_UTC_CFM:
-                this.commandStatus = CommandStatus.COMPLETE;
+                this.setStatus(CommandStatus.COMPLETE);
                 logger.debug("Set time acknowledged.");
                 return true;
             default:
@@ -53,5 +53,20 @@ public class KlfCmdSetTime extends BaseKLFCommand {
     @Override
     protected byte[] pack() {
         return KLFUtils.longToBytes(Instant.now().getEpochSecond());
+    }
+
+    @Override
+    public boolean isSessionRequired() {
+        return false;
+    }
+
+    @Override
+    public boolean isNodeSpecific() {
+        return false;
+    }
+
+    @Override
+    public KLFGatewayCommands getCommand() {
+        return KLFGatewayCommands.GW_SET_UTC_REQ;
     }
 }

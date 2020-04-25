@@ -64,7 +64,7 @@ public class KlfCmdGetVersion extends BaseKLFCommand {
                     default:
                         this.productType = "Unknown";
                 }
-                this.commandStatus = CommandStatus.COMPLETE;
+                this.setStatus(CommandStatus.COMPLETE);
                 logger.debug("Request version completed. Version is {}", this.getSoftwareVersion());
                 return true;
             default:
@@ -116,5 +116,20 @@ public class KlfCmdGetVersion extends BaseKLFCommand {
     @Override
     protected byte[] pack() {
         return new byte[] {};
+    }
+
+    @Override
+    public boolean isSessionRequired() {
+        return false;
+    }
+
+    @Override
+    public boolean isNodeSpecific() {
+        return false;
+    }
+
+    @Override
+    public KLFGatewayCommands getCommand() {
+        return KLFGatewayCommands.GW_GET_VERSION_REQ;
     }
 }

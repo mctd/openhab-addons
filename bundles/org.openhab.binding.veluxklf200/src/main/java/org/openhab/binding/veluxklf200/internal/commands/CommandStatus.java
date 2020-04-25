@@ -12,7 +12,7 @@ package org.openhab.binding.veluxklf200.internal.commands;
  * Used to indicate the status of a command being sent to a KLF200 unit as it
  * transitions through its life-cycle.
  *
- * @author MFK - Initial Contribution
+ * @author emmanuel
  */
 public enum CommandStatus {
 
@@ -71,7 +71,7 @@ public enum CommandStatus {
      * Sets the error detail.
      *
      * @param err
-     *                the err
+     *            the err
      * @return the command status
      */
     public CommandStatus setErrorDetail(String err) {

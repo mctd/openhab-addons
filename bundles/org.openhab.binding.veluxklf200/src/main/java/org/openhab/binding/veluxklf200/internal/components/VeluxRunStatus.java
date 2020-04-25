@@ -11,7 +11,7 @@ package org.openhab.binding.veluxklf200.internal.components;
 /**
  * Used to indicate the status of a command that is executing.
  *
- * @author MFK - Initial Contribution
+ * @author emmanuel
  */
 public enum VeluxRunStatus {
 
@@ -28,7 +28,7 @@ public enum VeluxRunStatus {
     private byte statusCode;
 
     /**
-     * Instantiates a new velux run status.
+     * Instantiates a new Velux run status.
      *
      * @param statusCode
      *            the status code
@@ -51,7 +51,7 @@ public enum VeluxRunStatus {
      *
      * @param code
      *            the code
-     * @return the velux run status
+     * @return the Velux run status
      */
     public static VeluxRunStatus createFromCode(byte code) {
         switch (code) {

@@ -11,7 +11,7 @@ package org.openhab.binding.veluxklf200.internal.components;
 /**
  * Representation of a Scene (Program) as defined on the KLF 200.
  *
- * @author MFK - Initial Contribution
+ * @author emmanuel
  */
 public class VeluxScene {
 
@@ -22,7 +22,7 @@ public class VeluxScene {
     private String sceneName;
 
     /**
-     * Instantiates a new velux scene.
+     * Instantiates a new Velux scene.
      *
      * @param sceneId
      *            the scene id

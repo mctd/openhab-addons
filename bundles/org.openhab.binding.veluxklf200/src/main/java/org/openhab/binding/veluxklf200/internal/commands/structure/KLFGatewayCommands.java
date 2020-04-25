@@ -12,7 +12,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Command numbers
+ * List of KLF 200 API commands.
+ *
+ * @author emmanuel
  */
 public enum KLFGatewayCommands {
     /** Provides information on what triggered the error. */
@@ -351,10 +353,9 @@ public enum KLFGatewayCommands {
      * @return the {@link KLFGatewayCommands} matching commandNumber if found, null otherwise
      */
     public static KLFGatewayCommands fromNumber(short commandNumber) {
-        for (KLFGatewayCommands value : values()) {
-            short number = value.getNumber();
-            if (commandNumber == number) {
-                return value;
+        for (KLFGatewayCommands testCommand : values()) {
+            if (commandNumber == testCommand.getNumber()) {
+                return testCommand;
             }
         }
         logger.error("Unsupported command with code: {}", String.format("0x%04X", commandNumber));

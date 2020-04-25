@@ -19,61 +19,56 @@ import org.eclipse.smarthome.core.thing.ThingStatusDetail;
 import org.eclipse.smarthome.core.types.Command;
 import org.eclipse.smarthome.core.types.RefreshType;
 import org.eclipse.smarthome.core.types.UnDefType;
-import org.openhab.binding.veluxklf200.internal.VeluxKLF200V2BindingConstants;
+import org.openhab.binding.veluxklf200.internal.VeluxKLF200BindingConstants;
 import org.openhab.binding.veluxklf200.internal.commands.CommandStatus;
 import org.openhab.binding.veluxklf200.internal.commands.KlfCmdGetNodeInformation;
 import org.openhab.binding.veluxklf200.internal.commands.KlfCmdSendCommand;
 import org.openhab.binding.veluxklf200.internal.components.VeluxCommandInstruction;
 import org.openhab.binding.veluxklf200.internal.components.VeluxPosition;
+import org.openhab.binding.veluxklf200.internal.status.NodeTypeSubType;
+import org.openhab.binding.veluxklf200.internal.status.Position;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * Handles interactions relating to Vertical Interior Blinds
  *
- * @author MFK - Initial Contribution
+ * @author emmanuel
  */
-public class KLF200ShutterLikeHandler extends KLF200BaseThingHandler {
+public class ActuatorHandler extends KLF200BaseThingHandler implements ActuatorListener {
 
     /** The logger. */
-    private final Logger logger = LoggerFactory.getLogger(KLF200ShutterLikeHandler.class);
+    private final Logger logger = LoggerFactory.getLogger(ActuatorHandler.class);
 
     /**
      * Constructor
      *
      * @param thing thing
      */
-    public KLF200ShutterLikeHandler(Thing thing) {
+    public ActuatorHandler(Thing thing) {
         super(thing);
     }
 
     @Override
     protected void updateStatus(ThingStatus status, ThingStatusDetail statusDetail, @Nullable String description) {
         logger.debug("updateStatus({}, {})", this.getThing().getLabel(), status);
-        // TODO Auto-generated method stub
         super.updateStatus(status, statusDetail, description);
     }
 
-    /*
-     *
-     * @see
-     * org.eclipse.smarthome.core.thing.binding.ThingHandler#handleCommand(org.eclipse.smarthome.core.thing.ChannelUID,
-     * org.eclipse.smarthome.core.types.Command)
-     */
     @Override
     public void handleCommand(ChannelUID channelUID, Command command) {
         logger.trace("handleCommand({}, {})", channelUID, command);
 
-        int nodeId = (byte) Integer.valueOf(channelUID.getThingUID().getId()).intValue();
+        byte nodeId = (byte) Integer.valueOf(channelUID.getThingUID().getId()).intValue();
         String thingLabel = getThing().getLabel();
 
         if (command == RefreshType.REFRESH) {
             logger.debug("Received refresh command for channel {} of {} (Id: {}).", channelUID.getId(), thingLabel,
                     nodeId);
             switch (channelUID.getId()) {
-                case VeluxKLF200V2BindingConstants.VELUX_POSITION_CHANNEL_ID: {
+                case VeluxKLF200BindingConstants.ACTUATOR_MP_POSITION_CHANNEL_ID: {
                     logger.debug("Updating state for {}, Id: {}", thingLabel, nodeId);
-                    KlfCmdGetNodeInformation getNodeInfoCmd = new KlfCmdGetNodeInformation((byte) nodeId);
+                    KlfCmdGetNodeInformation getNodeInfoCmd = new KlfCmdGetNodeInformation(nodeId);
                     getKLFCommandProcessor().executeCommand(getNodeInfoCmd);
                     if (getNodeInfoCmd.getStatus() == CommandStatus.COMPLETE) {
                         Integer pctClosed = getNodeInfoCmd.getNode().getCurrentPosition().getPosition();
@@ -101,7 +96,7 @@ public class KLF200ShutterLikeHandler extends KLF200BaseThingHandler {
         } else {
             logger.debug("Handling state change command for {}, Id: {}.", thingLabel, nodeId);
             switch (channelUID.getId()) {
-                case VeluxKLF200V2BindingConstants.VELUX_POSITION_CHANNEL_ID: {
+                case VeluxKLF200BindingConstants.ACTUATOR_MP_POSITION_CHANNEL_ID: {
                     logger.debug("Trigger movement for {} to position '{}'.", thingLabel, command);
 
                     short targetPosition = KlfCmdSendCommand.STOP_PARAMETER;
@@ -121,23 +116,31 @@ public class KLF200ShutterLikeHandler extends KLF200BaseThingHandler {
                         }
                         targetPosition = new VeluxPosition(targetPctClosed).toKLFCode();
 
-                        logger.debug("Sending command to move {}, (Id:{}) to {}% closed.", thingLabel, nodeId,
+                        logger.debug("Sending command to move nodeId: {} ({}) to {}% closed.", nodeId, thingLabel,
                                 targetPctClosed);
                     }
 
-                    /*
-                     * getKLFCommandProcessor()
-                     * .executeCommandAsync(new KlfCmdSetVelocity((byte) nodeId, VeluxVelocity.SILENT));
-                     */
+                    // getKLFCommandProcessor().executeCommandAsync(new KlfCmdSetVelocity(nodeId,
+                    // Velocity.SILENT));
+
+                    // getKLFCommandProcessor().executeCommandAsync(new KlfCmdGetNodeInformation(nodeId));
 
                     /*
                      * getKLFCommandProcessor()
                      * .executeCommandAsync(new KlfCmdSetName((byte) nodeId, "Volet Salon Gauche"));
                      */
 
-                    getKLFCommandProcessor()
-                            .executeCommandAsync(new KlfCmdSendCommand(new VeluxCommandInstruction((byte) nodeId,
-                                    KlfCmdSendCommand.MAIN_PARAMETER, targetPosition)));
+                    // getKLFCommandProcessor().executeCommandAsync(new KlfCmdGetAllGroups());
+
+                    // ArrayList<VeluxCommandInstruction> commands = new ArrayList<VeluxCommandInstruction>();
+                    // commands.add(new VeluxCommandInstruction((byte) nodeId, KlfCmdSendCommand.MAIN_PARAMETER,
+                    // targetPosition));
+                    // commands.add(new VeluxCommandInstruction((byte) nodeId, (byte) 0x0001, (short) 0xC800));
+
+                    // getKLFCommandProcessor().executeCommandAsync(new KlfCmdSendCommand(commands));
+
+                    getKLFCommandProcessor().executeCommandAsync(new KlfCmdSendCommand(
+                            new VeluxCommandInstruction(nodeId, KlfCmdSendCommand.MAIN_PARAMETER, targetPosition)));
                     break;
                 }
                 default: {
@@ -146,5 +149,17 @@ public class KLF200ShutterLikeHandler extends KLF200BaseThingHandler {
                 }
             }
         }
+    }
+
+    @Override
+    public void PositionChanged(Position newPosition) {
+        logger.info("triggered PositionChanged");
+
+    }
+
+    @Override
+    public void InfoUpdated(NodeTypeSubType nodeTypeSubType) {
+        logger.info("triggered InfoUpdated");
+        updateProperty(VeluxKLF200BindingConstants.ACTUATOR_PROP_PRODUCT_TYPE, nodeTypeSubType.toString());
     }
 }

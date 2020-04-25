@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
  * Various utility functions that are used when interacting with or parsing data
  * pertaining to the KLF200 unit.
  *
- * @author MFK - Initial Contribution
+ * @author emmanuel
  */
 public class KLFUtils {
 
@@ -277,5 +277,43 @@ public class KLFUtils {
         data[1] = (byte) (value >>> 16);
         data[0] = (byte) (value >>> 32);
         return data;
+    }
+
+    /**
+     * Returns the size of a primitive data type (in bytes).
+     *
+     * @param dataType
+     * @return
+     */
+    public static int sizeof(Object data) {
+        if (data == null) {
+            return 0;
+        }
+
+        Class<?> objClass = data.getClass();
+
+        if (objClass == int.class || objClass == Integer.class) {
+            return 4;
+        }
+        if (objClass == short.class || objClass == Short.class) {
+            return 2;
+        }
+        if (objClass == byte.class || objClass == Byte.class) {
+            return 1;
+        }
+        if (objClass == char.class || objClass == Character.class) {
+            return 2;
+        }
+        if (objClass == long.class || objClass == Long.class) {
+            return 8;
+        }
+        if (objClass == float.class || objClass == Float.class) {
+            return 4;
+        }
+        if (objClass == double.class || objClass == Double.class) {
+            return 8;
+        }
+
+        throw new IllegalArgumentException(String.format("Unsupported data type: %s", objClass.toString()));
     }
 }

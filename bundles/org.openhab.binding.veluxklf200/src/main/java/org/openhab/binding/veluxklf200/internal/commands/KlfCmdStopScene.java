@@ -11,7 +11,7 @@ package org.openhab.binding.veluxklf200.internal.commands;
 import org.openhab.binding.veluxklf200.internal.commands.structure.KLFCommandStructure;
 import org.openhab.binding.veluxklf200.internal.commands.structure.KLFGatewayCommands;
 import org.openhab.binding.veluxklf200.internal.components.VeluxRunStatus;
-import org.openhab.binding.veluxklf200.internal.components.VeluxStatusReply;
+import org.openhab.binding.veluxklf200.internal.status.StatusReply;
 import org.openhab.binding.veluxklf200.internal.utility.KLFUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,23 +46,23 @@ public class KlfCmdStopScene extends BaseKLFCommand {
                         break;
                     case 1:
                         logger.error("Request to stop scene rejected - Invalid Parameter");
-                        this.commandStatus = CommandStatus.ERROR
-                                .setErrorDetail("Request to execute scene rejected - Invalid Parameter");
+                        this.setStatus(CommandStatus.ERROR
+                                .setErrorDetail("Request to execute scene rejected - Invalid Parameter"));
                         break;
                     case 2:
                         logger.error("Request to stop scene rejected - Request Rejected");
-                        this.commandStatus = CommandStatus.ERROR
-                                .setErrorDetail("Request to execute scene rejected - Request Rejected");
+                        this.setStatus(CommandStatus.ERROR
+                                .setErrorDetail("Request to execute scene rejected - Request Rejected"));
                         break;
                 }
                 return true;
             case GW_SESSION_FINISHED_NTF:
                 logger.debug("Finished stopping the scene");
-                this.commandStatus = CommandStatus.COMPLETE;
+                this.setStatus(CommandStatus.COMPLETE);
                 return true;
             case GW_COMMAND_RUN_STATUS_NTF:
                 VeluxRunStatus runStatus = VeluxRunStatus.createFromCode(data[FIRSTBYTE + 7]);
-                VeluxStatusReply statusReply = VeluxStatusReply.create(data[FIRSTBYTE + 8]);
+                StatusReply statusReply = StatusReply.fromCode(data[FIRSTBYTE + 8]);
                 logger.trace(
                         "Notification for Node {}, relating to function parameter {}, Run status is: {}, Command status is: {} ",
                         data[FIRSTBYTE + 3], data[FIRSTBYTE + 4], runStatus, statusReply);
@@ -105,4 +105,18 @@ public class KlfCmdStopScene extends BaseKLFCommand {
         }
     }
 
+    @Override
+    public boolean isSessionRequired() {
+        return true;
+    }
+
+    @Override
+    public boolean isNodeSpecific() {
+        return false;
+    }
+
+    @Override
+    public KLFGatewayCommands getCommand() {
+        return KLFGatewayCommands.GW_STOP_SCENE_REQ;
+    }
 }

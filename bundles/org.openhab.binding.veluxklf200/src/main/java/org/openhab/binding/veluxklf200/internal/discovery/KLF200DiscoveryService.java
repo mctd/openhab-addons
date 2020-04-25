@@ -19,7 +19,7 @@ import org.eclipse.smarthome.config.discovery.DiscoveryResult;
 import org.eclipse.smarthome.config.discovery.DiscoveryResultBuilder;
 import org.eclipse.smarthome.core.thing.ThingTypeUID;
 import org.eclipse.smarthome.core.thing.ThingUID;
-import org.openhab.binding.veluxklf200.internal.VeluxKLF200V2BindingConstants;
+import org.openhab.binding.veluxklf200.internal.VeluxKLF200BindingConstants;
 import org.openhab.binding.veluxklf200.internal.commands.KlfCmdGetAllNodes;
 import org.openhab.binding.veluxklf200.internal.commands.KlfCmdGetAllScenes;
 import org.openhab.binding.veluxklf200.internal.components.VeluxNode;
@@ -32,8 +32,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Responsible for discovering all of the devices that are available on the KLF200 bridge.
  *
- * @author Emmanuel Bachschmidt - made more generic
- * @author MFK - Initial Contribution
+ * @author emmanuel
  */
 @NonNullByDefault
 public class KLF200DiscoveryService extends AbstractDiscoveryService {
@@ -53,46 +52,26 @@ public class KLF200DiscoveryService extends AbstractDiscoveryService {
      * @param bridge Parent bridge for the KLF200 {@link KLF200BridgeHandler}
      */
     public KLF200DiscoveryService(KLF200BridgeHandler bridge) {
-        super(VeluxKLF200V2BindingConstants.SUPPORTED_VELUX_KLF200_THING_TYPES_UIDS, DISCOVERY_TIMEOUT, true);
+        super(VeluxKLF200BindingConstants.SUPPORTED_VELUX_KLF200_THING_TYPES_UIDS, DISCOVERY_TIMEOUT, true);
         logger.debug("KLF200DiscoveryService {}", bridge);
         this.bridge = bridge;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.eclipse.smarthome.config.discovery.AbstractDiscoveryService#abortScan()
-     */
     @Override
     public synchronized void abortScan() {
         super.abortScan();
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.eclipse.smarthome.config.discovery.AbstractDiscoveryService#startScan()
-     */
     @Override
     protected void startScan() {
         discoverKLF200Things(bridge.getKLFCommandProcessor(), bridge.getThing().getUID());
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.eclipse.smarthome.config.discovery.AbstractDiscoveryService#startBackgroundDiscovery()
-     */
     @Override
     protected void startBackgroundDiscovery() {
         discoverKLF200Things(bridge.getKLFCommandProcessor(), bridge.getThing().getUID());
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.eclipse.smarthome.config.discovery.AbstractDiscoveryService#deactivate()
-     */
     @Override
     public void deactivate() {
         super.deactivate();
@@ -112,7 +91,7 @@ public class KLF200DiscoveryService extends AbstractDiscoveryService {
     }
 
     /**
-     * Executes a KLFCMD_GetAllNodes to get a list of all nodes on the KLF200.
+     * Gets the list of all nodes defined on the KLF200.
      *
      * @param klf200 CommandProcessor
      * @param bridgeUID bridge UID
@@ -152,7 +131,7 @@ public class KLF200DiscoveryService extends AbstractDiscoveryService {
         for (Iterator<VeluxScene> it = scenes.getScenes().iterator(); it.hasNext();) {
             VeluxScene s = it.next();
             logger.info("Found scene '{}', Called: '{}'", s.getSceneId(), s.getSceneName());
-            ThingUID thingUID = new ThingUID(VeluxKLF200V2BindingConstants.THING_TYPE_VELUX_SCENE, bridgeUID,
+            ThingUID thingUID = new ThingUID(VeluxKLF200BindingConstants.THING_TYPE_VELUX_SCENE, bridgeUID,
                     String.valueOf(s.getSceneId()));
 
             DiscoveryResult discoveryResult = DiscoveryResultBuilder.create(thingUID).withBridge(bridgeUID)
@@ -181,11 +160,6 @@ public class KLF200DiscoveryService extends AbstractDiscoveryService {
         return properties;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.eclipse.smarthome.config.discovery.AbstractDiscoveryService#stopScan()
-     */
     @Override
     protected synchronized void stopScan() {
         super.stopScan();

@@ -40,7 +40,7 @@ public class KlfCmdEnableHomeStatusMonitor extends BaseKLFCommand {
         switch (responseCommand) {
             case GW_HOUSE_STATUS_MONITOR_ENABLE_CFM:
                 logger.debug("Home Status Monitor enal.");
-                this.commandStatus = CommandStatus.COMPLETE;
+                this.setStatus(CommandStatus.COMPLETE);
                 return true;
             default:
                 return false;
@@ -50,5 +50,20 @@ public class KlfCmdEnableHomeStatusMonitor extends BaseKLFCommand {
     @Override
     protected byte[] pack() {
         return new byte[] {};
+    }
+
+    @Override
+    public boolean isSessionRequired() {
+        return false;
+    }
+
+    @Override
+    public boolean isNodeSpecific() {
+        return false;
+    }
+
+    @Override
+    public KLFGatewayCommands getCommand() {
+        return KLFGatewayCommands.GW_HOUSE_STATUS_MONITOR_ENABLE_REQ;
     }
 }

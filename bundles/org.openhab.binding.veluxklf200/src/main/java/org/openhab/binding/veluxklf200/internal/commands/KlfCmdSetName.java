@@ -53,20 +53,20 @@ public class KlfCmdSetName extends BaseKLFCommand {
                 switch (status) {
                     case CMD_STATUS_ACCEPTED:
                         logger.debug("Command accepted for node: {}", nodeId);
-                        this.commandStatus = CommandStatus.COMPLETE;
+                        this.setStatus(CommandStatus.COMPLETE);
                         break;
                     case CMD_ERROR_REQUEST_REJECTED:
                         logger.warn("The command was rejected for node {}.", nodeId);
-                        this.commandStatus = CommandStatus.ERROR;
+                        this.setStatus(CommandStatus.ERROR);
                         break;
                     case CMD_ERROR_INVALID_SYSTEM_TABLE_INDEX:
                         logger.warn("The command failed: invalid system table index {}.", nodeId);
-                        this.commandStatus = CommandStatus.ERROR;
+                        this.setStatus(CommandStatus.ERROR);
                         break;
                     default:
                         logger.error("An unknown confirmation code was recieved: {}, marking the command as ERROR.",
                                 status);
-                        this.commandStatus = CommandStatus.ERROR;
+                        this.setStatus(CommandStatus.ERROR);
                         break;
                 }
                 return true;
@@ -101,5 +101,20 @@ public class KlfCmdSetName extends BaseKLFCommand {
                 logger.error("Unknown response command.");
                 return BaseKLFCommand.NOT_REQUIRED;
         }
+    }
+
+    @Override
+    public boolean isSessionRequired() {
+        return false;
+    }
+
+    @Override
+    public boolean isNodeSpecific() {
+        return true;
+    }
+
+    @Override
+    public KLFGatewayCommands getCommand() {
+        return KLFGatewayCommands.GW_SET_NODE_NAME_REQ;
     }
 }

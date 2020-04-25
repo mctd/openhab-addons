@@ -11,7 +11,7 @@ package org.openhab.binding.veluxklf200.internal.components;
 /**
  * List of possible error responses that may be returned from the KLF200 unit.
  *
- * @author MFK - Initial Contribution
+ * @author emmanuel
  */
 public enum VeluxErrorResponse {
 

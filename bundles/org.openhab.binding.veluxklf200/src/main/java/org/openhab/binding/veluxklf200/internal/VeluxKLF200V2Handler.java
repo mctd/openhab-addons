@@ -8,10 +8,10 @@ package org.openhab.binding.veluxklf200.internal;
  * http://www.eclipse.org/legal/epl-v10.html
  */
 
-// import static org.openhab.binding.veluxklf200.internal.VeluxKLF200V2BindingConstants.*;
+// import static org.openhab.binding.veluxklf200.internal.VeluxKLF200BindingConstants.*;
 //
 // import org.eclipse.jdt.annotation.NonNullByDefault;import org.eclipse.jdt.annotation.Nullable;import
-/// org.openhab.binding.veluxklf200.internal.VeluxKLF200V2Configuration;import
+/// org.openhab.binding.veluxklf200.internal.BridgeConfiguration;import
 /// org.eclipse.smarthome.core.thing.ChannelUID;import org.eclipse.smarthome.core.thing.Thing;import
 /// org.eclipse.smarthome.core.thing.ThingStatus;import org.eclipse.smarthome.core.thing.binding.BaseThingHandler;import
 /// org.eclipse.smarthome.core.types.Command;import org.eclipse.smarthome.core.types.RefreshType;import
@@ -28,7 +28,7 @@ package org.openhab.binding.veluxklf200.internal;
 // private final Logger logger = LoggerFactory.getLogger(VeluxKLF200V2Handler.class);
 //
 // @Nullable
-// private VeluxKLF200V2Configuration config;
+// private BridgeConfiguration config;
 //
 // public VeluxKLF200V2Handler(Thing thing) {
 // super(thing);
@@ -53,7 +53,7 @@ package org.openhab.binding.veluxklf200.internal;
 // @Override
 // public void initialize() {
 // // logger.debug("Start initializing!");
-// config = getConfigAs(VeluxKLF200V2Configuration.class);
+// config = getConfigAs(BridgeConfiguration.class);
 //
 // // TODO: Initialize the handler.
 // // The framework requires you to return from this method quickly. Also, before leaving this method a thing

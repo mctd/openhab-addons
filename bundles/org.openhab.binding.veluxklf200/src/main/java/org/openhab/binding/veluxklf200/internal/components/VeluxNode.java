@@ -11,10 +11,12 @@ package org.openhab.binding.veluxklf200.internal.components;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import org.openhab.binding.veluxklf200.internal.status.Velocity;
+
 /**
- * Representation of a velux node.
+ * Representation of a Velux node.
  *
- * @author MFK - Initial Contribution
+ * @author emmanuel
  */
 public class VeluxNode {
 
@@ -22,7 +24,7 @@ public class VeluxNode {
     private byte nodeId;
 
     /**
-     * The order in which the node occurrs in the system (as defined on the KLF200).
+     * The order in which the node occurs in the system (as defined on the KLF200).
      */
     private short order;
 
@@ -38,7 +40,7 @@ public class VeluxNode {
     /**
      * Indicates the velocity the node is operating at (eg: Default, Silent, etc..).
      */
-    private VeluxVelocity velocity;
+    private Velocity velocity;
 
     /** The type of node. */
     private VeluxNodeType nodeTypeSubType;
@@ -152,7 +154,7 @@ public class VeluxNode {
         this.order = order;
         this.placement = placement;
         this.name = name;
-        this.velocity = VeluxVelocity.createFromCode(veluxVelocity);
+        this.velocity = Velocity.fromCode(veluxVelocity);
         this.nodeTypeSubType = VeluxNodeType.createFromCode(nodeTypeSubType);
         this.productGroup = productGroup;
         this.productType = productType;
@@ -183,7 +185,7 @@ public class VeluxNode {
         ret += "\nOrder: " + order;
         ret += "\nPlacement: " + placement;
         ret += "\nName: " + name;
-        ret += "\nVelocity: " + velocity.getDisplayVelocity();
+        ret += "\nVelocity: " + velocity.getDisplayName();
         ret += "\nNode Type: " + nodeTypeSubType.getDisplayName();
         ret += "\nCurrent Position: " + currentPosition;
         ret += "\nTarget Position: " + targetPosition;
@@ -244,7 +246,7 @@ public class VeluxNode {
      *
      * @return the velocity
      */
-    public VeluxVelocity getVelocity() {
+    public Velocity getVelocity() {
         return velocity;
     }
 

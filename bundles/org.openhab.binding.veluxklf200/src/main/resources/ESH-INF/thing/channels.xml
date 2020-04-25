@@ -4,14 +4,6 @@
     xmlns:thing="https://openhab.org/schemas/thing-description/v1.0.0"
     xsi:schemaLocation="https://openhab.org/schemas/thing-description/v1.0.0 https://openhab.org/schemas/thing-description-1.0.0.xsd">
 
-	<!-- <channel-type id="connection_status">
-		<item-type>Switch</item-type>
-		<label>Connected</label>
-		<description>Indicates whether or not the connection to the KLF200 is active.</description>
-		<category>Switch</category>
-		<state readOnly="true"></state>
-	</channel-type> -->
-
 	<channel-type id="scene_trigger">
 		<item-type>Switch</item-type>
 		<label>Execute</label>
@@ -20,24 +12,10 @@
 		<state readOnly="false"></state>
 	</channel-type>
 
-	<channel-type id="shutter-control">
+	<channel-type id="position-control">
 		<item-type>Rollershutter</item-type>
 		<label>Control</label>
-		<description>Device control (Up, Down, closure 0-100%)</description>
+		<description>Actuator position control (Up, Down, closure 0-100%)</description>
 		<state readOnly="false"></state>
 	</channel-type>
-	
-	<channel-type id="shutter-status">
-		<item-type>Switch</item-type>
-		<label>Moving</label>
-		<description>Device is moving</description>
-		<state readOnly="true"></state>
-	</channel-type>
-
-	<channel-type id="shutter-last-movement-timestamp">
-		<item-type>DateTime</item-type>
-		<label>Last movement</label>
-		<description>Timestamp of last known movement</description>
-		<state readOnly="true"></state>
-	</channel-type>	
 </thing:thing-descriptions>

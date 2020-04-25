@@ -16,7 +16,7 @@ import org.openhab.binding.veluxklf200.internal.commands.structure.KLFCommandStr
 import org.openhab.binding.veluxklf200.internal.commands.structure.KLFGatewayCommands;
 import org.openhab.binding.veluxklf200.internal.components.VeluxCommandInstruction;
 import org.openhab.binding.veluxklf200.internal.components.VeluxRunStatus;
-import org.openhab.binding.veluxklf200.internal.components.VeluxStatusReply;
+import org.openhab.binding.veluxklf200.internal.status.StatusReply;
 import org.openhab.binding.veluxklf200.internal.utility.KLFUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,11 +52,13 @@ public class KlfCmdSendCommand extends BaseKLFCommand {
      * @param nodeCommand
      *            the node command
      */
-    public KlfCmdSendCommand(byte nodeId, byte function, short nodeCommand) {
-        super();
-        this.commands = new ArrayList<VeluxCommandInstruction>();
-        commands.add(new VeluxCommandInstruction(nodeId, function, nodeCommand));
-    }
+    /*
+     * public KlfCmdSendCommand(byte nodeId, byte function, short nodeCommand) {
+     * super();
+     * this.commands = new ArrayList<VeluxCommandInstruction>();
+     * commands.add(new VeluxCommandInstruction(nodeId, function, nodeCommand));
+     * }
+     */
 
     /**
      * Constructor variant that creates a command with a single instruction to
@@ -94,7 +96,7 @@ public class KlfCmdSendCommand extends BaseKLFCommand {
                     case CMD_STATUS_REJECTED:
                         logger.warn("The command was rejected for session {}, marking the command as ERROR.",
                                 sessionId);
-                        this.commandStatus = CommandStatus.ERROR;
+                        this.setStatus(CommandStatus.ERROR);
                         break;
                     case CMD_STATUS_ACCEPTED:
                         logger.debug("Command accepted for session: {}", sessionId);
@@ -102,17 +104,23 @@ public class KlfCmdSendCommand extends BaseKLFCommand {
                     default:
                         logger.error("An unknown confirmation code was recieved: {}, marking the command as ERROR.",
                                 status);
-                        this.commandStatus = CommandStatus.ERROR;
+                        this.setStatus(CommandStatus.ERROR);
                         break;
                 }
                 return true;
             case GW_COMMAND_RUN_STATUS_NTF:
                 VeluxRunStatus runStatus = VeluxRunStatus.createFromCode(data[FIRSTBYTE + 7]);
-                VeluxStatusReply statusReply = VeluxStatusReply.create(data[FIRSTBYTE + 8]);
+                StatusReply statusReply = StatusReply.fromCode(data[FIRSTBYTE + 8]);
+                short sessionID = KLFUtils.extractTwoBytes(data, FIRSTBYTE);
+                byte statusID = data[FIRSTBYTE + 2];
+                byte nodeID = data[FIRSTBYTE + 3];
+                byte nodeParameter = data[FIRSTBYTE + 4];
+                short parameterValue = KLFUtils.extractTwoBytes(data, FIRSTBYTE + 5);
+
                 logger.debug(
-                        "GW_COMMAND_RUN_STATUS_NTF Notification for Node {}, relating to function parameter {}, Session: {}, Run status is: {}, Command status is: {} ",
-                        data[FIRSTBYTE + 3], KLFUtils.extractTwoBytes(data, FIRSTBYTE), data[FIRSTBYTE + 4], runStatus,
-                        statusReply);
+                        // SessionID StatusID Index NodeParameter ParameterValue
+                        "GW_COMMAND_RUN_STATUS_NTF(SessionID: {}, StatusID: {}, Index: {}, NodeParameter: {}, ParameterValue: {}, RunStatus: {}, StatusReply: {}",
+                        sessionID, statusID, nodeID, nodeParameter, parameterValue, runStatus, statusReply);
                 return true;
             case GW_COMMAND_REMAINING_TIME_NTF:
                 logger.debug(
@@ -121,9 +129,8 @@ public class KlfCmdSendCommand extends BaseKLFCommand {
                         KLFUtils.extractTwoBytes(data, FIRSTBYTE + 4));
                 return true;
             case GW_SESSION_FINISHED_NTF:
-                logger.debug("Processing of the command with session: {} is complete.",
-                        KLFUtils.extractTwoBytes(data, FIRSTBYTE));
-                this.commandStatus = CommandStatus.COMPLETE;
+                logger.debug("GW_SESSION_FINISHED_NTF(SessionID: {})", KLFUtils.extractTwoBytes(data, FIRSTBYTE));
+                this.setStatus(CommandStatus.COMPLETE);
                 return true;
             default:
                 return false;
@@ -154,6 +161,10 @@ public class KlfCmdSendCommand extends BaseKLFCommand {
             // ParameterActive
             data[4] = cmd.getFunction();
 
+            // FPI1 / FPI2
+            // data[5] = 0;
+            // data[6] = 0;
+
             // FunctionalParameterValueArray
             data[7 + (counter * 2)] = (byte) (cmd.getPosition() >>> 8);
             data[8 + (counter * 2)] = (byte) cmd.getPosition();
@@ -171,4 +182,18 @@ public class KlfCmdSendCommand extends BaseKLFCommand {
         return KLFUtils.extractTwoBytes(data, FIRSTBYTE);
     }
 
+    @Override
+    public boolean isSessionRequired() {
+        return true;
+    }
+
+    @Override
+    public boolean isNodeSpecific() {
+        return false;
+    }
+
+    @Override
+    public KLFGatewayCommands getCommand() {
+        return KLFGatewayCommands.GW_COMMAND_SEND_REQ;
+    }
 }

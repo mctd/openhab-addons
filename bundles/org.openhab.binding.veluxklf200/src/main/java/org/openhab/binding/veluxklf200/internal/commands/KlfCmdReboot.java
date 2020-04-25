@@ -50,4 +50,19 @@ public class KlfCmdReboot extends BaseKLFCommand {
     protected byte[] pack() {
         return new byte[] {};
     }
+
+    @Override
+    public boolean isSessionRequired() {
+        return false;
+    }
+
+    @Override
+    public boolean isNodeSpecific() {
+        return false;
+    }
+
+    @Override
+    public KLFGatewayCommands getCommand() {
+        return KLFGatewayCommands.GW_REBOOT_REQ;
+    }
 }

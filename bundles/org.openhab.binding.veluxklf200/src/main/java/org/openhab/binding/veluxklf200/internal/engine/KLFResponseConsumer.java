@@ -14,8 +14,11 @@ import java.util.Iterator;
 import org.openhab.binding.veluxklf200.internal.commands.BaseKLFCommand;
 import org.openhab.binding.veluxklf200.internal.commands.CommandStatus;
 import org.openhab.binding.veluxklf200.internal.commands.KlfCmdTerminate;
+import org.openhab.binding.veluxklf200.internal.commands.response.BaseResponse;
+import org.openhab.binding.veluxklf200.internal.commands.response.ResponseFactory;
 import org.openhab.binding.veluxklf200.internal.commands.structure.KLFGatewayCommands;
 import org.openhab.binding.veluxklf200.internal.components.VeluxErrorResponse;
+import org.openhab.binding.veluxklf200.internal.utility.KLFCommandFrame;
 import org.openhab.binding.veluxklf200.internal.utility.KLFUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,19 +51,32 @@ class KLFResponseConsumer implements Runnable {
         logger.debug("Starting the response consumer. Thread Id: {}", Thread.currentThread().getId());
         while (!queueShutdown) {
             try {
-                byte[] temp = new byte[CONNECTION_BUFFER_SIZE];
-                int messageLength = processor.klfInputStream.read(temp, 0, temp.length);
+                byte[] receiveBuffer = new byte[CONNECTION_BUFFER_SIZE];
+                int messageLength = processor.klfInputStream.read(receiveBuffer, 0, receiveBuffer.length);
                 if (messageLength == -1) {
                     // Most likely the stream has closed, so shutdown the queue
                     logger.warn("Received end of file while reading on KLF200 socket, shuting down.");
                     queueShutdown = true;
                 } else {
-                    byte[] data = new byte[messageLength];
-                    System.arraycopy(temp, 0, data, 0, messageLength);
+                    // Copy the byte array to a properly sized container
+                    byte[] slipFrame = new byte[messageLength];
+                    System.arraycopy(receiveBuffer, 0, slipFrame, 0, messageLength);
+                    logger.trace("Received response (raw): {}", KLFUtils.formatBytes(slipFrame));
 
-                    logger.trace("Received response (raw): {}", KLFUtils.formatBytes(data));
+                    KLFCommandFrame commandFrame = KLFCommandFrame.fromSlipFrame(slipFrame);
+                    BaseResponse response = ResponseFactory.createFromCommandFrame(commandFrame);
+                    // TODO: Here we have the response object (or null if not handled). Handle it!
 
-                    byte decoded[] = KLFUtils.slipRFC1055decode(data);
+                    if (response != null) {
+                        // if (response.isNotification()) {
+                        // TODO
+                        // processor.eventNotification.notifyEvent(response);
+                        // }
+                    } else {
+                        logger.warn("Unable to understand response.");
+                    }
+
+                    byte decoded[] = KLFUtils.slipRFC1055decode(slipFrame);
                     KLFGatewayCommands responseCommand = KLFGatewayCommands
                             .fromNumber(KLFUtils.decodeKLFCommand(decoded));
                     // TODO: handle responseCommand==null (in case the response command is not yet implemented)
@@ -71,7 +87,7 @@ class KLFResponseConsumer implements Runnable {
                         if (KLFGatewayCommands.GW_ERROR_NTF == responseCommand) {
                             // General error notification received
                             VeluxErrorResponse error = VeluxErrorResponse
-                                    .createFromCode(data[BaseKLFCommand.FIRSTBYTE]);
+                                    .createFromCode(slipFrame[BaseKLFCommand.FIRSTBYTE]);
                             logger.error("Error Notification Recieved: {}", error);
                             handleGeneralError(error);
                         } else {
@@ -81,32 +97,32 @@ class KLFResponseConsumer implements Runnable {
                                 processor.eventNotification.notifyEvent(responseCommand, decoded);
                             }
 
-                            BaseKLFCommand cmd = findInProgressCommand(responseCommand, decoded);
-                            if (cmd != null) {
-                                synchronized (cmd) {
-                                    cmd.handleResponse(responseCommand, decoded);
-                                    switch (cmd.getStatus()) {
+                            BaseKLFCommand command = findInProgressCommand(responseCommand, decoded);
+                            if (command != null) {
+                                synchronized (command) {
+                                    command.handleResponse(responseCommand, decoded);
+                                    switch (command.getStatus()) {
                                         case ERROR:
                                             logger.trace("Response is in an error state for command {}.",
-                                                    cmd.getKLFCommandStructure().getDisplayCode());
+                                                    command.getCommand().name());
                                         case COMPLETE:
                                             logger.trace(
                                                     "Response processed for command {}. No further responses expected, notifying observers.",
-                                                    cmd.getKLFCommandStructure().getDisplayCode());
-                                            processor.getCommandsInProgress().remove(cmd);
-                                            cmd.notifyAll();
+                                                    command.getCommand().name());
+                                            processor.getCommandsInProgress().remove(command);
+                                            command.notifyAll();
                                             break;
                                         case PROCESSING:
                                             // Do nothing, command expecting further responses
                                             logger.trace(
                                                     "Response recieved for command {}, but expecting further responses.",
-                                                    cmd.getKLFCommandStructure().getDisplayCode());
+                                                    command.getCommand().name());
                                             break;
                                         default:
                                             // Should never happen as no other states are valid at this stage.
                                             logger.error(
                                                     "An unexpected condition occurred. A {} command was found with status '{}', this is not permitted at this time.",
-                                                    cmd.getKLFCommandStructure().getDisplayCode(), cmd.getStatus());
+                                                    command.getCommand().name(), command.getStatus());
                                             break;
                                     }
                                 }
@@ -124,11 +140,11 @@ class KLFResponseConsumer implements Runnable {
                         }
                     } else {
                         logger.error("Unable to SLIP RFC1055 decode the payload recieved, discarding. {}",
-                                KLFUtils.formatBytes(data));
+                                KLFUtils.formatBytes(slipFrame));
                     }
                 }
             } catch (IOException e) {
-                if (processor.communicationStopped) {
+                if (processor.isCommunicationStopped()) {
                     logger.info(
                             "Error caught when awaiting a response from KLF200 unit, but as the command processor is marked to shutdown, assuming it's ok: {}",
                             e.getMessage());
@@ -144,11 +160,13 @@ class KLFResponseConsumer implements Runnable {
         // Ask the command consumer to terminate
         processor.getCommandQueue().offerFirst(new KlfCmdTerminate());
 
-        try {
-            // Closing socket so the watchdog can detect something went wrong
-            processor.klfRawSocket.close();
-        } catch (IOException e) {
-            logger.error("Error while closing communication socket.");
+        if (processor.klfRawSocket != null) {
+            try {
+                // Closing socket so the watchdog can detect something went wrong
+                processor.klfRawSocket.close();
+            } catch (IOException e) {
+                logger.error("Error while closing communication socket.");
+            }
         }
     }
 

@@ -7,30 +7,24 @@
 	<bridge-type id="klf200-bridge">
 		<label>Velux KLF200 Bridge</label>
 		<description>This bridge connects to a Velux KLF200 device running firmware version 2.x.</description>
-		<!--<channels>
-            <channel id="connection_status" typeId="connection_status">
-				<label>Connected</label>
-				<description>Indicates whether or not the connection to the KLF200 is active.</description>
-			</channel>
-		</channels> -->
 		<config-description>
 			<parameter name="hostname" type="text" required="true">
 				<label>IP / Hostname</label>
-				<description>The IP address or Hostname of the KLF200 that you want to connect to.</description>
+				<description>The IP address or Hostname of the KLF200 unit.</description>
 			</parameter>
 			<parameter name="password" type="text" required="true">
 				<context>password</context>
 				<label>Password</label>
-				<description>If you have not changed the password, it is the wlan password printed on the underside of the KLF200 unit.</description>
+				<description>Device password (default is printed underside of the KLF200 unit).</description>
 			</parameter>
 			<parameter name="port" type="integer" required="true">
-				<label>Socket Port</label>
-				<description>The port that the unit is listening on. By default, 51200.</description>
+				<label>Port</label>
+				<description>The port that the unit is listening to (default: 51200).</description>
 				<default>51200</default>
 			</parameter>
 			<parameter name="refresh" type="integer" required="true">
 				<label>Refresh Period</label>
-				<description>Frequency (in minutes) of the refresh interval.</description>
+				<description>Refresh interval (in minutes).</description>
 				<default>5</default>
 			</parameter>
 		</config-description>

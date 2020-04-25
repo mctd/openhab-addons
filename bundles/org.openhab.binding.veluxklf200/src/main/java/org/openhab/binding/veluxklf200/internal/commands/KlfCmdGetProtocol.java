@@ -37,7 +37,7 @@ public class KlfCmdGetProtocol extends BaseKLFCommand {
             case GW_GET_PROTOCOL_VERSION_CFM:
                 this.protocol = "" + KLFUtils.extractTwoBytes(data, FIRSTBYTE);
                 this.protocol += "." + KLFUtils.extractTwoBytes(data, FIRSTBYTE + 2);
-                this.commandStatus = CommandStatus.COMPLETE;
+                this.setStatus(CommandStatus.COMPLETE);
                 logger.debug("Get protocol command completed. Protocol is {}", this.getProtocol());
                 return true;
             default:
@@ -62,5 +62,20 @@ public class KlfCmdGetProtocol extends BaseKLFCommand {
     @Override
     protected byte[] pack() {
         return new byte[] {};
+    }
+
+    @Override
+    public boolean isSessionRequired() {
+        return false;
+    }
+
+    @Override
+    public boolean isNodeSpecific() {
+        return false;
+    }
+
+    @Override
+    public KLFGatewayCommands getCommand() {
+        return KLFGatewayCommands.GW_GET_PROTOCOL_VERSION_REQ;
     }
 }

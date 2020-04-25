@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
  * Abstraction from the main handlers to include some helper functionality such as methods for finding the bridge and
  * finding things
  *
- * @author MFK - Initial Contribution
+ * @author emmanuel
  */
 public abstract class KLF200BaseThingHandler extends BaseThingHandler {
 

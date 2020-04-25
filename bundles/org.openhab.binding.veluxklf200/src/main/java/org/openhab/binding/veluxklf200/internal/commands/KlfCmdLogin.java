@@ -47,10 +47,10 @@ public class KlfCmdLogin extends BaseKLFCommand {
                 logger.trace("Handling GW_PASSWORD_ENTER_CFM with payload {}", KLFUtils.formatBytes(data));
                 if (data[FIRSTBYTE] == 0) {
                     // Authentication was successful.
-                    this.commandStatus = CommandStatus.COMPLETE;
+                    this.setStatus(CommandStatus.COMPLETE);
                 } else {
                     // Authentication failed.
-                    this.commandStatus = CommandStatus.ERROR;
+                    this.setStatus(CommandStatus.ERROR);
                 }
                 return true;
             default:
@@ -79,5 +79,25 @@ public class KlfCmdLogin extends BaseKLFCommand {
         }
         System.arraycopy(password, 0, data, 0, password.length);
         return data;
+    }
+
+    @Override
+    public boolean isSessionRequired() {
+        return false;
+    }
+
+    @Override
+    public boolean isAuthRequired() {
+        return false;
+    }
+
+    @Override
+    public boolean isNodeSpecific() {
+        return false;
+    }
+
+    @Override
+    public KLFGatewayCommands getCommand() {
+        return KLFGatewayCommands.GW_PASSWORD_ENTER_REQ;
     }
 }

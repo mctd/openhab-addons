@@ -9,9 +9,9 @@
 package org.openhab.binding.veluxklf200.internal.components;
 
 /**
- * Indicates a node variation.
+ * Represents a node variation.
  *
- * @author MFK - Initial Contribution
+ * @author emmanuel
  */
 public enum VeluxNodeVariation {
 

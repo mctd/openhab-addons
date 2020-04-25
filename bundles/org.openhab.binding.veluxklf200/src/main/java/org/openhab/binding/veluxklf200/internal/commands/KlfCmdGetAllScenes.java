@@ -52,7 +52,7 @@ public class KlfCmdGetAllScenes extends BaseKLFCommand {
                 int scenesExpected = data[FIRSTBYTE];
                 logger.debug("Command executing, expecting data for {} scenes.", scenesExpected);
                 if (0 == scenesExpected) {
-                    this.commandStatus = CommandStatus.COMPLETE;
+                    this.setStatus(CommandStatus.COMPLETE);
                 }
                 return true;
             case GW_GET_SCENE_LIST_NTF:
@@ -66,7 +66,7 @@ public class KlfCmdGetAllScenes extends BaseKLFCommand {
                             KLFUtils.extractUTF8String(data, framePos + 1, framePos + 64)));
                     framePos += 65;
                 }
-                this.commandStatus = CommandStatus.COMPLETE;
+                this.setStatus(CommandStatus.COMPLETE);
                 return true;
             default:
                 return false;
@@ -82,5 +82,20 @@ public class KlfCmdGetAllScenes extends BaseKLFCommand {
     @Override
     protected byte[] pack() {
         return new byte[] {};
+    }
+
+    @Override
+    public boolean isSessionRequired() {
+        return false;
+    }
+
+    @Override
+    public boolean isNodeSpecific() {
+        return false;
+    }
+
+    @Override
+    public KLFGatewayCommands getCommand() {
+        return KLFGatewayCommands.GW_GET_SCENE_LIST_REQ;
     }
 }

@@ -9,38 +9,38 @@
 package org.openhab.binding.veluxklf200.internal.components;
 
 /**
- * Indicates the interim state of a velux command.
+ * Indicates the state of a Velux command.
  *
- * @author MFK - Initial Contribution
+ * @author emmanuel
  */
 public enum VeluxState {
 
-    /** The non executing. */
+    /** Non executing. */
     NON_EXECUTING((byte) 0),
 
-    /** The error executing. */
+    /** Error executing. */
     ERROR_EXECUTING((byte) 1),
 
-    /** The not used. */
+    /** Not used. */
     NOT_USED((byte) 2),
 
-    /** The awaiting power. */
+    /** Awaiting power. */
     AWAITING_POWER((byte) 3),
 
-    /** The executing. */
+    /** Executing. */
     EXECUTING((byte) 4),
 
-    /** The done. */
+    /** Done. */
     DONE((byte) 5),
 
-    /** The unknown. */
+    /** Unknown. */
     UNKNOWN((byte) 255);
 
     /** The state code. */
     private byte stateCode;
 
     /**
-     * Instantiates a new velux state.
+     * Instantiates a new Velux state.
      *
      * @param code
      *            the code
@@ -59,28 +59,18 @@ public enum VeluxState {
     }
 
     /**
-     * Creates the.
+     * Creates a state from its code.
      *
      * @param code
      *            the code
-     * @return the velux state
+     * @return the Velux state
      */
     public static VeluxState createFromCode(byte code) {
-        switch (code) {
-            case 0:
-                return NON_EXECUTING;
-            case 1:
-                return ERROR_EXECUTING;
-            case 2:
-                return NOT_USED;
-            case 3:
-                return AWAITING_POWER;
-            case 4:
-                return EXECUTING;
-            case 5:
-                return DONE;
-            default:
-                return UNKNOWN;
+        for (VeluxState testState : VeluxState.values()) {
+            if (testState.getStateCode() == code) {
+                return testState;
+            }
         }
+        return UNKNOWN;
     }
 }

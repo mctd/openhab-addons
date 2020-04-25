@@ -9,21 +9,20 @@
 package org.openhab.binding.veluxklf200.internal.components;
 
 import org.eclipse.smarthome.core.thing.ThingTypeUID;
-import org.openhab.binding.veluxklf200.internal.VeluxKLF200V2BindingConstants;
+import org.openhab.binding.veluxklf200.internal.VeluxKLF200BindingConstants;
 
 /**
- * Indicates a type of velux node.
+ * Represents a type of Velux node.
  *
- * @author MFK - Initial Contribution
+ * @author emmanuel
  */
 public enum VeluxNodeType {
 
     /** The interior venetian blind. */
-    INTERIOR_VENETIAN_BLIND("Interior Venetian Blind", (byte) 0, "",
-            VeluxKLF200V2BindingConstants.THING_TYPE_VELUX_BLIND),
+    INTERIOR_VENETIAN_BLIND("Interior Venetian Blind", (byte) 0, "", VeluxKLF200BindingConstants.THING_TYPE_ACTUATOR),
 
     /** The roller shutter. */
-    ROLLER_SHUTTER("Roller Shutter", (byte) 0, "", VeluxKLF200V2BindingConstants.THING_TYPE_VELUX_ROLLER_SHUTTER),
+    ROLLER_SHUTTER("Roller Shutter", (byte) 0, "", VeluxKLF200BindingConstants.THING_TYPE_ACTUATOR),
 
     /** The vertical exterior awning. */
     VERTICAL_EXTERIOR_AWNING("Vertical Exterior Awning", (byte) 0, "", null),

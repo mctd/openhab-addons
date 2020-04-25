@@ -6,249 +6,147 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  */
-package org.openhab.binding.veluxklf200.internal.components;
+package org.openhab.binding.veluxklf200.internal.status;
 
 /**
- * Indicates the end state of a command that was executed.
+ * Contains current state of the node. (Error code).
  *
- * @author MFK - Initial Contribution
+ * @author emmanuel
  */
-public enum VeluxStatusReply {
+public enum StatusReply {
+    /** Used to indicate unknown reply. */
+    UNKNOWN_STATUS_REPLY((byte) 0x00, "Used to indicate unknown reply"),
+    /** Indicates no errors detected. */
+    COMMAND_COMPLETED_OK((byte) 0x01, "Indicates no errors detected"),
+    /** Indicates no communication to node. */
+    NO_CONTACT((byte) 0x02, "Indicates no communication to node"),
+    /** Indicates manually operated by a user. */
+    MANUALLY_OPERATED((byte) 0x03, "Indicates manually operated by a user"),
+    /** Indicates node has been blocked by an object. */
+    BLOCKED((byte) 0x04, "Indicates node has been blocked by an object"),
+    /** Indicates the node contains a wrong system key. */
+    WRONG_SYSTEMKEY((byte) 0x05, "Indicates the node contains a wrong system key"),
+    /** Indicates the node is locked on this priority level. */
+    PRIORITY_LEVEL_LOCKED((byte) 0x06, "Indicates the node is locked on this priority level"),
+    /** Indicates node has stopped in another position than expected. */
+    REACHED_WRONG_POSITION((byte) 0x07, "Indicates node has stopped in another position than expected"),
+    /** Indicates an error has occurred during execution of command. */
+    ERROR_DURING_EXECUTION((byte) 0x08, "Indicates an error has occurred during execution of command"),
+    /** Indicates no movement of the node parameter. */
+    NO_EXECUTION((byte) 0x09, "Indicates no movement of the node parameter"),
+    /** Indicates the node is calibrating the parameters. */
+    CALIBRATING((byte) 0x0A, "Indicates the node is calibrating the parameters"),
+    /** Indicates the node power consumption is too high. */
+    POWER_CONSUMPTION_TOO_HIGH((byte) 0x0B, "Indicates the node power consumption is too high"),
+    /** Indicates the node power consumption is too low. */
+    POWER_CONSUMPTION_TOO_LOW((byte) 0x0C, "Indicates the node power consumption is too low"),
+    /** Indicates door lock errors. (Door open during lock command) */
+    LOCK_POSITION_OPEN((byte) 0x0D, "Indicates door lock errors. (Door open during lock command)"),
+    /** Indicates the target was not reached in time. */
+    MOTION_TIME_TOO_LONG_COMMUNICATION_ENDED((byte) 0x0E, "Indicates the target was not reached in time"),
+    /** Indicates the node has gone into thermal protection mode. */
+    THERMAL_PROTECTION((byte) 0x0F, "Indicates the node has gone into thermal protection mode"),
+    /** Indicates the node is not currently operational. */
+    PRODUCT_NOT_OPERATIONAL((byte) 0x10, "Indicates the node is not currently operational"),
+    /** Indicates the filter needs maintenance. */
+    FILTER_MAINTENANCE_NEEDED((byte) 0x11, "Indicates the filter needs maintenance"),
+    /** Indicates the battery level is low. */
+    BATTERY_LEVEL((byte) 0x12, "Indicates the battery level is low"),
+    /** Indicates the node has modified the target value of the command. */
+    TARGET_MODIFIED((byte) 0x13, "Indicates the node has modified the target value of the command"),
+    /** Indicates this node does not support the mode received. */
+    MODE_NOT_IMPLEMENTED((byte) 0x14, "Indicates this node does not support the mode received"),
+    /** Indicates the node is unable to move in the right direction. */
+    COMMAND_INCOMPATIBLE_TO_MOVEMENT((byte) 0x15, "Indicates the node is unable to move in the right direction"),
+    /** Indicates dead bolt is manually locked during unlock command. */
+    USER_ACTION((byte) 0x16, "Indicates dead bolt is manually locked during unlock command"),
+    /** Indicates dead bolt error. */
+    DEAD_BOLT_ERROR((byte) 0x17, "Indicates dead bolt error"),
+    /** Indicates the node has gone into automatic cycle mode. */
+    AUTOMATIC_CYCLE_ENGAGED((byte) 0x18, "Indicates the node has gone into automatic cycle mode"),
+    /** Indicates wrong load on node. */
+    WRONG_LOAD_CONNECTED((byte) 0x19, "Indicates wrong load on node"),
+    /** Indicates that node is unable to reach received colour code. */
+    COLOUR_NOT_REACHABLE((byte) 0x1A, "Indicates that node is unable to reach received colour code"),
+    /** Indicates the node is unable to reach received target position. */
+    TARGET_NOT_REACHABLE((byte) 0x1B, "Indicates the node is unable to reach received target position"),
+    /** Indicates io-protocol has received an invalid index. */
+    BAD_INDEX_RECEIVED((byte) 0x1C, "Indicates io-protocol has received an invalid index"),
+    /** Indicates that the command was overruled by a new command. */
+    COMMAND_OVERRULED((byte) 0x1D, "Indicates that the command was overruled by a new command"),
+    /** Indicates that the node reported waiting for power. */
+    NODE_WAITING_FOR_POWER((byte) 0x1E, "Indicates that the node reported waiting for power"),
+    /** Indicates an unknown error code received. (Hex code is shown on display) */
+    INFORMATION_CODE((byte) 0xDF, "Indicates an unknown error code received. (Hex code is shown on display)"),
+    /** Indicates the parameter was limited by an unknown device. (Same as LIMITATION_BY_UNKNOWN_DEVICE) */
+    PARAMETER_LIMITED((byte) 0xE0,
+            "Indicates the parameter was limited by an unknown device. (Same as LIMITATION_BY_UNKNOWN_DEVICE)"),
+    /** Indicates the parameter was limited by local button. */
+    LIMITATION_BY_LOCAL_USER((byte) 0xE1, "Indicates the parameter was limited by local button"),
+    /** Indicates the parameter was limited by a remote control. */
+    LIMITATION_BY_USER((byte) 0xE2, "Indicates the parameter was limited by a remote control"),
+    /** Indicates the parameter was limited by a rain sensor. */
+    LIMITATION_BY_RAIN((byte) 0xE3, "Indicates the parameter was limited by a rain sensor"),
+    /** Indicates the parameter was limited by a timer. */
+    LIMITATION_BY_TIMER((byte) 0xE4, "Indicates the parameter was limited by a timer"),
+    /** Indicates the parameter was limited by a power supply. */
+    LIMITATION_BY_UPS((byte) 0xE6, "Indicates the parameter was limited by a power supply"),
+    /** Indicates the parameter was limited by an unknown device. (Same as PARAMETER_LIMITED) */
+    LIMITATION_BY_UNKNOWN_DEVICE((byte) 0xE7,
+            "Indicates the parameter was limited by an unknown device. (Same as PARAMETER_LIMITED)"),
+    /** Indicates the parameter was limited by a standalone automatic controller. */
+    LIMITATION_BY_SAAC((byte) 0xEA, "Indicates the parameter was limited by a standalone automatic controller"),
+    /** Indicates the parameter was limited by a wind sensor. */
+    LIMITATION_BY_WIND((byte) 0xEB, "Indicates the parameter was limited by a wind sensor"),
+    /** Indicates the parameter was limited by the node itself. */
+    LIMITATION_BY_MYSELF((byte) 0xEC, "Indicates the parameter was limited by the node itself"),
+    /** Indicates the parameter was limited by an automatic cycle. */
+    LIMITATION_BY_AUTOMATIC_CYCLE((byte) 0xED, "Indicates the parameter was limited by an automatic cycle"),
+    /** Indicates the parameter was limited by an emergency. */
+    LIMITATION_BY_EMERGENCY((byte) 0xEE, "Indicates the parameter was limited by an emergency");
 
-    /** The unknown status reply. */
-    UNKNOWN_STATUS_REPLY((byte) 0x00),
-
-    /** The command completed ok. */
-    COMMAND_COMPLETED_OK((byte) 0x01),
-
-    /** The no contact. */
-    NO_CONTACT((byte) 0x02),
-
-    /** The manually operated. */
-    MANUALLY_OPERATED((byte) 0x03),
-
-    /** The blocked. */
-    BLOCKED((byte) 0x04),
-
-    /** The wrong systemkey. */
-    WRONG_SYSTEMKEY((byte) 0x05),
-
-    /** The priority level locked. */
-    PRIORITY_LEVEL_LOCKED((byte) 0x06),
-
-    /** The reached wrong position. */
-    REACHED_WRONG_POSITION((byte) 0x07),
-
-    /** The error during execution. */
-    ERROR_DURING_EXECUTION((byte) 0x08),
-
-    /** The no execution. */
-    NO_EXECUTION((byte) 0x09),
-
-    /** The power consumption too high. */
-    POWER_CONSUMPTION_TOO_HIGH((byte) 0x0C),
-
-    /** The lock position open. */
-    LOCK_POSITION_OPEN((byte) 0x0D),
-
-    /** The mttl communiction needed. */
-    MTTL_COMMUNICTION_NEEDED((byte) 0x0E),
-
-    /** The thermal protection. */
-    THERMAL_PROTECTION((byte) 0x0F),
-
-    /** The battery level. */
-    BATTERY_LEVEL((byte) 0x12),
-
-    /** The target modified. */
-    TARGET_MODIFIED((byte) 0x13),
-
-    /** The mode not implemented. */
-    MODE_NOT_IMPLEMENTED((byte) 0x14),
-
-    /** The command incompatible. */
-    COMMAND_INCOMPATIBLE((byte) 0x15),
-
-    /** The user action. */
-    USER_ACTION((byte) 0x16),
-
-    /** The dead bolt error. */
-    DEAD_BOLT_ERROR((byte) 0x17),
-
-    /** The auto cycle engaged. */
-    AUTO_CYCLE_ENGAGED((byte) 0x18),
-
-    /** The wrong load connected. */
-    WRONG_LOAD_CONNECTED((byte) 0x19),
-
-    /** The colour not reachable. */
-    COLOUR_NOT_REACHABLE((byte) 0x1A),
-
-    /** The target not reachable. */
-    TARGET_NOT_REACHABLE((byte) 0x1B),
-
-    /** The bad index received. */
-    BAD_INDEX_RECEIVED((byte) 0x1C),
-
-    /** The command overruled. */
-    COMMAND_OVERRULED((byte) 0x1D),
-
-    /** The node waiting for power. */
-    NODE_WAITING_FOR_POWER((byte) 0x1E),
-
-    /** The information code. */
-    INFORMATION_CODE((byte) 0xDF),
-
-    /** The parameter limited. */
-    PARAMETER_LIMITED((byte) 0xE0),
-
-    /** The limitation by local user. */
-    LIMITATION_BY_LOCAL_USER((byte) 0xE1),
-
-    /** The limitation by user. */
-    LIMITATION_BY_USER((byte) 0xE2),
-
-    /** The limitation by rain. */
-    LIMITATION_BY_RAIN((byte) 0xE3),
-
-    /** The limitation by timer. */
-    LIMITATION_BY_TIMER((byte) 0xE4),
-
-    /** The limitation by ups. */
-    LIMITATION_BY_UPS((byte) 0xE6),
-
-    /** The limitation by unknown. */
-    LIMITATION_BY_UNKNOWN((byte) 0xE7),
-
-    /** The limitation by saac. */
-    LIMITATION_BY_SAAC((byte) 0xEA),
-
-    /** The limitation by wind. */
-    LIMITATION_BY_WIND((byte) 0xEB),
-
-    /** The limitation by myself. */
-    LIMITATION_BY_MYSELF((byte) 0xEC),
-
-    /** The limitation by auto cycle. */
-    LIMITATION_BY_AUTO_CYCLE((byte) 0xED),
-
-    /** The limitation by emergency. */
-    LIMITATION_BY_EMERGENCY((byte) 0xEE);
-
-    /** The status code. */
-    private byte statusCode;
+    /** Status value. */
+    private byte value;
+    private String description;
 
     /**
-     * Instantiates a new velux status reply.
+     * Instantiates a new StatusReply.
      *
-     * @param code
-     *                 the code
+     * @param value StatusReply value
      */
-    private VeluxStatusReply(byte code) {
-        this.statusCode = code;
+    private StatusReply(byte value, String description) {
+        this.value = value;
     }
 
     /**
-     * Gets the status code.
+     * Gets the status value.
      *
-     * @return the status code
+     * @return Value of StatusReply
      */
-    public byte getStatusCode() {
-        return this.statusCode;
+    public byte getValue() {
+        return this.value;
     }
 
     /**
-     * Creates the.
+     * Creates a StatusReply from its value.
      *
-     * @param code
-     *                 the code
-     * @return the velux status reply
+     * @param value Value of StatusReply
+     * @return StatusReply matching the value.
      */
-    public static VeluxStatusReply create(byte code) {
-        switch (code) {
-            case (byte) 0x00:
-                return UNKNOWN_STATUS_REPLY;
-            case (byte) 0x01:
-                return COMMAND_COMPLETED_OK;
-            case (byte) 0x02:
-                return NO_CONTACT;
-            case (byte) 0x03:
-                return MANUALLY_OPERATED;
-            case (byte) 0x04:
-                return BLOCKED;
-            case (byte) 0x05:
-                return WRONG_SYSTEMKEY;
-            case (byte) 0x06:
-                return PRIORITY_LEVEL_LOCKED;
-            case (byte) 0x07:
-                return REACHED_WRONG_POSITION;
-            case (byte) 0x08:
-                return ERROR_DURING_EXECUTION;
-            case (byte) 0x09:
-                return NO_EXECUTION;
-            case (byte) 0x0C:
-                return POWER_CONSUMPTION_TOO_HIGH;
-            case (byte) 0x0D:
-                return LOCK_POSITION_OPEN;
-            case (byte) 0x0E:
-                return MTTL_COMMUNICTION_NEEDED;
-            case (byte) 0x0F:
-                return THERMAL_PROTECTION;
-            case (byte) 0x12:
-                return BATTERY_LEVEL;
-            case (byte) 0x13:
-                return TARGET_MODIFIED;
-            case (byte) 0x14:
-                return MODE_NOT_IMPLEMENTED;
-            case (byte) 0x15:
-                return COMMAND_INCOMPATIBLE;
-            case (byte) 0x16:
-                return USER_ACTION;
-            case (byte) 0x17:
-                return DEAD_BOLT_ERROR;
-            case (byte) 0x18:
-                return AUTO_CYCLE_ENGAGED;
-            case (byte) 0x19:
-                return WRONG_LOAD_CONNECTED;
-            case (byte) 0x1A:
-                return COLOUR_NOT_REACHABLE;
-            case (byte) 0x1B:
-                return TARGET_NOT_REACHABLE;
-            case (byte) 0x1C:
-                return BAD_INDEX_RECEIVED;
-            case (byte) 0x1D:
-                return COMMAND_OVERRULED;
-            case (byte) 0x1E:
-                return NODE_WAITING_FOR_POWER;
-            case (byte) 0xDF:
-                return INFORMATION_CODE;
-            case (byte) 0xE0:
-                return PARAMETER_LIMITED;
-            case (byte) 0xE1:
-                return LIMITATION_BY_LOCAL_USER;
-            case (byte) 0xE2:
-                return LIMITATION_BY_USER;
-            case (byte) 0xE3:
-                return LIMITATION_BY_RAIN;
-            case (byte) 0xE4:
-                return LIMITATION_BY_TIMER;
-            case (byte) 0xE6:
-                return LIMITATION_BY_UPS;
-            case (byte) 0xE7:
-                return LIMITATION_BY_UNKNOWN;
-            case (byte) 0xEA:
-                return LIMITATION_BY_SAAC;
-            case (byte) 0xEB:
-                return LIMITATION_BY_WIND;
-            case (byte) 0xEC:
-                return LIMITATION_BY_MYSELF;
-            case (byte) 0xED:
-                return LIMITATION_BY_AUTO_CYCLE;
-            case (byte) 0xEE:
-                return LIMITATION_BY_EMERGENCY;
-            default:
-                return UNKNOWN_STATUS_REPLY;
+    public static StatusReply fromCode(byte code) {
+        for (StatusReply testStatus : StatusReply.values()) {
+            if (testStatus.getValue() == code) {
+                return testStatus;
+            }
         }
+
+        // TODO : log warn unmapped value
+        return UNKNOWN_STATUS_REPLY;
+    }
+
+    @Override
+    public String toString() {
+        return this.description;
     }
 
 }

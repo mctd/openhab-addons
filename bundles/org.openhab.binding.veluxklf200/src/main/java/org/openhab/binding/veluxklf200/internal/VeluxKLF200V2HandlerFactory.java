@@ -24,68 +24,56 @@ import org.eclipse.smarthome.core.thing.binding.BaseThingHandlerFactory;
 import org.eclipse.smarthome.core.thing.binding.ThingHandler;
 import org.eclipse.smarthome.core.thing.binding.ThingHandlerFactory;
 import org.openhab.binding.veluxklf200.internal.discovery.KLF200DiscoveryService;
+import org.openhab.binding.veluxklf200.internal.handler.ActuatorHandler;
 import org.openhab.binding.veluxklf200.internal.handler.KLF200BridgeHandler;
 import org.openhab.binding.veluxklf200.internal.handler.KLF200SceneHandler;
-import org.openhab.binding.veluxklf200.internal.handler.KLF200ShutterLikeHandler;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * The {@link VeluxKLF200V2HandlerFactory} is responsible for creating things and thing
- * handlers.
+ * Class responsible of creating things and thing handlers.
  *
- * @author mctd - Initial contribution
+ * @author emmanuel - Initial contribution
  */
 @NonNullByDefault
 @Component(configurationPid = "binding.veluxklf200", service = ThingHandlerFactory.class)
 public class VeluxKLF200V2HandlerFactory extends BaseThingHandlerFactory {
 
-    /** The logger. */
     private Logger logger = LoggerFactory.getLogger(VeluxKLF200V2HandlerFactory.class);
-
     /** A registry of things we have discovered. */
     private final Map<ThingUID, ServiceRegistration<?>> discoveryServiceRegs = new HashMap<>();
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see
-     * org.eclipse.smarthome.core.thing.binding.ThingHandlerFactory#supportsThingType(org.eclipse.smarthome.core.thing.
-     * ThingTypeUID)
-     */
     @Override
     public boolean supportsThingType(ThingTypeUID thingTypeUID) {
-        return VeluxKLF200V2BindingConstants.SUPPORTED_VELUX_KLF200_THING_TYPES_UIDS.contains(thingTypeUID);
+        return VeluxKLF200BindingConstants.SUPPORTED_VELUX_KLF200_THING_TYPES_UIDS.contains(thingTypeUID);
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see
-     * org.eclipse.smarthome.core.thing.binding.BaseThingHandlerFactory#createHandler(org.eclipse.smarthome.core.thing.
-     * Thing)
-     */
     @Override
     protected @Nullable ThingHandler createHandler(Thing thing) {
         ThingTypeUID thingTypeUID = thing.getThingTypeUID();
 
-        if (thingTypeUID.equals(VeluxKLF200V2BindingConstants.THING_TYPE_VELUX_KLF200)) {
+        // Creates the bridge handler
+        if (thingTypeUID.equals(VeluxKLF200BindingConstants.THING_TYPE_VELUX_KLF200)) {
             logger.debug("Creating the bridge handler.");
             KLF200BridgeHandler handler = new KLF200BridgeHandler((Bridge) thing);
             registerDiscoveryService(handler);
             return handler;
         }
-        if (thingTypeUID.equals(VeluxKLF200V2BindingConstants.THING_TYPE_VELUX_SCENE)) {
+
+        // Creates a Scene handler
+        if (thingTypeUID.equals(VeluxKLF200BindingConstants.THING_TYPE_VELUX_SCENE)) {
             logger.debug("Creating the scene handler.");
             return new KLF200SceneHandler(thing);
         }
-        if (thingTypeUID.equals(VeluxKLF200V2BindingConstants.THING_TYPE_VELUX_ROLLER_SHUTTER)
-                || thingTypeUID.equals(VeluxKLF200V2BindingConstants.THING_TYPE_VELUX_BLIND)) {
-            logger.debug("Creating the roller shutter-like handler.");
-            return new KLF200ShutterLikeHandler(thing);
+
+        // Creates a generic actuator handler
+        if (thingTypeUID.equals(VeluxKLF200BindingConstants.THING_TYPE_ACTUATOR)) {
+            logger.debug("Creating an Actuator handler.");
+            return new ActuatorHandler(thing);
         }
+
         logger.error("Trying to create an handler for an unknown Thing type: {}", thingTypeUID);
         return null;
     }
@@ -102,14 +90,6 @@ public class VeluxKLF200V2HandlerFactory extends BaseThingHandlerFactory {
                 bundleContext.registerService(DiscoveryService.class.getName(), discoveryService, new Hashtable<>()));
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see
-     *
-     * org.eclipse.smarthome.core.thing.binding.BaseThingHandlerFactory#removeHandler(org.eclipse.smarthome.core.thing.
-     * binding.ThingHandler)
-     */
     @Override
     protected synchronized void removeHandler(ThingHandler thingHandler) {
         logger.debug("Removing handler: {}.", thingHandler);
@@ -118,5 +98,4 @@ public class VeluxKLF200V2HandlerFactory extends BaseThingHandlerFactory {
             serviceReg.unregister();
         }
     }
-
 }

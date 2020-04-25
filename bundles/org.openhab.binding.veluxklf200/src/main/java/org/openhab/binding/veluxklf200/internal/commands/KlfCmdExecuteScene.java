@@ -13,7 +13,8 @@ import org.openhab.binding.veluxklf200.internal.commands.structure.KLFGatewayCom
 import org.openhab.binding.veluxklf200.internal.components.VeluxPosition;
 import org.openhab.binding.veluxklf200.internal.components.VeluxRunStatus;
 import org.openhab.binding.veluxklf200.internal.components.VeluxState;
-import org.openhab.binding.veluxklf200.internal.components.VeluxStatusReply;
+import org.openhab.binding.veluxklf200.internal.status.StatusReply;
+import org.openhab.binding.veluxklf200.internal.status.Velocity;
 import org.openhab.binding.veluxklf200.internal.utility.KLFUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,6 +28,7 @@ public class KlfCmdExecuteScene extends BaseKLFCommand {
 
     private final Logger logger = LoggerFactory.getLogger(KlfCmdExecuteScene.class);
     private byte sceneId;
+    private Velocity velocity = Velocity.DEFAULT;
 
     /**
      * Default constructor.
@@ -34,8 +36,18 @@ public class KlfCmdExecuteScene extends BaseKLFCommand {
      * @param sceneId The scene ID
      */
     public KlfCmdExecuteScene(byte sceneId) {
+        this(sceneId, Velocity.DEFAULT);
+    }
+
+    /**
+     * Constructor with velocity.
+     *
+     * @param sceneId The scene ID
+     */
+    public KlfCmdExecuteScene(byte sceneId, Velocity velocity) {
         super();
         this.sceneId = sceneId;
+        this.velocity = velocity;
     }
 
     @Override
@@ -48,19 +60,19 @@ public class KlfCmdExecuteScene extends BaseKLFCommand {
                         break;
                     case 1:
                         logger.error("Request to execute scene rejected - Invalid Parameter");
-                        this.commandStatus = CommandStatus.ERROR
-                                .setErrorDetail("Request to execute scene rejected - Invalid Parameter");
+                        this.setStatus(CommandStatus.ERROR
+                                .setErrorDetail("Request to execute scene rejected - Invalid Parameter"));
                         break;
                     case 2:
                         logger.error("Request to execute scene rejected - Request Rejected");
-                        this.commandStatus = CommandStatus.ERROR
-                                .setErrorDetail("Request to execute scene rejected - Request Rejected");
+                        this.setStatus(CommandStatus.ERROR
+                                .setErrorDetail("Request to execute scene rejected - Invalid Parameter"));
                         break;
                 }
                 return true;
             case GW_SESSION_FINISHED_NTF:
                 logger.debug("Finished executing scene");
-                this.commandStatus = CommandStatus.COMPLETE;
+                this.setStatus(CommandStatus.COMPLETE);
                 return true;
             case GW_NODE_STATE_POSITION_CHANGED_NTF:
                 logger.trace(
@@ -72,7 +84,7 @@ public class KlfCmdExecuteScene extends BaseKLFCommand {
                 return true;
             case GW_COMMAND_RUN_STATUS_NTF:
                 VeluxRunStatus runStatus = VeluxRunStatus.createFromCode(data[FIRSTBYTE + 7]);
-                VeluxStatusReply statusReply = VeluxStatusReply.create(data[FIRSTBYTE + 8]);
+                StatusReply statusReply = StatusReply.fromCode(data[FIRSTBYTE + 8]);
                 logger.trace(
                         "Notification for Node {}, relating to function parameter {}, Run status is: {}, Command status is: {} ",
                         data[FIRSTBYTE + 3], data[FIRSTBYTE + 4], runStatus, statusReply);
@@ -100,7 +112,7 @@ public class KlfCmdExecuteScene extends BaseKLFCommand {
         data[2] = CMD_ORIGINATOR_USER;
         data[3] = CMD_PRIORITY_NORMAL;
         data[4] = this.sceneId;
-        data[5] = CMD_VELOCITY_DEFAULT;
+        data[5] = this.velocity.getCode();
         return data;
     }
 
@@ -121,4 +133,18 @@ public class KlfCmdExecuteScene extends BaseKLFCommand {
         }
     }
 
+    @Override
+    public boolean isSessionRequired() {
+        return true;
+    }
+
+    @Override
+    public boolean isNodeSpecific() {
+        return false;
+    }
+
+    @Override
+    public KLFGatewayCommands getCommand() {
+        return KLFGatewayCommands.GW_ACTIVATE_SCENE_REQ;
+    }
 }

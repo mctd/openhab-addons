@@ -101,21 +101,27 @@ class KLFCommandConsumer implements Runnable {
      * @return True if there is a similar command in progress, false otherwise.
      */
     private boolean isSimilarInProgress(BaseKLFCommand current) {
-        if (current.getKLFCommandStructure().isSessionRequired()) {
+        if (current.isSessionRequired()) {
             return false;
         }
 
-        if (!current.getKLFCommandStructure().isNodeSpecific()) {
-            return false;
-        }
+        /*
+         * if (!current.isNodeSpecific()) {
+         * return false;
+         * }
+         */
 
         Iterator<BaseKLFCommand> iterator = this.processor.getCommandsInProgress().iterator();
         while (iterator.hasNext()) {
             BaseKLFCommand inProgress = iterator.next();
             if (inProgress.getClass() == current.getClass()) {
-                // A command similar to this is already in progress
-                logger.warn("Another similar command ({}) is beeing processed.", current.getClass());
-                return true;
+                // command are of same type
+                if (!current.isNodeSpecific() || (inProgress.getMainNode() == current.getMainNode())) {
+                    // command is not node specific, OR relates to the same node, then a similar command is already in
+                    // progress
+                    logger.warn("Another similar command ({}) is beeing processed.", current.getClass());
+                    return true;
+                }
             }
         }
         return false;
@@ -154,13 +160,11 @@ class KLFCommandConsumer implements Runnable {
     private void processCommand(BaseKLFCommand command) {
         if (this.processor.klfOutputStream != null) {
             if (command.isValid()) {
-                if ((!command.getKLFCommandStructure().isAuthRequired())
-                        || (command.getKLFCommandStructure().isAuthRequired() == this.processor.isLoggedIn)) {
+                if (!command.isAuthRequired() || this.processor.isLoggedIn()) {
                     byte[] data = command.getRawKLFCommand();
                     try {
                         logger.debug("Executing command {} with Session: {} for Specific Node: {}",
-                                command.getKLFCommandStructure().getDisplayCode(), command.formatSessionID(),
-                                command.formatMainNode());
+                                command.getCommand().name(), command.formatSessionID(), command.formatMainNode());
 
                         this.processor.klfOutputStream.write(data, 0, data.length);
                         this.processor.klfOutputStream.flush();
@@ -190,9 +194,9 @@ class KLFCommandConsumer implements Runnable {
             logger.error("Rejected command as connection with KLF200 was null.");
         }
 
-        // If we get here, something has gone wrong, so we need to notify the caller
         command.setStatus(CommandStatus.ERROR);
         synchronized (command) {
+            // If we get here, something has gone wrong, so we need to notify the caller
             command.notifyAll();
         }
     }

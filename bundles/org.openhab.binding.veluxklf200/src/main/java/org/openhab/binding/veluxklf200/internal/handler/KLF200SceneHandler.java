@@ -13,7 +13,7 @@ import org.eclipse.smarthome.core.thing.ChannelUID;
 import org.eclipse.smarthome.core.thing.Thing;
 import org.eclipse.smarthome.core.types.Command;
 import org.eclipse.smarthome.core.types.RefreshType;
-import org.openhab.binding.veluxklf200.internal.VeluxKLF200V2BindingConstants;
+import org.openhab.binding.veluxklf200.internal.VeluxKLF200BindingConstants;
 import org.openhab.binding.veluxklf200.internal.commands.KlfCmdExecuteScene;
 import org.openhab.binding.veluxklf200.internal.commands.KlfCmdStopScene;
 import org.slf4j.Logger;
@@ -22,7 +22,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Handles interactions with a Scene configured on the KLF200.
  *
- * @author MFK - Initial Contribution
+ * @author emmanuel
  */
 public class KLF200SceneHandler extends KLF200BaseThingHandler {
 
@@ -52,14 +52,14 @@ public class KLF200SceneHandler extends KLF200BaseThingHandler {
         logger.debug("Handling scene state refresh command.");
         if (command == RefreshType.REFRESH) {
             switch (channelUID.getId()) {
-                case VeluxKLF200V2BindingConstants.KLF200_TRIGGER_SCENE: {
+                case VeluxKLF200BindingConstants.KLF200_TRIGGER_SCENE: {
                     updateState(channelUID, OnOffType.OFF);
                     break;
                 }
             }
         } else {
             switch (channelUID.getId()) {
-                case VeluxKLF200V2BindingConstants.KLF200_TRIGGER_SCENE:
+                case VeluxKLF200BindingConstants.KLF200_TRIGGER_SCENE:
                     Thing thing = getThing();
                     if (command.equals(OnOffType.ON)) {
                         logger.debug("Trigger Scene ID:{} {}", Integer.valueOf(channelUID.getThingUID().getId()),

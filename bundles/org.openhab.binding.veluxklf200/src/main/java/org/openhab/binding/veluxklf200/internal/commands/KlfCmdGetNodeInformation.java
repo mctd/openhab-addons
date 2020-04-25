@@ -22,7 +22,7 @@ import org.slf4j.LoggerFactory;
  */
 public class KlfCmdGetNodeInformation extends BaseKLFCommand {
 
-    private final Logger logger = LoggerFactory.getLogger(KlfCmdGetNodeInformation.class);
+    private final static Logger logger = LoggerFactory.getLogger(KlfCmdGetNodeInformation.class);
     private byte nodeId;
     private VeluxNode node;
 
@@ -64,7 +64,7 @@ public class KlfCmdGetNodeInformation extends BaseKLFCommand {
                 } else {
                     // Command has been rejected by the bridge
                     logger.error("Command has been rejected by the KLF200 unit.");
-                    this.commandStatus = CommandStatus.ERROR;
+                    this.setStatus(CommandStatus.ERROR);
                 }
                 return true;
             case GW_GET_NODE_INFORMATION_NTF:
@@ -91,9 +91,10 @@ public class KlfCmdGetNodeInformation extends BaseKLFCommand {
                         KLFUtils.extractTwoBytes(data, FIRSTBYTE + 97), // remainingTime
                         KLFUtils.extractUnsignedInt32(data, FIRSTBYTE + 99) // lastCommand
                 );
-                logger.trace("Retrieved information successfully for node '" + node.getName() + "'.");
+                logger.debug("Retrieved information successfully for node {}, velocity: {}.", node.getName(),
+                        node.getVelocity().getDisplayName());
                 this.node = node;
-                this.commandStatus = CommandStatus.COMPLETE;
+                this.setStatus(CommandStatus.COMPLETE);
                 return true;
             default:
                 return false;
@@ -142,4 +143,19 @@ public class KlfCmdGetNodeInformation extends BaseKLFCommand {
      * return Objects.hash(getKLFCommandStructure().getCommandCode(), this.nodeId);
      * }
      */
+
+    @Override
+    public boolean isSessionRequired() {
+        return false;
+    }
+
+    @Override
+    public boolean isNodeSpecific() {
+        return true;
+    }
+
+    @Override
+    public KLFGatewayCommands getCommand() {
+        return KLFGatewayCommands.GW_GET_NODE_INFORMATION_REQ;
+    }
 }
