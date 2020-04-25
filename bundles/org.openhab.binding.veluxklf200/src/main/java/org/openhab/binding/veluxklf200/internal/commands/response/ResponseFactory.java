@@ -3,6 +3,7 @@ package org.openhab.binding.veluxklf200.internal.commands.response;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
+import org.openhab.binding.veluxklf200.internal.engine.KLFCommandProcessor;
 import org.openhab.binding.veluxklf200.internal.utility.KLFCommandFrame;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,11 +11,10 @@ import org.slf4j.LoggerFactory;
 public abstract class ResponseFactory {
     private static final Logger logger = LoggerFactory.getLogger(ResponseFactory.class);
 
-    public static BaseResponse createFromCommandFrame(KLFCommandFrame commandFrame) {
+    public static BaseResponse createFromCommandFrame(KLFCommandProcessor processor, KLFCommandFrame commandFrame) {
 
         // TODO : implement a Class Annotation (ex: //@KLFCommand(name = "GW_GET_NODE_INFORMATION_NTF", value =
-        // KLFGatewayCommands.GW_GET_NODE_INFORMATION_NTF))
-        // and scan the classes with matching Annotation
+        // KLFGatewayCommands.GW_GET_NODE_INFORMATION_NTF)) and scan for classes with matching Annotation ?
 
         Object retobj = null;
 
@@ -28,8 +28,9 @@ public abstract class ResponseFactory {
         }
 
         if (responseClass != null) {
-            Class<?> ctParameters[] = new Class[1];
-            ctParameters[0] = KLFCommandFrame.class;
+            Class<?> ctParameters[] = new Class[2];
+            ctParameters[0] = KLFCommandProcessor.class;
+            ctParameters[1] = KLFCommandFrame.class;
             Constructor<?> ct = null;
             try {
                 ct = responseClass.getConstructor(ctParameters);
@@ -38,8 +39,9 @@ public abstract class ResponseFactory {
                 e.printStackTrace();
             }
             if (ct != null) {
-                Object arglist[] = new Object[1];
-                arglist[0] = commandFrame;
+                Object arglist[] = new Object[2];
+                arglist[0] = processor;
+                arglist[1] = commandFrame;
                 try {
                     // Instantiate the response object
                     retobj = ct.newInstance(arglist);

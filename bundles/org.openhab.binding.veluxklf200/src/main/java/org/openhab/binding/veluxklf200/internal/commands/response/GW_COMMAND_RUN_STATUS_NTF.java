@@ -1,5 +1,6 @@
 package org.openhab.binding.veluxklf200.internal.commands.response;
 
+import org.openhab.binding.veluxklf200.internal.engine.KLFCommandProcessor;
 import org.openhab.binding.veluxklf200.internal.status.NodeParameter;
 import org.openhab.binding.veluxklf200.internal.status.Position;
 import org.openhab.binding.veluxklf200.internal.status.RunStatus;
@@ -26,8 +27,8 @@ public class GW_COMMAND_RUN_STATUS_NTF extends BaseResponse {
      */
     private int informationCode;
 
-    public GW_COMMAND_RUN_STATUS_NTF(KLFCommandFrame commandFrame) {
-        super(commandFrame);
+    public GW_COMMAND_RUN_STATUS_NTF(KLFCommandProcessor processor, KLFCommandFrame commandFrame) {
+        super(processor, commandFrame);
         this.sessionID = this.getCommandFrame().getShort(1);
         this.status = Status.fromCode(this.getCommandFrame().getByte(3));
         this.index = this.getCommandFrame().getByte(4);

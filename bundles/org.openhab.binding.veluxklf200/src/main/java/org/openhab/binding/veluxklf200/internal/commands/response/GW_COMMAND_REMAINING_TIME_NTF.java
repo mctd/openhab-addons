@@ -1,5 +1,6 @@
 package org.openhab.binding.veluxklf200.internal.commands.response;
 
+import org.openhab.binding.veluxklf200.internal.engine.KLFCommandProcessor;
 import org.openhab.binding.veluxklf200.internal.status.NodeParameter;
 import org.openhab.binding.veluxklf200.internal.utility.KLFCommandFrame;
 import org.slf4j.Logger;
@@ -19,8 +20,8 @@ public class GW_COMMAND_REMAINING_TIME_NTF extends BaseResponse {
     private NodeParameter nodeParameter;
     private short timeRemaining;
 
-    public GW_COMMAND_REMAINING_TIME_NTF(KLFCommandFrame commandFrame) {
-        super(commandFrame);
+    public GW_COMMAND_REMAINING_TIME_NTF(KLFCommandProcessor processor, KLFCommandFrame commandFrame) {
+        super(processor, commandFrame);
         this.sessionID = this.getCommandFrame().getShort(1);
         this.index = this.getCommandFrame().getByte(3);
         this.nodeParameter = NodeParameter.fromCode(this.getCommandFrame().getByte(4));

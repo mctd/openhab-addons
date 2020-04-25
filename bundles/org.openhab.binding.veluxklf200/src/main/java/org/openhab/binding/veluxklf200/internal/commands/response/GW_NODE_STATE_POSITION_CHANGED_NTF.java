@@ -1,5 +1,6 @@
 package org.openhab.binding.veluxklf200.internal.commands.response;
 
+import org.openhab.binding.veluxklf200.internal.engine.KLFCommandProcessor;
 import org.openhab.binding.veluxklf200.internal.status.Position;
 import org.openhab.binding.veluxklf200.internal.status.State;
 import org.openhab.binding.veluxklf200.internal.utility.KLFCommandFrame;
@@ -20,8 +21,8 @@ public class GW_NODE_STATE_POSITION_CHANGED_NTF extends BaseResponse {
     private short remainingTime;
     private int timeStamp;
 
-    public GW_NODE_STATE_POSITION_CHANGED_NTF(KLFCommandFrame commandFrame) {
-        super(commandFrame);
+    public GW_NODE_STATE_POSITION_CHANGED_NTF(KLFCommandProcessor processor, KLFCommandFrame commandFrame) {
+        super(processor, commandFrame);
         this.nodeID = this.getCommandFrame().getByte(1);
         this.state = State.fromCode(this.getCommandFrame().getByte(2));
         this.currentPosition = Position.fromCode(this.getCommandFrame().getShort(3));

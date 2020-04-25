@@ -1,5 +1,8 @@
 package org.openhab.binding.veluxklf200.internal.commands.request;
 
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
+
 import org.openhab.binding.veluxklf200.internal.commands.KlfCmdGetNodeInformation;
 import org.openhab.binding.veluxklf200.internal.utility.KLFCommandFrame;
 import org.slf4j.Logger;
@@ -9,13 +12,15 @@ public abstract class BaseRequest {
     private final static Logger logger = LoggerFactory.getLogger(KlfCmdGetNodeInformation.class);
 
     public BaseRequest() {
+
     }
 
-    protected abstract void Pack();
+    // protected abstract void GetData(ByteBuffer dataBuffer);
 
     public void Execute() {
-
-        this.getTransportFrame();
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        DataOutputStream dataStream = new DataOutputStream(bos);
+        this.getTransportFrame(dataStream);
 
         try {
             this.wait();
@@ -24,12 +29,13 @@ public abstract class BaseRequest {
         }
     }
 
-    private KLFCommandFrame getCommandFrame() {
+    private KLFCommandFrame getCommandFrame(DataOutputStream dataStream) {
         // KLFCommandFrame commandFrame = KLFCommandFrame.
+
         return null;
     }
 
-    private void getTransportFrame() {
+    private void getTransportFrame(DataOutputStream dataStream) {
 
     }
 }

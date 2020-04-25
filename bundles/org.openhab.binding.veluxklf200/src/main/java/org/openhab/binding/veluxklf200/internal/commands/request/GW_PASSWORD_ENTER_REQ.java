@@ -8,9 +8,4 @@ public class GW_PASSWORD_ENTER_REQ extends BaseRequest {
         super();
         this.password = password;
     }
-
-    @Override
-    protected void Pack() {
-    }
-
 }

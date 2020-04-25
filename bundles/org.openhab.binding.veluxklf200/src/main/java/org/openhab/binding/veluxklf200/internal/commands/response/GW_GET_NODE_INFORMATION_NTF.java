@@ -1,5 +1,6 @@
 package org.openhab.binding.veluxklf200.internal.commands.response;
 
+import org.openhab.binding.veluxklf200.internal.engine.KLFCommandProcessor;
 import org.openhab.binding.veluxklf200.internal.status.NodeTypeSubType;
 import org.openhab.binding.veluxklf200.internal.status.NodeVariation;
 import org.openhab.binding.veluxklf200.internal.status.Position;
@@ -38,8 +39,8 @@ public class GW_GET_NODE_INFORMATION_NTF extends BaseResponse {
     private byte nbrOfAlias;
     private byte[] aliasArray;
 
-    public GW_GET_NODE_INFORMATION_NTF(KLFCommandFrame commandFrame) {
-        super(commandFrame);
+    public GW_GET_NODE_INFORMATION_NTF(KLFCommandProcessor processor, KLFCommandFrame commandFrame) {
+        super(processor, commandFrame);
         this.nodeID = this.getCommandFrame().getByte(1);
         this.order = this.getCommandFrame().getShort(2);
         this.placement = this.getCommandFrame().getByte(4);

@@ -1,5 +1,6 @@
 package org.openhab.binding.veluxklf200.internal.commands.response;
 
+import org.openhab.binding.veluxklf200.internal.engine.KLFCommandProcessor;
 import org.openhab.binding.veluxklf200.internal.status.CommandStatus;
 import org.openhab.binding.veluxklf200.internal.utility.KLFCommandFrame;
 import org.slf4j.Logger;
@@ -11,8 +12,8 @@ public class GW_COMMAND_SEND_CFM extends BaseResponse {
     private short sessionID;
     private CommandStatus status;
 
-    public GW_COMMAND_SEND_CFM(KLFCommandFrame commandFrame) {
-        super(commandFrame);
+    public GW_COMMAND_SEND_CFM(KLFCommandProcessor processor, KLFCommandFrame commandFrame) {
+        super(processor, commandFrame);
         this.sessionID = this.getCommandFrame().getShort(1);
         this.status = CommandStatus.fromCode(this.getCommandFrame().getByte(3));
 

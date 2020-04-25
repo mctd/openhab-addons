@@ -64,7 +64,7 @@ class KLFResponseConsumer implements Runnable {
                     logger.trace("Received response (raw): {}", KLFUtils.formatBytes(slipFrame));
 
                     KLFCommandFrame commandFrame = KLFCommandFrame.fromSlipFrame(slipFrame);
-                    BaseResponse response = ResponseFactory.createFromCommandFrame(commandFrame);
+                    BaseResponse response = ResponseFactory.createFromCommandFrame(this.processor, commandFrame);
                     // TODO: Here we have the response object (or null if not handled). Handle it!
 
                     if (response != null) {
