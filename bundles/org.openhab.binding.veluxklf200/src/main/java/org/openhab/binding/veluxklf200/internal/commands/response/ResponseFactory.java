@@ -4,7 +4,6 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
 import org.openhab.binding.veluxklf200.internal.engine.KLFCommandProcessor;
-import org.openhab.binding.veluxklf200.internal.utility.KLFCommandFrame;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

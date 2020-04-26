@@ -8,7 +8,6 @@ import org.openhab.binding.veluxklf200.internal.status.PowerMode;
 import org.openhab.binding.veluxklf200.internal.status.ProductType;
 import org.openhab.binding.veluxklf200.internal.status.State;
 import org.openhab.binding.veluxklf200.internal.status.Velocity;
-import org.openhab.binding.veluxklf200.internal.utility.KLFCommandFrame;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

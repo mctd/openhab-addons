@@ -6,7 +6,6 @@ import org.openhab.binding.veluxklf200.internal.status.Position;
 import org.openhab.binding.veluxklf200.internal.status.RunStatus;
 import org.openhab.binding.veluxklf200.internal.status.Status;
 import org.openhab.binding.veluxklf200.internal.status.StatusReply;
-import org.openhab.binding.veluxklf200.internal.utility.KLFCommandFrame;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

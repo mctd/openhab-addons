@@ -4,15 +4,17 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 
 import org.openhab.binding.veluxklf200.internal.commands.KlfCmdGetNodeInformation;
-import org.openhab.binding.veluxklf200.internal.utility.KLFCommandFrame;
+import org.openhab.binding.veluxklf200.internal.commands.response.KLFCommandFrame;
+import org.openhab.binding.veluxklf200.internal.commands.structure.KLFGatewayCommands;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public abstract class BaseRequest {
     private final static Logger logger = LoggerFactory.getLogger(KlfCmdGetNodeInformation.class);
+    private KLFGatewayCommands command;
 
-    public BaseRequest() {
-
+    public BaseRequest(KLFGatewayCommands command) {
+        this.command = command;
     }
 
     // protected abstract void GetData(ByteBuffer dataBuffer);

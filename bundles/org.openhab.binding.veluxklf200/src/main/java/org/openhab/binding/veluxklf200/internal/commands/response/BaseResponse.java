@@ -1,7 +1,6 @@
 package org.openhab.binding.veluxklf200.internal.commands.response;
 
 import org.openhab.binding.veluxklf200.internal.engine.KLFCommandProcessor;
-import org.openhab.binding.veluxklf200.internal.utility.KLFCommandFrame;
 
 public abstract class BaseResponse {
     private KLFCommandProcessor processor;
