@@ -31,7 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Handles interactions relating to Vertical Interior Blinds
+ * Handles interactions relating to Actuators
  *
  * @author emmanuel
  */

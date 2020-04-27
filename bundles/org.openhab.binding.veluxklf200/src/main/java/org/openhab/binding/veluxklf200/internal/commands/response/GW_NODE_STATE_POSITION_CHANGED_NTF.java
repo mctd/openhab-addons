@@ -22,16 +22,16 @@ public class GW_NODE_STATE_POSITION_CHANGED_NTF extends BaseResponse {
 
     public GW_NODE_STATE_POSITION_CHANGED_NTF(KLFCommandProcessor processor, KLFCommandFrame commandFrame) {
         super(processor, commandFrame);
-        this.nodeID = this.getCommandFrame().getByte(1);
-        this.state = State.fromCode(this.getCommandFrame().getByte(2));
-        this.currentPosition = Position.fromCode(this.getCommandFrame().getShort(3));
-        this.target = Position.fromCode(this.getCommandFrame().getShort(5));
-        this.fp1currentPosition = Position.fromCode(this.getCommandFrame().getShort(7));
-        this.fp2currentPosition = Position.fromCode(this.getCommandFrame().getShort(9));
-        this.fp3currentPosition = Position.fromCode(this.getCommandFrame().getShort(11));
-        this.fp4currentPosition = Position.fromCode(this.getCommandFrame().getShort(13));
-        this.remainingTime = this.getCommandFrame().getShort(15);
-        this.timeStamp = this.getCommandFrame().getInt(17);
+        this.nodeID = this.getCommandFrame().readByte(1);
+        this.state = State.fromCode(this.getCommandFrame().readByte(2));
+        this.currentPosition = Position.fromCode(this.getCommandFrame().readShort(3));
+        this.target = Position.fromCode(this.getCommandFrame().readShort(5));
+        this.fp1currentPosition = Position.fromCode(this.getCommandFrame().readShort(7));
+        this.fp2currentPosition = Position.fromCode(this.getCommandFrame().readShort(9));
+        this.fp3currentPosition = Position.fromCode(this.getCommandFrame().readShort(11));
+        this.fp4currentPosition = Position.fromCode(this.getCommandFrame().readShort(13));
+        this.remainingTime = this.getCommandFrame().readShort(15);
+        this.timeStamp = this.getCommandFrame().readInt(17);
 
         logger.info(
                 "GW_GET_NODE_INFORMATION_NTF: nodeID: {}, state: {}, currentPosition: {}, target: {}, fp1currentPosition: {}, "

@@ -14,8 +14,8 @@ public class GW_GET_NODE_INFORMATION_CFM extends BaseResponse {
 
     public GW_GET_NODE_INFORMATION_CFM(KLFCommandProcessor processor, KLFCommandFrame commandFrame) {
         super(processor, commandFrame);
-        this.status = NodeInformationStatus.fromCode(this.getCommandFrame().getByte(1));
-        this.nodeID = this.getCommandFrame().getByte(2);
+        this.status = NodeInformationStatus.fromCode(this.getCommandFrame().readByte(1));
+        this.nodeID = this.getCommandFrame().readByte(2);
 
         logger.info("Get Node Information status: {}, nodeID: {}", this.getStatus(), this.getNodeID());
     }

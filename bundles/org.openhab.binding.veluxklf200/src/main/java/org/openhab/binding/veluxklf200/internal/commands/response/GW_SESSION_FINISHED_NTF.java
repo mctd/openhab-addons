@@ -17,7 +17,7 @@ public class GW_SESSION_FINISHED_NTF extends BaseResponse {
 
     public GW_SESSION_FINISHED_NTF(KLFCommandProcessor processor, KLFCommandFrame commandFrame) {
         super(processor, commandFrame);
-        this.sessionID = this.getCommandFrame().getShort(1);
+        this.sessionID = this.getCommandFrame().readShort(1);
 
         logger.info("GW_SESSION_FINISHED_NTF: Command with sessionID {} is over.", this.getSessionID());
     }

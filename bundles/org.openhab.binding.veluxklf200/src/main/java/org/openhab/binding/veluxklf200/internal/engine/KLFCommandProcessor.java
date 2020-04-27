@@ -33,6 +33,7 @@ import org.openhab.binding.veluxklf200.internal.commands.CommandStatus;
 import org.openhab.binding.veluxklf200.internal.commands.KlfCmdLogin;
 import org.openhab.binding.veluxklf200.internal.commands.KlfCmdPing;
 import org.openhab.binding.veluxklf200.internal.commands.KlfCmdTerminate;
+import org.openhab.binding.veluxklf200.internal.commands.request.GW_PASSWORD_ENTER_REQ;
 import org.openhab.binding.veluxklf200.internal.handler.KLF200BridgeHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,7 +83,7 @@ public class KLFCommandProcessor {
     SSLSocket klfRawSocket = null;
 
     /** Output data stream related to the {@link klfRawSocket}. */
-    DataOutputStream klfOutputStream;
+    public DataOutputStream klfOutputStream;
 
     /** Input data stream related to the {@link klfRawSocket}. */
     DataInputStream klfInputStream;
@@ -274,6 +275,9 @@ public class KLFCommandProcessor {
         commandConsumerThread = new Thread(new KLFCommandConsumer(this), "KLFCommandConsumer");
         commandConsumerThread.start();
         logger.trace("CommandConsumer Thread id: {}", commandConsumerThread.getId());
+
+        GW_PASSWORD_ENTER_REQ loginCmd = new GW_PASSWORD_ENTER_REQ(this, password);
+        loginCmd.Execute();
 
         // Login to KLF 200
         logger.debug("Attempting to login to the KLF200 unit with password supplied.");

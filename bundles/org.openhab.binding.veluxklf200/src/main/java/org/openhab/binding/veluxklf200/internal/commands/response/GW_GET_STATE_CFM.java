@@ -14,8 +14,8 @@ public class GW_GET_STATE_CFM extends BaseResponse {
 
     public GW_GET_STATE_CFM(KLFCommandProcessor processor, KLFCommandFrame commandFrame) {
         super(processor, commandFrame);
-        this.gatewaySate = GatewayState.fromCode(this.getCommandFrame().getByte(1));
-        this.gatewaySubState = GatewaySubState.fromCode(this.getCommandFrame().getByte(2));
+        this.gatewaySate = GatewayState.fromCode(this.getCommandFrame().readByte(1));
+        this.gatewaySubState = GatewaySubState.fromCode(this.getCommandFrame().readByte(2));
 
         logger.info("Gateway State: {}, SubState: {}", this.getGatewayState(), this.getGatewaySubState());
     }

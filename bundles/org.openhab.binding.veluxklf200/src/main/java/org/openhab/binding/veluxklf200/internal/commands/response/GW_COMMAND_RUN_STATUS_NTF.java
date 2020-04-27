@@ -28,14 +28,14 @@ public class GW_COMMAND_RUN_STATUS_NTF extends BaseResponse {
 
     public GW_COMMAND_RUN_STATUS_NTF(KLFCommandProcessor processor, KLFCommandFrame commandFrame) {
         super(processor, commandFrame);
-        this.sessionID = this.getCommandFrame().getShort(1);
-        this.status = Status.fromCode(this.getCommandFrame().getByte(3));
-        this.index = this.getCommandFrame().getByte(4);
-        this.nodeParameter = NodeParameter.fromCode(this.getCommandFrame().getByte(5));
-        this.parameterValue = Position.fromCode(this.getCommandFrame().getShort(6));
-        this.runStatus = RunStatus.fromCode(this.getCommandFrame().getByte(8));
-        this.statusReply = StatusReply.fromCode(this.getCommandFrame().getByte(9));
-        this.informationCode = this.getCommandFrame().getInt(10);
+        this.sessionID = this.getCommandFrame().readShort(1);
+        this.status = Status.fromCode(this.getCommandFrame().readByte(3));
+        this.index = this.getCommandFrame().readByte(4);
+        this.nodeParameter = NodeParameter.fromCode(this.getCommandFrame().readByte(5));
+        this.parameterValue = Position.fromCode(this.getCommandFrame().readShort(6));
+        this.runStatus = RunStatus.fromCode(this.getCommandFrame().readByte(8));
+        this.statusReply = StatusReply.fromCode(this.getCommandFrame().readByte(9));
+        this.informationCode = this.getCommandFrame().readInt(10);
 
         logger.info(
                 "GW_COMMAND_RUN_STATUS_NTF: sessionID: {}, status: {}, index: {}, nodeParameter: {}, parameterValue: {}, "

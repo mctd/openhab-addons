@@ -21,10 +21,10 @@ public class GW_COMMAND_REMAINING_TIME_NTF extends BaseResponse {
 
     public GW_COMMAND_REMAINING_TIME_NTF(KLFCommandProcessor processor, KLFCommandFrame commandFrame) {
         super(processor, commandFrame);
-        this.sessionID = this.getCommandFrame().getShort(1);
-        this.index = this.getCommandFrame().getByte(3);
-        this.nodeParameter = NodeParameter.fromCode(this.getCommandFrame().getByte(4));
-        this.timeRemaining = this.getCommandFrame().getShort(5);
+        this.sessionID = this.getCommandFrame().readShort(1);
+        this.index = this.getCommandFrame().readByte(3);
+        this.nodeParameter = NodeParameter.fromCode(this.getCommandFrame().readByte(4));
+        this.timeRemaining = this.getCommandFrame().readShort(5);
 
         logger.info(
                 "GW_COMMAND_REMAINING_TIME_NTF: Command with sessionID: {}, for nodeID: {}, nodeParameter: {}, will end in {} seconds.",

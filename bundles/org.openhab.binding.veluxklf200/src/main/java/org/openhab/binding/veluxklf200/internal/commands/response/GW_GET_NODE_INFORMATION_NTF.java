@@ -40,29 +40,29 @@ public class GW_GET_NODE_INFORMATION_NTF extends BaseResponse {
 
     public GW_GET_NODE_INFORMATION_NTF(KLFCommandProcessor processor, KLFCommandFrame commandFrame) {
         super(processor, commandFrame);
-        this.nodeID = this.getCommandFrame().getByte(1);
-        this.order = this.getCommandFrame().getShort(2);
-        this.placement = this.getCommandFrame().getByte(4);
-        this.name = this.getCommandFrame().getString(5, 64);
-        this.velocity = Velocity.fromCode(this.getCommandFrame().getByte(69));
-        this.nodeTypeSubType = NodeTypeSubType.fromCode(this.getCommandFrame().getShort(70));
-        this.productGroup = this.getCommandFrame().getByte(72);
-        this.productType = ProductType.fromCode(this.getCommandFrame().getByte(73));
-        this.nodeVariation = NodeVariation.fromCode(this.getCommandFrame().getByte(74));
-        this.powerMode = PowerMode.fromCode(this.getCommandFrame().getByte(75));
-        this.buildNumber = this.getCommandFrame().getByte(76);
-        this.serialNumber = this.getCommandFrame().getLong(77);
-        this.state = State.fromCode(this.getCommandFrame().getByte(85));
-        this.currentPosition = Position.fromCode(this.getCommandFrame().getShort(86));
-        this.target = Position.fromCode(this.getCommandFrame().getShort(88));
-        this.fp1currentPosition = Position.fromCode(this.getCommandFrame().getShort(90));
-        this.fp2currentPosition = Position.fromCode(this.getCommandFrame().getShort(92));
-        this.fp3currentPosition = Position.fromCode(this.getCommandFrame().getShort(94));
-        this.fp4currentPosition = Position.fromCode(this.getCommandFrame().getShort(96));
-        this.remainingTime = this.getCommandFrame().getShort(98);
-        this.timeStamp = this.getCommandFrame().getInt(100);
-        this.nbrOfAlias = this.getCommandFrame().getByte(104);
-        this.aliasArray = this.getCommandFrame().getBytes(105, 20);
+        this.nodeID = this.getCommandFrame().readByte(1);
+        this.order = this.getCommandFrame().readShort(2);
+        this.placement = this.getCommandFrame().readByte(4);
+        this.name = this.getCommandFrame().readString(5, 64);
+        this.velocity = Velocity.fromCode(this.getCommandFrame().readByte(69));
+        this.nodeTypeSubType = NodeTypeSubType.fromCode(this.getCommandFrame().readShort(70));
+        this.productGroup = this.getCommandFrame().readByte(72);
+        this.productType = ProductType.fromCode(this.getCommandFrame().readByte(73));
+        this.nodeVariation = NodeVariation.fromCode(this.getCommandFrame().readByte(74));
+        this.powerMode = PowerMode.fromCode(this.getCommandFrame().readByte(75));
+        this.buildNumber = this.getCommandFrame().readByte(76);
+        this.serialNumber = this.getCommandFrame().readLong(77);
+        this.state = State.fromCode(this.getCommandFrame().readByte(85));
+        this.currentPosition = Position.fromCode(this.getCommandFrame().readShort(86));
+        this.target = Position.fromCode(this.getCommandFrame().readShort(88));
+        this.fp1currentPosition = Position.fromCode(this.getCommandFrame().readShort(90));
+        this.fp2currentPosition = Position.fromCode(this.getCommandFrame().readShort(92));
+        this.fp3currentPosition = Position.fromCode(this.getCommandFrame().readShort(94));
+        this.fp4currentPosition = Position.fromCode(this.getCommandFrame().readShort(96));
+        this.remainingTime = this.getCommandFrame().readShort(98);
+        this.timeStamp = this.getCommandFrame().readInt(100);
+        this.nbrOfAlias = this.getCommandFrame().readByte(104);
+        this.aliasArray = this.getCommandFrame().readBytes(105, 20);
 
         logger.info(
                 "GW_GET_NODE_INFORMATION_NTF: nodeID: {}, order: {}, placement: {}, name: \"{}\", velocity: {}, nodeTypeSubType: {}, productGroup: {}, productType: {}, "

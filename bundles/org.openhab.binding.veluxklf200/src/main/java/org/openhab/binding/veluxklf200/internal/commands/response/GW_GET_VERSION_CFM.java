@@ -20,15 +20,15 @@ public class GW_GET_VERSION_CFM extends BaseResponse {
     public GW_GET_VERSION_CFM(KLFCommandProcessor processor, KLFCommandFrame commandFrame) {
         super(processor, commandFrame);
 
-        this.commandVersionNumber = this.getCommandFrame().getByte(1);
-        this.versionWholeNumber = this.getCommandFrame().getByte(2);
-        this.versionSubNumber = this.getCommandFrame().getByte(3);
-        this.branchID = this.getCommandFrame().getByte(4);
-        this.buildNumber = this.getCommandFrame().getByte(5);
-        this.microBuild = this.getCommandFrame().getByte(6);
-        this.hardwareVersion = this.getCommandFrame().getByte(7);
-        this.productGroup = this.getCommandFrame().getByte(8);
-        this.productType = this.getCommandFrame().getByte(9);
+        this.commandVersionNumber = this.getCommandFrame().readByte(1);
+        this.versionWholeNumber = this.getCommandFrame().readByte(2);
+        this.versionSubNumber = this.getCommandFrame().readByte(3);
+        this.branchID = this.getCommandFrame().readByte(4);
+        this.buildNumber = this.getCommandFrame().readByte(5);
+        this.microBuild = this.getCommandFrame().readByte(6);
+        this.hardwareVersion = this.getCommandFrame().readByte(7);
+        this.productGroup = this.getCommandFrame().readByte(8);
+        this.productType = this.getCommandFrame().readByte(9);
 
         logger.info("KLF version: {}.{}.{}.{}.{}.{}. Hardware version: {}, product group: {}, product type: {}",
                 this.commandVersionNumber, versionWholeNumber, versionSubNumber, branchID, buildNumber, microBuild,

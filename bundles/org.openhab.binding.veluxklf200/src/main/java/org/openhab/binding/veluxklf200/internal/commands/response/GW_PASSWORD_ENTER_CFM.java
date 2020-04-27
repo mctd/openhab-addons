@@ -12,7 +12,7 @@ public class GW_PASSWORD_ENTER_CFM extends BaseResponse {
 
     public GW_PASSWORD_ENTER_CFM(KLFCommandProcessor processor, KLFCommandFrame commandFrame) {
         super(processor, commandFrame);
-        this.status = PasswordEnterCommandStatus.fromCode(this.getCommandFrame().getByte(1));
+        this.status = PasswordEnterCommandStatus.fromCode(this.getCommandFrame().readByte(1));
 
         if (this.status == PasswordEnterCommandStatus.SUCCESS) {
             logger.info("Login successful");

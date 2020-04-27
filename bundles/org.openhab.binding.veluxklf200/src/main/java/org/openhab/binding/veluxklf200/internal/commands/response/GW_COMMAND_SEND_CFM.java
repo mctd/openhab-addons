@@ -13,8 +13,8 @@ public class GW_COMMAND_SEND_CFM extends BaseResponse {
 
     public GW_COMMAND_SEND_CFM(KLFCommandProcessor processor, KLFCommandFrame commandFrame) {
         super(processor, commandFrame);
-        this.sessionID = this.getCommandFrame().getShort(1);
-        this.status = CommandStatus.fromCode(this.getCommandFrame().getByte(3));
+        this.sessionID = this.getCommandFrame().readShort(1);
+        this.status = CommandStatus.fromCode(this.getCommandFrame().readByte(3));
 
         if (this.status == CommandStatus.ACCEPTED) {
             logger.info("Command accepted for session: {}.", this.sessionID);

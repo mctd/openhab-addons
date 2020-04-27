@@ -12,8 +12,8 @@ public class GW_GET_PROTOCOL_VERSION_CFM extends BaseResponse {
 
     public GW_GET_PROTOCOL_VERSION_CFM(KLFCommandProcessor processor, KLFCommandFrame commandFrame) {
         super(processor, commandFrame);
-        this.majorVersion = this.getCommandFrame().getShort(1);
-        this.minorVersion = this.getCommandFrame().getShort(3);
+        this.majorVersion = this.getCommandFrame().readShort(1);
+        this.minorVersion = this.getCommandFrame().readShort(3);
 
         logger.info("Major version: {}, minor version: {}", this.getMajorVersion(), this.getMinorVersion());
     }
