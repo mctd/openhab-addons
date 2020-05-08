@@ -1,28 +1,34 @@
 package org.openhab.binding.veluxklf200.internal.commands.response;
 
-import org.openhab.binding.veluxklf200.internal.engine.KLFCommandProcessor;
+import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.smarthome.core.thing.ThingUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class GW_GET_PROTOCOL_VERSION_CFM extends BaseResponse {
+@NonNullByDefault
+public class GW_GET_PROTOCOL_VERSION_CFM extends BaseConfirmationResponse {
     private static final Logger logger = LoggerFactory.getLogger(GW_GET_PROTOCOL_VERSION_CFM.class);
 
-    private short majorVersion;
-    private short minorVersion;
+    private int majorVersion;
+    private int minorVersion;
 
-    public GW_GET_PROTOCOL_VERSION_CFM(KLFCommandProcessor processor, KLFCommandFrame commandFrame) {
-        super(processor, commandFrame);
-        this.majorVersion = this.getCommandFrame().readShort(1);
-        this.minorVersion = this.getCommandFrame().readShort(3);
+    public GW_GET_PROTOCOL_VERSION_CFM(KLFCommandFrame commandFrame, ThingUID bridgeUID) {
+        super(commandFrame, bridgeUID);
+        this.majorVersion = this.getCommandFrame().readShortAsInt(1);
+        this.minorVersion = this.getCommandFrame().readShortAsInt(3);
 
-        logger.info("Major version: {}, minor version: {}", this.getMajorVersion(), this.getMinorVersion());
+        logger.debug("Major version: {}, minor version: {}", this.getMajorVersion(), this.getMinorVersion());
     }
 
-    public short getMajorVersion() {
+    public int getMajorVersion() {
         return this.majorVersion;
     }
 
-    public short getMinorVersion() {
+    public int getMinorVersion() {
         return this.minorVersion;
+    }
+
+    public String getFullVersion() {
+        return String.format("%d.%d", this.getMajorVersion(), this.getMinorVersion());
     }
 }

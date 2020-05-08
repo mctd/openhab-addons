@@ -1,30 +1,25 @@
 package org.openhab.binding.veluxklf200.internal.commands.response;
 
-import org.openhab.binding.veluxklf200.internal.engine.KLFCommandProcessor;
-import org.openhab.binding.veluxklf200.internal.status.NodeInformationStatus;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.smarthome.core.thing.ThingUID;
+import org.openhab.binding.veluxklf200.internal.commands.status.NodeInformationStatus;
 
-public class GW_GET_NODE_INFORMATION_CFM extends BaseResponse {
-
-    private static final Logger logger = LoggerFactory.getLogger(GW_GET_NODE_INFORMATION_CFM.class);
-
+@NonNullByDefault
+public class GW_GET_NODE_INFORMATION_CFM extends BaseConfirmationResponse {
     private NodeInformationStatus status;
-    private short nodeID;
+    private short nodeId;
 
-    public GW_GET_NODE_INFORMATION_CFM(KLFCommandProcessor processor, KLFCommandFrame commandFrame) {
-        super(processor, commandFrame);
+    public GW_GET_NODE_INFORMATION_CFM(KLFCommandFrame commandFrame, ThingUID bridgeUID) {
+        super(commandFrame, bridgeUID);
         this.status = NodeInformationStatus.fromCode(this.getCommandFrame().readByte(1));
-        this.nodeID = this.getCommandFrame().readByte(2);
-
-        logger.info("Get Node Information status: {}, nodeID: {}", this.getStatus(), this.getNodeID());
+        this.nodeId = this.getCommandFrame().readByte(2);
     }
 
     public NodeInformationStatus getStatus() {
         return this.status;
     }
 
-    public short getNodeID() {
-        return this.nodeID;
+    public short getNodeId() {
+        return this.nodeId;
     }
 }

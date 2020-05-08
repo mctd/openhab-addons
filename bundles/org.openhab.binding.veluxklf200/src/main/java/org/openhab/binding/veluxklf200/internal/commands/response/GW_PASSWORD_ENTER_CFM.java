@@ -1,24 +1,25 @@
 package org.openhab.binding.veluxklf200.internal.commands.response;
 
-import org.openhab.binding.veluxklf200.internal.engine.KLFCommandProcessor;
-import org.openhab.binding.veluxklf200.internal.status.PasswordEnterCommandStatus;
+import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.smarthome.core.thing.ThingUID;
+import org.openhab.binding.veluxklf200.internal.commands.status.PasswordEnterCommandStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class GW_PASSWORD_ENTER_CFM extends BaseResponse {
+@NonNullByDefault
+public class GW_PASSWORD_ENTER_CFM extends BaseConfirmationResponse {
     private static final Logger logger = LoggerFactory.getLogger(GW_PASSWORD_ENTER_CFM.class);
 
     private PasswordEnterCommandStatus status;
 
-    public GW_PASSWORD_ENTER_CFM(KLFCommandProcessor processor, KLFCommandFrame commandFrame) {
-        super(processor, commandFrame);
+    public GW_PASSWORD_ENTER_CFM(KLFCommandFrame commandFrame, ThingUID bridgeUID) {
+        super(commandFrame, bridgeUID);
         this.status = PasswordEnterCommandStatus.fromCode(this.getCommandFrame().readByte(1));
 
         if (this.status == PasswordEnterCommandStatus.SUCCESS) {
-            logger.info("Login successful");
-            // TODO : update KLFCommandProcessor "isLoggedIn"
+            logger.trace("GW_PASSWORD_ENTER_CFM: login successful");
         } else {
-            logger.error("Login failed (bad password?)");
+            logger.trace("GW_PASSWORD_ENTER_CFM: login failed");
         }
     }
 

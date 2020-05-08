@@ -1,7 +1,8 @@
 package org.openhab.binding.veluxklf200.internal.commands.response;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.io.IOException;
+
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 /**
  * Utility class to handle SLIP encoded messages.
@@ -9,13 +10,12 @@ import org.slf4j.LoggerFactory;
  * @author emmanuel
  *
  */
+@NonNullByDefault
 public class SlipUtils {
     private static final byte SLIP_BYTE_END = (byte) 0xC0;
     private static final byte SLIP_BYTE_ESC = (byte) 0xDB;
     private static final byte SLIP_BYTE_ESC_END = (byte) 0xDC;
     private static final byte SLIP_BYTE_ESC_ESC = (byte) 0xDD;
-
-    private final static Logger logger = LoggerFactory.getLogger(SlipUtils.class);
 
     private SlipUtils() {
     }
@@ -60,22 +60,21 @@ public class SlipUtils {
      * @param slipData SLIP wrapped data.
      *
      * @return Unwrapped data.
+     * @throws IOException
      */
-    public static byte[] Unwrap(byte[] slipData) {
+    public static byte[] Unwrap(byte[] slipData) throws IOException {
         if (slipData.length < 3) {
-            logger.error("Attempt to decode a packet that is too short: {}", slipData.length);
-            return null;
+            throw new IOException(String.format("Attempt to decode a packet that is too short: %d", slipData.length));
         }
+
         if (slipData[0] != SLIP_BYTE_END) {
-            logger.error("Attempt to decode a packet with an unexpected character at position 0");
-            return null;
+            throw new IOException("Attempt to decode a packet with an unexpected character at position 0");
         }
-        ;
+
         if (slipData[slipData.length - 1] != SLIP_BYTE_END) {
-            logger.error("Attempt to decode a packet with an unexpected end character");
-            return null;
+            throw new IOException("Attempt to decode a packet with an unexpected end character");
         }
-        ;
+
         int additional = -2; // will remove first and last bytes
         for (int i = 0; i < slipData.length; i++) {
             if (slipData[i] == SLIP_BYTE_ESC) {

@@ -3,14 +3,17 @@ package org.openhab.binding.veluxklf200.internal.commands.response;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
-import org.openhab.binding.veluxklf200.internal.engine.KLFCommandProcessor;
+import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.smarthome.core.thing.ThingUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@NonNullByDefault
 public abstract class ResponseFactory {
     private static final Logger logger = LoggerFactory.getLogger(ResponseFactory.class);
 
-    public static BaseResponse createFromCommandFrame(KLFCommandProcessor processor, KLFCommandFrame commandFrame) {
+    public static @Nullable BaseResponse createFromCommandFrame(KLFCommandFrame commandFrame, ThingUID bridgeUID) {
 
         // TODO : implement a Class Annotation (ex: //@KLFCommand(name = "GW_GET_NODE_INFORMATION_NTF", value =
         // KLFGatewayCommands.GW_GET_NODE_INFORMATION_NTF)) and scan for classes with matching Annotation ?
@@ -22,14 +25,13 @@ public abstract class ResponseFactory {
             responseClass = Class
                     .forName(BaseResponse.class.getPackage().getName() + "." + commandFrame.getCommand().name());
         } catch (ClassNotFoundException e) {
-            logger.error("Unable to find a class for {}", commandFrame.getCommand().name());
-            e.printStackTrace();
+            logger.trace("Unable to find a class for {}", commandFrame.getCommand().name());
         }
 
         if (responseClass != null) {
             Class<?> ctParameters[] = new Class[2];
-            ctParameters[0] = KLFCommandProcessor.class;
-            ctParameters[1] = KLFCommandFrame.class;
+            ctParameters[0] = KLFCommandFrame.class;
+            ctParameters[1] = ThingUID.class;
             Constructor<?> ct = null;
             try {
                 ct = responseClass.getConstructor(ctParameters);
@@ -39,8 +41,8 @@ public abstract class ResponseFactory {
             }
             if (ct != null) {
                 Object arglist[] = new Object[2];
-                arglist[0] = processor;
-                arglist[1] = commandFrame;
+                arglist[0] = commandFrame;
+                arglist[1] = bridgeUID;
                 try {
                     // Instantiate the response object
                     retobj = ct.newInstance(arglist);

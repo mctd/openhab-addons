@@ -1,21 +1,23 @@
 package org.openhab.binding.veluxklf200.internal.commands.response;
 
-import org.openhab.binding.veluxklf200.internal.engine.KLFCommandProcessor;
+import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.smarthome.core.thing.ThingUID;
 
+@NonNullByDefault
 public abstract class BaseResponse {
-    private KLFCommandProcessor processor;
+    private ThingUID bridgeUID;
     private KLFCommandFrame commandFrame;
 
-    public BaseResponse(KLFCommandProcessor processor, KLFCommandFrame commandFrame) {
-        this.processor = processor;
+    public BaseResponse(KLFCommandFrame commandFrame, ThingUID bridgeUID) {
         this.commandFrame = commandFrame;
+        this.bridgeUID = bridgeUID;
     }
 
-    protected KLFCommandProcessor getProcessor() {
-        return this.processor;
-    }
-
-    protected KLFCommandFrame getCommandFrame() {
+    protected final KLFCommandFrame getCommandFrame() {
         return this.commandFrame;
+    }
+
+    public final ThingUID getBridgeUID() {
+        return this.bridgeUID;
     }
 }

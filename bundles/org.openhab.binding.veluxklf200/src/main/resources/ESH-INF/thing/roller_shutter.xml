@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<thing:thing-descriptions bindingId="veluxklf200"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:thing="https://openhab.org/schemas/thing-description/v1.0.0"
+    xsi:schemaLocation="https://openhab.org/schemas/thing-description/v1.0.0 https://openhab.org/schemas/thing-description-1.0.0.xsd">
+
+	<thing-type id="roller_shutter">
+		<supported-bridge-type-refs>
+			<bridge-type-ref id="klf200" />
+		</supported-bridge-type-refs>
+		<label>Roller shutter</label>
+		<description>Roller shutter configured on the KLF200 bridge.</description>
+		<category>Blinds</category>
+		<channels>
+			<channel id="control" typeId="control" />
+		</channels>
+		
+	    <config-description uri="thing-type:veluxklf200:device">
+	        <parameter-group name="positioning">
+	            <label>Positioning 3</label>
+	            <description>Provides window positioning data (to be used in rules).</description>
+	            <advanced>true</advanced>
+	        </parameter-group>      
+	        <parameter name="velocity" type="integer" required="true">
+	            <label>Velocity</label>
+	            <description>Speed of roller shutter.</description>
+	            <options>
+	               <option value="0" >Default Speed</option>
+	               <option value="1">Silent</option>
+	               <option value="2">Fast</option>
+	            </options>
+	            <default>0</default>
+	        </parameter>
+	        <parameter name="azimuth" type="integer" min="0" max="359" groupName="positioning">
+	           <label>Azimuth</label>
+	           <description>Orientation relative to the north.</description>
+	           <unitLabel>°</unitLabel>
+	        </parameter>
+	        <parameter name="tilt" type="integer" min="0" max="90" groupName="positioning">
+	           <label>Tilt</label>
+	           <description>Tilt angle relative to the floor.</description>
+	           <unitLabel>°</unitLabel>
+	        </parameter>
+	    </config-description>
+	</thing-type>
+</thing:thing-descriptions>

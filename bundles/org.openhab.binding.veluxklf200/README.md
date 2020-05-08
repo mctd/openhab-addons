@@ -83,7 +83,7 @@ Based on the currently supported things, the following channels are available:
 
 | Channel Type ID  | Item Type | Description                                    | Thing types supporting this channel                             |
 |------------------|-----------|------------------------------------------------|-----------------------------------------------------------------|
-| connection_status| Switch    | Read-only switch that indicates connectivity to the KLF200 bridge. | klf200-bridge|
+| connection_status| Switch    | Read-only switch that indicates connectivity to the KLF200 bridge. | klf200|
 | scene_trigger| Switch| Switch to allow triggering of a scene. When switched on, the switch remains on until the scene has completed its execution. If switched off (by a user / rule) during its execution, the scene is stopped mid-execution.      | velux_scene                       |
 | blind-control| RollerShutter| Allows granular control of a blind, up, down, stop or movement to a specific percentage open / closed. | velux_blind                                      |
 

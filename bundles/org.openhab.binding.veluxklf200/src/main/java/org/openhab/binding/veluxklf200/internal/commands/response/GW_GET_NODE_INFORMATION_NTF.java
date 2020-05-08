@@ -1,90 +1,186 @@
 package org.openhab.binding.veluxklf200.internal.commands.response;
 
-import org.openhab.binding.veluxklf200.internal.engine.KLFCommandProcessor;
-import org.openhab.binding.veluxklf200.internal.status.NodeTypeSubType;
-import org.openhab.binding.veluxklf200.internal.status.NodeVariation;
-import org.openhab.binding.veluxklf200.internal.status.Position;
-import org.openhab.binding.veluxklf200.internal.status.PowerMode;
-import org.openhab.binding.veluxklf200.internal.status.ProductType;
-import org.openhab.binding.veluxklf200.internal.status.State;
-import org.openhab.binding.veluxklf200.internal.status.Velocity;
+import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.smarthome.core.thing.ThingUID;
+import org.openhab.binding.veluxklf200.internal.commands.status.ExecutionState;
+import org.openhab.binding.veluxklf200.internal.commands.status.NodeTypeSubType;
+import org.openhab.binding.veluxklf200.internal.commands.status.NodeVariation;
+import org.openhab.binding.veluxklf200.internal.commands.status.Position;
+import org.openhab.binding.veluxklf200.internal.commands.status.PowerMode;
+import org.openhab.binding.veluxklf200.internal.commands.status.ProductGroup;
+import org.openhab.binding.veluxklf200.internal.commands.status.ProductType;
+import org.openhab.binding.veluxklf200.internal.commands.status.Velocity;
+import org.openhab.binding.veluxklf200.internal.events.NodePositionEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class GW_GET_NODE_INFORMATION_NTF extends BaseResponse {
-    private static final Logger logger = LoggerFactory.getLogger(GW_GET_NODE_INFORMATION_NTF.class);
+@NonNullByDefault
+public class GW_GET_NODE_INFORMATION_NTF extends BaseNotificationResponse implements NodePositionEvent {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private byte nodeID;
-    private short order;
-    private byte placement;
+    private int nodeId;
+    private int order;
+    private int placement;
     private String name;
     private Velocity velocity;
     private NodeTypeSubType nodeTypeSubType;
-    private byte productGroup;
+    private ProductGroup productGroup;
     private ProductType productType;
     private NodeVariation nodeVariation;
     private PowerMode powerMode;
-    private byte buildNumber;
+    private int buildNumber;
     private long serialNumber;
-    private State state;
+    private ExecutionState executionState;
     private Position currentPosition;
     private Position target;
     private Position fp1currentPosition;
     private Position fp2currentPosition;
     private Position fp3currentPosition;
     private Position fp4currentPosition;
-    private short remainingTime;
+    private int remainingTime;
     private int timeStamp;
-    private byte nbrOfAlias;
+    private byte nbrOfAlias; // max number of alias is 5
     private byte[] aliasArray;
 
-    public GW_GET_NODE_INFORMATION_NTF(KLFCommandProcessor processor, KLFCommandFrame commandFrame) {
-        super(processor, commandFrame);
-        this.nodeID = this.getCommandFrame().readByte(1);
-        this.order = this.getCommandFrame().readShort(2);
-        this.placement = this.getCommandFrame().readByte(4);
+    public GW_GET_NODE_INFORMATION_NTF(KLFCommandFrame commandFrame, ThingUID bridgeUID) {
+        super(commandFrame, bridgeUID);
+        this.nodeId = this.getCommandFrame().readByteAsInt(1);
+        this.order = this.getCommandFrame().readShortAsInt(2);
+        this.placement = this.getCommandFrame().readByteAsInt(4);
         this.name = this.getCommandFrame().readString(5, 64);
         this.velocity = Velocity.fromCode(this.getCommandFrame().readByte(69));
         this.nodeTypeSubType = NodeTypeSubType.fromCode(this.getCommandFrame().readShort(70));
-        this.productGroup = this.getCommandFrame().readByte(72);
+        this.productGroup = ProductGroup.fromCode(this.getCommandFrame().readByte(72));
         this.productType = ProductType.fromCode(this.getCommandFrame().readByte(73));
         this.nodeVariation = NodeVariation.fromCode(this.getCommandFrame().readByte(74));
         this.powerMode = PowerMode.fromCode(this.getCommandFrame().readByte(75));
-        this.buildNumber = this.getCommandFrame().readByte(76);
+        this.buildNumber = this.getCommandFrame().readByteAsInt(76);
         this.serialNumber = this.getCommandFrame().readLong(77);
-        this.state = State.fromCode(this.getCommandFrame().readByte(85));
+        this.executionState = ExecutionState.fromCode(this.getCommandFrame().readByte(85));
         this.currentPosition = Position.fromCode(this.getCommandFrame().readShort(86));
         this.target = Position.fromCode(this.getCommandFrame().readShort(88));
         this.fp1currentPosition = Position.fromCode(this.getCommandFrame().readShort(90));
         this.fp2currentPosition = Position.fromCode(this.getCommandFrame().readShort(92));
         this.fp3currentPosition = Position.fromCode(this.getCommandFrame().readShort(94));
         this.fp4currentPosition = Position.fromCode(this.getCommandFrame().readShort(96));
-        this.remainingTime = this.getCommandFrame().readShort(98);
+        this.remainingTime = this.getCommandFrame().readShortAsInt(98);
         this.timeStamp = this.getCommandFrame().readInt(100);
         this.nbrOfAlias = this.getCommandFrame().readByte(104);
         this.aliasArray = this.getCommandFrame().readBytes(105, 20);
 
-        logger.info(
-                "GW_GET_NODE_INFORMATION_NTF: nodeID: {}, order: {}, placement: {}, name: \"{}\", velocity: {}, nodeTypeSubType: {}, productGroup: {}, productType: {}, "
+        // TODO : convert aliasArray to a better object representation
+
+        logger.debug(
+                "nodeID: {}, order: {}, placement: {}, name: \"{}\", velocity: {}, nodeTypeSubType: {}, productGroup: {}, productType: {}, "
                         + "nodeVariation: {}, powerMode: {}, buildNumber: {}, serialNumber: {}, state: {}, currentPosition: {}, target: {}, fp1currentPosition: {}, "
                         + "fp2currentPosition: {}, fp3currentPosition: {}, fp4currentPosition: {}, remainingTime: {}, timeStamp: {}, nbrOfAlias: {}, aliasArray: {}",
-                this.nodeID, this.order, this.placement, this.name, this.velocity, this.nodeTypeSubType,
-                this.productGroup, this.productType, this.nodeVariation, this.powerMode, this.buildNumber,
-                this.serialNumber, this.state, this.currentPosition, this.target, this.fp1currentPosition,
-                this.fp2currentPosition, this.fp3currentPosition, this.fp4currentPosition, this.remainingTime,
-                this.timeStamp, this.nbrOfAlias, this.aliasArray);
-
-        // TODO : update properties => fire an event that thingHandler watches
-        // updateProperty(PROPERTY_ASSIGNED_NAME, deviceInformationState.name); // method available in thingHandler
-
-        // TODO : update position channel
+                this.getNodeId(), this.getOrder(), this.getPlacement(), this.getName(), this.getVelocity(),
+                this.getNodeTypeSubType(), this.getProductGroup(), this.getProductType(), this.getNodeVariation(),
+                this.getPowerMode(), this.getBuildNumber(), this.getSerialNumber(), this.getExecutionState(),
+                this.getCurrentPosition(), this.getTarget(), this.getFp1currentPosition(), this.getFp2currentPosition(),
+                this.getFp3currentPosition(), this.getFp4currentPosition(), this.getRemainingTime(),
+                this.getTimeStamp(), this.getNbrOfAlias(), this.getAliasArray());
     }
 
-    public short getNodeID() {
-        return this.nodeID;
+    @Override
+    public int getNodeId() {
+        return this.nodeId;
     }
 
-    public short getOrder() {
-        return this.order;
+    public int getOrder() {
+        return order;
+    }
+
+    public int getPlacement() {
+        return placement;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public Velocity getVelocity() {
+        return velocity;
+    }
+
+    public NodeTypeSubType getNodeTypeSubType() {
+        return nodeTypeSubType;
+    }
+
+    public ProductGroup getProductGroup() {
+        return productGroup;
+    }
+
+    public ProductType getProductType() {
+        return productType;
+    }
+
+    public NodeVariation getNodeVariation() {
+        return nodeVariation;
+    }
+
+    public PowerMode getPowerMode() {
+        return powerMode;
+    }
+
+    public int getBuildNumber() {
+        return buildNumber;
+    }
+
+    public long getSerialNumber() {
+        return serialNumber;
+    }
+
+    @Override
+    public ExecutionState getExecutionState() {
+        return executionState;
+    }
+
+    @Override
+    public Position getCurrentPosition() {
+        return currentPosition;
+    }
+
+    @Override
+    public Position getTarget() {
+        return target;
+    }
+
+    @Override
+    public Position getFp1currentPosition() {
+        return fp1currentPosition;
+    }
+
+    @Override
+    public Position getFp2currentPosition() {
+        return fp2currentPosition;
+    }
+
+    @Override
+    public Position getFp3currentPosition() {
+        return fp3currentPosition;
+    }
+
+    @Override
+    public Position getFp4currentPosition() {
+        return fp4currentPosition;
+    }
+
+    @Override
+    public int getRemainingTime() {
+        return remainingTime;
+    }
+
+    @Override
+    public int getTimeStamp() {
+        return timeStamp;
+    }
+
+    public byte getNbrOfAlias() {
+        return nbrOfAlias;
+    }
+
+    public byte[] getAliasArray() {
+        return aliasArray;
     }
 }

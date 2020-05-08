@@ -4,20 +4,17 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 
-import org.openhab.binding.veluxklf200.internal.commands.structure.KLFGatewayCommands;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.openhab.binding.veluxklf200.internal.commands.GatewayCommands;
 
+@NonNullByDefault
 public class KLFCommandFrame {
-    private KLFGatewayCommands command;
-    // private ByteBuffer dataBuffer;
+    private GatewayCommands command;
     private final static byte PROTOCOL_ID = 0x00;
     private final static int MAX_DATA_LENGTH = 250;
     private ByteBuffer byteBuffer;
 
-    private final static Logger logger = LoggerFactory.getLogger(KLFCommandFrame.class);
-
-    public KLFCommandFrame(KLFGatewayCommands command) {
+    public KLFCommandFrame(GatewayCommands command) {
         this.command = command;
         this.byteBuffer = ByteBuffer.allocate(MAX_DATA_LENGTH + 2); // data length + 2 bytes for command
         this.writeShort(this.command.getNumber());
@@ -46,15 +43,15 @@ public class KLFCommandFrame {
         }
 
         // Extract command and data
-        byte length = transportFrame[1];
-        byte[] commandFrameBytes = new byte[length - 1]; // TODO : why -1 ???
+        int length = transportFrame[1] & 0xFF; // unsigned byte
+        byte[] commandFrameBytes = new byte[length - 1]; // checksum is counted in length
         System.arraycopy(transportFrame, 2, commandFrameBytes, 0, length - 1);
 
         KLFCommandFrame commandFrame = new KLFCommandFrame(commandFrameBytes);
         return commandFrame;
     }
 
-    public KLFGatewayCommands getCommand() {
+    public GatewayCommands getCommand() {
         return this.command;
     }
 
@@ -68,6 +65,10 @@ public class KLFCommandFrame {
         // this.byteArray.add((byte) value); // Least significant byte
     }
 
+    public void writeUnsignedShort(int value) {
+        this.writeShort((short) (value & 0xFFFF));
+    }
+
     public void writeInt(int value) {
         this.byteBuffer.putInt(value);
         // this.dataBuffer[index - 1] = (byte) (value >>> 32); // Shift 8 bits to get most significant byte
@@ -76,7 +77,7 @@ public class KLFCommandFrame {
         // this.dataBuffer[index + 2] = (byte) (value & 0xFF); // Least significant byte
     }
 
-    public void writeLong(int index, long value) {
+    public void writeLong(long value) {
         this.byteBuffer.putLong(value);
 
         // this.dataBuffer[index - 1] = (byte) (value >>> 32); // Shift 8 bits to get most significant byte
@@ -93,13 +94,17 @@ public class KLFCommandFrame {
         this.byteBuffer.put(buffer, 0, buffer.length);
     }
 
-    private KLFGatewayCommands readCommand() {
+    private GatewayCommands readCommand() {
         // reads the first two bytes of command frame
-        return KLFGatewayCommands.fromNumber(this.byteBuffer.getShort(0));
+        return GatewayCommands.fromNumber(this.byteBuffer.getShort(0));
     }
 
     public byte readByte(int index) {
         return this.byteBuffer.get(index + 1);
+    }
+
+    public int readByteAsInt(int index) {
+        return this.readByte(index) & 0xFF;
     }
 
     public byte[] readBytes(int index, int length) {
@@ -112,6 +117,10 @@ public class KLFCommandFrame {
 
     public short readShort(int index) {
         return this.byteBuffer.getShort(index + 1);
+    }
+
+    public int readShortAsInt(int index) {
+        return this.readShort(index) & 0xFFFF;
     }
 
     public int readInt(int index) {

@@ -1,7 +1,9 @@
 package org.openhab.binding.veluxklf200.internal.commands.response;
 
-import org.openhab.binding.veluxklf200.internal.engine.KLFCommandProcessor;
-import org.openhab.binding.veluxklf200.internal.status.NodeParameter;
+import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.smarthome.core.thing.ThingUID;
+import org.openhab.binding.veluxklf200.internal.commands.status.NodeParameter;
+import org.openhab.binding.veluxklf200.internal.events.NodeEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,27 +13,28 @@ import org.slf4j.LoggerFactory;
  * @author emmanuel
  *
  */
-public class GW_COMMAND_REMAINING_TIME_NTF extends BaseResponse {
+@NonNullByDefault
+public class GW_COMMAND_REMAINING_TIME_NTF extends BaseNotificationResponse implements NodeEvent {
     private static final Logger logger = LoggerFactory.getLogger(GW_COMMAND_REMAINING_TIME_NTF.class);
 
-    private short sessionID;
-    private byte index;
+    private int sessionID;
+    private int nodeId;
     private NodeParameter nodeParameter;
-    private short timeRemaining;
+    private int timeRemaining;
 
-    public GW_COMMAND_REMAINING_TIME_NTF(KLFCommandProcessor processor, KLFCommandFrame commandFrame) {
-        super(processor, commandFrame);
-        this.sessionID = this.getCommandFrame().readShort(1);
-        this.index = this.getCommandFrame().readByte(3);
+    public GW_COMMAND_REMAINING_TIME_NTF(KLFCommandFrame commandFrame, ThingUID bridgeUID) {
+        super(commandFrame, bridgeUID);
+        this.sessionID = this.getCommandFrame().readShortAsInt(1);
+        this.nodeId = this.getCommandFrame().readByteAsInt(3);
         this.nodeParameter = NodeParameter.fromCode(this.getCommandFrame().readByte(4));
-        this.timeRemaining = this.getCommandFrame().readShort(5);
+        this.timeRemaining = this.getCommandFrame().readShortAsInt(5);
 
-        logger.info(
-                "GW_COMMAND_REMAINING_TIME_NTF: Command with sessionID: {}, for nodeID: {}, nodeParameter: {}, will end in {} seconds.",
-                this.getSessionID(), this.index, this.nodeParameter, this.timeRemaining);
+        logger.debug("Command with sessionID: {}, for nodeID: {}, nodeParameter: {}, will end in {} seconds.",
+                this.sessionID, this.nodeId, this.nodeParameter, this.timeRemaining);
     }
 
-    public short getSessionID() {
-        return this.sessionID;
+    @Override
+    public int getNodeId() {
+        return this.nodeId;
     }
 }

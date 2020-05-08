@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<thing:thing-descriptions bindingId="veluxklf200"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:thing="https://openhab.org/schemas/thing-description/v1.0.0"
+    xsi:schemaLocation="https://openhab.org/schemas/thing-description/v1.0.0 https://openhab.org/schemas/thing-description-1.0.0.xsd">
+
+	<bridge-type id="klf200">
+		<label>Velux KLF 200 bridge</label>
+		<description>A Velux KLF 200 io-homecontrol® bridge</description>
+		<config-description>
+            <parameter-group name="deviceconfig">
+                <label>Device configuration</label>
+            </parameter-group>
+            <parameter-group name="actions">
+                <label>Actions</label>
+                <advanced>true</advanced>
+            </parameter-group>
+		
+            <!-- Device Configuration -->
+			<parameter name="hostname" type="text" required="true" groupName="deviceconfig">
+				<label>Host</label>
+				<description>Hostname or IP address of the KLF 200 unit.</description>
+			</parameter>
+			<parameter name="password" type="text" required="true" groupName="deviceconfig">
+				<context>password</context>
+				<label>Password</label>
+				<description>Password for logging in to the KLF 200 API (default password is printed underside of the unit).</description>
+			</parameter>
+			<parameter name="port" type="integer" required="true" groupName="deviceconfig">
+				<label>Port</label>
+				<description>The API port of the unit to control. Usually 51200.</description>
+				<default>51200</default>
+				<advanced>true</advanced>
+			</parameter>
+			<parameter name="keepalive" type="integer" required="true" groupName="deviceconfig">
+				<label>Keepalive</label>
+				<description>Duration (in minutes) between two successive keepalive retransmissions.</description>
+				<default>5</default>
+				<advanced>true</advanced>
+			</parameter>
+
+            <!-- Actions -->			
+			<parameter name="reboot" type="boolean" groupName="actions">
+                <label>Reboot</label>
+                <description>Reboots the KLF 200 unit.</description>
+                <default>false</default>
+            </parameter>
+		</config-description>
+	</bridge-type>
+</thing:thing-descriptions>

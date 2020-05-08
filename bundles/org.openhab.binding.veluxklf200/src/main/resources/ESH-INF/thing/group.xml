@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<thing:thing-descriptions bindingId="veluxklf200"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:thing="https://openhab.org/schemas/thing-description/v1.0.0"
+    xsi:schemaLocation="https://openhab.org/schemas/thing-description/v1.0.0 https://openhab.org/schemas/thing-description-1.0.0.xsd">
+
+	<thing-type id="group">
+		<supported-bridge-type-refs>
+			<bridge-type-ref id="klf200" />
+		</supported-bridge-type-refs>
+		<label>Group</label>
+		<description>Group of actuators configured on the KLF 200.</description>
+        <!-- TODO : implement channel -->
+        <!--
+		<channels>
+			<channel id="mp_position" typeId="position-control">
+				<label>Position of the group</label>
+				<description>Closed %</description>
+			</channel>
+		</channels>
+		 -->
+		<!-- Sample -->
+		<!-- <config-description>
+        <parameter name="location" type="integer" required="true">
+            <label>Location</label>
+            <description>Location for the weather information.
+                Syntax is WOEID, see https://en.wikipedia.org/wiki/WOEID.
+            </description>
+        </parameter>
+        <parameter name="refresh" type="integer" min="1">
+            <label>Refresh interval</label>
+            <description>Specifies the refresh interval in seconds.</description>
+            <default>60</default>
+        </parameter>
+    </config-description> -->
+	</thing-type>
+</thing:thing-descriptions>

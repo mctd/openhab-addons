@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<thing:thing-descriptions bindingId="veluxklf200"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:thing="https://openhab.org/schemas/thing-description/v1.0.0"
+    xsi:schemaLocation="https://openhab.org/schemas/thing-description/v1.0.0 https://openhab.org/schemas/thing-description-1.0.0.xsd">
+
+	<thing-type id="window_opener">
+		<supported-bridge-type-refs>
+			<bridge-type-ref id="klf200" />
+		</supported-bridge-type-refs>
+		<label>Window Opener</label>
+		<description>Window Opener configured on the KLF 200.</description>
+		<category>Window</category>
+		<channels>
+			<channel id="MP" typeId="actuator-shutter-position">
+				<label>Position of the Window</label>
+				<description>0% : The window is fully opened. 100% : The window is closed.</description>
+			</channel>
+		</channels>
+	</thing-type>
+</thing:thing-descriptions>

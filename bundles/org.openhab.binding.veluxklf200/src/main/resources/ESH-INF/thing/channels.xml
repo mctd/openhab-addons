@@ -4,18 +4,17 @@
     xmlns:thing="https://openhab.org/schemas/thing-description/v1.0.0"
     xsi:schemaLocation="https://openhab.org/schemas/thing-description/v1.0.0 https://openhab.org/schemas/thing-description-1.0.0.xsd">
 
-	<channel-type id="scene_trigger">
-		<item-type>Switch</item-type>
-		<label>Execute</label>
-		<description>Allows execution of a predefined scene.</description>
+    <channel-type id="control">
+        <item-type>Rollershutter</item-type>
+        <label>Control</label>
+        <description>Device control (UP, DOWN, STOP, closure 0-100%)</description>
+    </channel-type>
+    
+	<channel-type id="scene_switch">
+        <item-type>Switch</item-type>
+		<label>Start/Stop</label>
+		<description>Starts or stops execution of a predefined scene.</description>
 		<category>Switch</category>
-		<state readOnly="false"></state>
-	</channel-type>
-
-	<channel-type id="position-control">
-		<item-type>Rollershutter</item-type>
-		<label>Control</label>
-		<description>Actuator position control (Up, Down, closure 0-100%)</description>
 		<state readOnly="false"></state>
 	</channel-type>
 </thing:thing-descriptions>

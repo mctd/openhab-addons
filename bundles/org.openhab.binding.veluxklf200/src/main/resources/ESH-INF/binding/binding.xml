@@ -3,8 +3,7 @@
 	xmlns:binding="https://openhab.org/schemas/binding/v1.0.0"
 	xsi:schemaLocation="https://openhab.org/schemas/binding/v1.0.0 https://openhab.org/schemas/binding-1.0.0.xsd">
 
-	<name>VeluxKLF200 Binding</name>
-	<description>This binding enables control of Velux devices that are associated with a KLF200 unit running firmware v2.x. The binding enables full control of individual devices as well as scenes.</description>
+	<name>Velux KLF 200 Binding</name>
+	<description>Binding to connect to Velux KLF 200. It allows to control io-homecontrol® devices.</description>
 	<author>Emmanuel Bachschmidt</author>
-
 </binding:binding>

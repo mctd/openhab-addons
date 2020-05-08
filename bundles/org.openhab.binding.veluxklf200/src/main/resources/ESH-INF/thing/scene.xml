@@ -4,19 +4,16 @@
     xmlns:thing="https://openhab.org/schemas/thing-description/v1.0.0"
     xsi:schemaLocation="https://openhab.org/schemas/thing-description/v1.0.0 https://openhab.org/schemas/thing-description-1.0.0.xsd">
 
-	<thing-type id="velux_scene">
+	<thing-type id="scene">
 		<supported-bridge-type-refs>
-			<bridge-type-ref id="klf200-bridge" />
+			<bridge-type-ref id="klf200" />
 		</supported-bridge-type-refs>
 
-		<label>Velux Scene</label>
-		<description>Scene configured on the KLF200 bridge.</description>
+		<label>Scene</label>
+		<description>A predefined scene recorded on the Velux KLF 200.</description>
 
 		<channels>
-			<channel id="trigger_scene" typeId="scene_trigger">
-				<label>Execute Scene</label>
-				<description>Executes this scene.</description>
-			</channel>
+			<channel id="trigger_scene" typeId="scene_switch" />
 		</channels>
 	</thing-type>
 </thing:thing-descriptions>
