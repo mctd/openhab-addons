@@ -7,6 +7,10 @@ import org.slf4j.LoggerFactory;
 @NonNullByDefault
 public enum ProductGroup {
     /** Remote control. */
+    ROLLER_SHUTTER((byte) 1, "Roller Shutter"), // This is an assumption, it is not documented
+    /** Remote control. */
+    WINDOW_OPENER((byte) 3, "Window Opener"), // This is an assumption, it is not documented
+    /** Remote control. */
     REMOTE_CONTROL((byte) 14, "Remote control"),
     /** Unknown. */
     UNKNOWN((byte) 255, "Unknown");

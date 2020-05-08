@@ -172,7 +172,8 @@ public class KLF200DiscoveryService extends AbstractDiscoveryService implements 
 
         ThingUID thingUID = new ThingUID(thingTypeUID, this.getBridgeUID(), String.valueOf(event.getNodeId()));
         DiscoveryResult discoveryResult = DiscoveryResultBuilder.create(thingUID).withProperties(properties)
-                .withBridge(this.getBridgeUID()).withLabel(thingLabel).build();
+                .withBridge(this.getBridgeUID()).withLabel(thingLabel).withRepresentationProperty("Serial Number")
+                .build();
         return discoveryResult;
     }
 
