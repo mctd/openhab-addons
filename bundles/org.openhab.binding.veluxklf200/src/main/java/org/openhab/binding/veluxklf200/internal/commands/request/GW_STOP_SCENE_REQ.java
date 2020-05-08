@@ -7,6 +7,12 @@ import org.openhab.binding.veluxklf200.internal.commands.response.GW_STOP_SCENE_
 import org.openhab.binding.veluxklf200.internal.commands.response.KLFCommandFrame;
 import org.openhab.binding.veluxklf200.internal.commands.status.CommandOriginator;
 
+/**
+ * Request all nodes in a given scene to stop at their current position.
+ *
+ * @author emmanuel
+ *
+ */
 @NonNullByDefault
 public class GW_STOP_SCENE_REQ extends BaseRequest<GW_STOP_SCENE_CFM> {
     private int sessionId;

@@ -7,6 +7,12 @@ import org.openhab.binding.veluxklf200.internal.commands.response.KLFCommandFram
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Request information about all defined groups.
+ *
+ * @author emmanuel
+ *
+ */
 @NonNullByDefault
 public class GW_GET_GROUP_INFORMATION_REQ extends BaseRequest<GW_GET_GROUP_INFORMATION_CFM> {
     private static final Logger logger = LoggerFactory.getLogger(GW_GET_GROUP_INFORMATION_REQ.class);

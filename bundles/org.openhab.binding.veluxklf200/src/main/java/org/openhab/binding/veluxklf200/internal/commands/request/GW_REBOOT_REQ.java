@@ -7,6 +7,12 @@ import org.openhab.binding.veluxklf200.internal.commands.response.KLFCommandFram
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Request gateway to reboot.
+ *
+ * @author emmanuel
+ *
+ */
 @NonNullByDefault
 public class GW_REBOOT_REQ extends BaseRequest<GW_REBOOT_CFM> {
     private Logger logger = LoggerFactory.getLogger(getClass());

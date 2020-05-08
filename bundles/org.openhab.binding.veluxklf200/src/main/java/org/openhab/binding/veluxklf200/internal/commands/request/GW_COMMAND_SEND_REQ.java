@@ -12,6 +12,12 @@ import org.openhab.binding.veluxklf200.internal.commands.status.NodeParameter;
 import org.openhab.binding.veluxklf200.internal.commands.status.Position;
 import org.openhab.binding.veluxklf200.internal.commands.status.PriorityLevelLock;
 
+/**
+ * Send activating command direct to one or more io-homecontrol® nodes.
+ *
+ * @author emmanuel
+ *
+ */
 @NonNullByDefault
 public class GW_COMMAND_SEND_REQ extends BaseRequest<GW_COMMAND_SEND_CFM> {
     private int sessionId;

@@ -7,6 +7,12 @@ import org.openhab.binding.veluxklf200.internal.commands.response.GW_GET_ALL_GRO
 import org.openhab.binding.veluxklf200.internal.commands.response.KLFCommandFrame;
 import org.openhab.binding.veluxklf200.internal.commands.status.GroupType;
 
+/**
+ * Request information about all defined groups.
+ *
+ * @author emmanuel
+ *
+ */
 @NonNullByDefault
 public class GW_GET_ALL_GROUPS_INFORMATION_REQ extends BaseRequest<GW_GET_ALL_GROUPS_INFORMATION_CFM> {
     private @Nullable GroupType groupType;

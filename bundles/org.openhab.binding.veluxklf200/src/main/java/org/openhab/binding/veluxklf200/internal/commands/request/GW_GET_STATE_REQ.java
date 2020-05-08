@@ -5,6 +5,12 @@ import org.openhab.binding.veluxklf200.internal.commands.GatewayCommands;
 import org.openhab.binding.veluxklf200.internal.commands.response.GW_GET_STATE_CFM;
 import org.openhab.binding.veluxklf200.internal.commands.response.KLFCommandFrame;
 
+/**
+ * Request the state of the gateway.
+ *
+ * @author emmanuel
+ *
+ */
 @NonNullByDefault
 public class GW_GET_STATE_REQ extends BaseRequest<GW_GET_STATE_CFM> {
 

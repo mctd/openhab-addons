@@ -10,6 +10,12 @@ import org.openhab.binding.veluxklf200.internal.commands.response.KLFCommandFram
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Request to set UTC time.
+ *
+ * @author emmanuel
+ *
+ */
 @NonNullByDefault
 public class GW_SET_UTC_REQ extends BaseRequest<GW_SET_UTC_CFM> {
     private final Logger logger = LoggerFactory.getLogger(getClass());

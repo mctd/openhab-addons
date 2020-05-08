@@ -7,6 +7,12 @@ import org.openhab.binding.veluxklf200.internal.commands.response.KLFCommandFram
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Enable house status monitor.
+ *
+ * @author emmanuel
+ *
+ */
 @NonNullByDefault
 public class GW_HOUSE_STATUS_MONITOR_ENABLE_REQ extends BaseRequest<GW_HOUSE_STATUS_MONITOR_ENABLE_CFM> {
     private final Logger logger = LoggerFactory.getLogger(getClass());

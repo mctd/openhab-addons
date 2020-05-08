@@ -8,6 +8,12 @@ import org.openhab.binding.veluxklf200.internal.commands.response.KLFCommandFram
 import org.openhab.binding.veluxklf200.internal.commands.status.CommandOriginator;
 import org.openhab.binding.veluxklf200.internal.commands.status.Velocity;
 
+/**
+ * Request gateway to enter a scene.
+ *
+ * @author emmanuel
+ *
+ */
 @NonNullByDefault
 public class GW_ACTIVATE_SCENE_REQ extends BaseRequest<GW_ACTIVATE_SCENE_CFM> {
     private int sessionId;

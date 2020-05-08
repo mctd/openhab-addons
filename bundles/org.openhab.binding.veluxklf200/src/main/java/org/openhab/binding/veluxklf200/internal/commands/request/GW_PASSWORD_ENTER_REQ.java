@@ -6,6 +6,12 @@ import org.openhab.binding.veluxklf200.internal.commands.response.GW_PASSWORD_EN
 import org.openhab.binding.veluxklf200.internal.commands.response.KLFCommandFrame;
 import org.openhab.binding.veluxklf200.internal.commands.status.PasswordEnterCommandStatus;
 
+/**
+ * Enter password to authenticate request
+ *
+ * @author emmanuel
+ *
+ */
 @NonNullByDefault
 public class GW_PASSWORD_ENTER_REQ extends BaseRequest<GW_PASSWORD_ENTER_CFM> {
     private String password;

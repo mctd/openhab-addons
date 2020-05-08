@@ -6,9 +6,7 @@ import org.openhab.binding.veluxklf200.internal.commands.response.GW_GET_ALL_NOD
 import org.openhab.binding.veluxklf200.internal.commands.response.KLFCommandFrame;
 
 /**
- * This event will get the information on all nodes. Every node information is sent in a
- * GW_GET_ALL_NODES_INFORMATION_NTF event. The event GW_GET_ALL_NODES_INFORMATION_FINISHED_NTF is sent after the last
- * node information.
+ * Request extended information of all nodes.
  *
  * @author emmanuel
  *

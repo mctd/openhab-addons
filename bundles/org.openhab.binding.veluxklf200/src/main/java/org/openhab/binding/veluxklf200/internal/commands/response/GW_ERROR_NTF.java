@@ -7,7 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Response sent by KLF200 unit when an error occurred.
+ * Provides information on what triggered the error.
  *
  * @author emmanuel
  *
