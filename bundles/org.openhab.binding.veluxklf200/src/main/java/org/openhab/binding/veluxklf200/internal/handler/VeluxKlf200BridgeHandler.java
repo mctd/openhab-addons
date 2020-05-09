@@ -52,11 +52,6 @@ public class VeluxKlf200BridgeHandler extends BaseBridgeHandler {
      */
     public VeluxKlf200BridgeHandler(Bridge bridge) {
         super(bridge);
-
-        // this.bridgeConfig = getConfigAs(VeluxKlf200BridgeConfiguration.class);
-
-        // TODO : need to reload config after update ? so don't pass as an argument but make it dynamic
-
     }
 
     public VeluxKlf200BridgeConfiguration getConfiguration() {
