@@ -81,7 +81,7 @@ public enum NodeTypeSubType {
     private String description;
     private NodeType nodeType;
 
-    NodeTypeSubType(short code, String description, NodeType nodeType) {
+    private NodeTypeSubType(short code, String description, NodeType nodeType) {
         this.code = code;
         this.description = description;
         this.nodeType = nodeType;

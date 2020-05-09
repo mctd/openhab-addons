@@ -34,8 +34,7 @@ public class GW_GET_VERSION_CFM extends BaseConfirmationResponse {
         this.productGroup = ProductGroup.fromCode(this.getCommandFrame().readByte(8));
         this.productType = ProductType.fromCode(this.getCommandFrame().readByte(9));
 
-        logger.trace(
-                "Received GW_GET_VERSION_CFM. KLF version: {}.{}.{}.{}.{}.{}. Hardware version: {}, product group: {}, product type: {}",
+        logger.trace("KLF version: {}.{}.{}.{}.{}.{}. Hardware version: {}, product group: {}, product type: {}",
                 this.commandVersionNumber, versionWholeNumber, versionSubNumber, branchID, buildNumber, microBuild,
                 hardwareVersion, productGroup, productType);
     }

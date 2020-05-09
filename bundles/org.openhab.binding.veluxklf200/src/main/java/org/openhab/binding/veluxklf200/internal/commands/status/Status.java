@@ -31,7 +31,7 @@ public enum Status {
     private byte code;
     private String description;
 
-    Status(byte code, String description) {
+    private Status(byte code, String description) {
         this.code = code;
         this.description = description;
     }

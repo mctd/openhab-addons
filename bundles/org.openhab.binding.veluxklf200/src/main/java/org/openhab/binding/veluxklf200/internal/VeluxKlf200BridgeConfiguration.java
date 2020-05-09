@@ -23,6 +23,6 @@ public class VeluxKlf200BridgeConfiguration {
     /** API password */
     public String password;
 
-    /** Duration between 2 pings will be sent to keep alive the connection */
+    /** Duration (in minutes) between 2 pings will be sent to keep the connection alive */
     public Integer keepalive;
 }

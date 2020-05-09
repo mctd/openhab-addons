@@ -33,11 +33,12 @@ import org.openhab.binding.veluxklf200.internal.commands.request.GW_HOUSE_STATUS
 import org.openhab.binding.veluxklf200.internal.commands.request.GW_PASSWORD_ENTER_REQ;
 import org.openhab.binding.veluxklf200.internal.commands.request.GW_SET_UTC_REQ;
 import org.openhab.binding.veluxklf200.internal.commands.response.BaseConfirmationResponse;
-import org.openhab.binding.veluxklf200.internal.commands.response.BaseNotificationResponse;
 import org.openhab.binding.veluxklf200.internal.commands.response.BaseResponse;
 import org.openhab.binding.veluxklf200.internal.commands.response.GW_GET_PROTOCOL_VERSION_CFM;
 import org.openhab.binding.veluxklf200.internal.commands.response.GW_GET_STATE_CFM;
 import org.openhab.binding.veluxklf200.internal.commands.response.GW_GET_VERSION_CFM;
+import org.openhab.binding.veluxklf200.internal.events.BaseEvent;
+import org.openhab.binding.veluxklf200.internal.events.EventBroker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,15 +59,16 @@ public class VeluxKlf200Connection implements Runnable {
     private String hostname;
     private String password;
     private int port;
+    private int keepaliveInterval;
     private @Nullable Socket klfSocket;
     private ScheduledExecutorService scheduler;
 
-    public VeluxKlf200Connection(VeluxKlf200BridgeHandler bridgeHandler, String hostname, int port, String password,
-            ScheduledExecutorService scheduler) {
+    public VeluxKlf200Connection(VeluxKlf200BridgeHandler bridgeHandler, ScheduledExecutorService scheduler) {
         this.bridgeHandler = bridgeHandler;
-        this.hostname = hostname;
-        this.port = port;
-        this.password = password;
+        this.hostname = bridgeHandler.getConfiguration().hostname;
+        this.port = bridgeHandler.getConfiguration().port;
+        this.password = bridgeHandler.getConfiguration().password;
+        this.keepaliveInterval = bridgeHandler.getConfiguration().keepalive;
         this.scheduler = scheduler;
     }
 
@@ -278,7 +280,7 @@ public class VeluxKlf200Connection implements Runnable {
         return this.klfSocket;
     }
 
-    public void HandleResponse(BaseResponse response) {
+    public void handleResponse(BaseResponse response) {
         logger.trace("Handling response: {}", response);
         if (response instanceof BaseConfirmationResponse) {
             // response is a confirmation, try to acknowledge a running request
@@ -293,12 +295,11 @@ public class VeluxKlf200Connection implements Runnable {
                     localRunningCommand.notifyAll();
                 }
             }
-        } else if (response instanceof BaseNotificationResponse) {
-            // response is a notification, notify listeners
-            BaseNotificationResponse responseNtf = (BaseNotificationResponse) response;
-            responseNtf.notifyListeners();
-        } else {
-            logger.error("Unknown response type: {}", response.getClass());
+        }
+
+        if (response instanceof BaseEvent) {
+            // response is an event, notify listeners
+            EventBroker.notifyEvent((BaseEvent) response);
         }
     }
 
@@ -326,12 +327,9 @@ public class VeluxKlf200Connection implements Runnable {
      * Keep alive ensures that the web socket connection is used and does not time out.
      */
     private void startKeepAliveJob() {
-        long KEEPALIVE_INTERVAL = 60 * 1000; // milliseconds
-
         ScheduledFuture<?> localJob = this.keepAliveJob;
         if (localJob == null || localJob.isCancelled()) {
             logger.debug("Scheduling keepalive job");
-            // TODO : use bridge config for KEEPALIVE_INTERVAL value
             this.keepAliveJob = this.scheduler.scheduleWithFixedDelay(new Runnable() {
                 @Override
                 public void run() {
@@ -339,7 +337,7 @@ public class VeluxKlf200Connection implements Runnable {
                     GW_GET_STATE_REQ getStateReq = new GW_GET_STATE_REQ();
                     sendRequest(getStateReq);
                 }
-            }, KEEPALIVE_INTERVAL, KEEPALIVE_INTERVAL, TimeUnit.MILLISECONDS);
+            }, this.keepaliveInterval, this.keepaliveInterval, TimeUnit.MINUTES);
         }
     }
 

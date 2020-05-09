@@ -38,7 +38,7 @@ public enum ExecutionState {
     private byte code;
     private String description;
 
-    ExecutionState(byte code, String description) {
+    private ExecutionState(byte code, String description) {
         this.code = code;
         this.description = description;
     }

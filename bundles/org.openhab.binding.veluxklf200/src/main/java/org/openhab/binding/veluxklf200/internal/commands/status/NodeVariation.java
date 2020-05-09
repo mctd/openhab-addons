@@ -21,7 +21,7 @@ public enum NodeVariation {
     private byte code;
     private String description;
 
-    NodeVariation(byte code, String description) {
+    private NodeVariation(byte code, String description) {
         this.code = code;
         this.description = description;
     }

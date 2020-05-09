@@ -16,7 +16,7 @@ import org.openhab.binding.veluxklf200.internal.commands.request.GW_GET_NODE_INF
 import org.openhab.binding.veluxklf200.internal.commands.response.GW_GET_NODE_INFORMATION_CFM;
 import org.openhab.binding.veluxklf200.internal.commands.response.GW_GET_NODE_INFORMATION_NTF;
 import org.openhab.binding.veluxklf200.internal.commands.status.ExecutionState;
-import org.openhab.binding.veluxklf200.internal.commands.status.NodeInformationStatus;
+import org.openhab.binding.veluxklf200.internal.commands.status.GetNodeInformationStatus;
 import org.openhab.binding.veluxklf200.internal.events.EventBroker;
 import org.openhab.binding.veluxklf200.internal.events.NodeEvent;
 import org.openhab.binding.veluxklf200.internal.events.NodeEventListener;
@@ -59,7 +59,7 @@ public abstract class VeluxKlf200BaseNodeHandler extends VeluxKlf200BaseThingHan
         GW_GET_NODE_INFORMATION_CFM response = getNodeInfoReq.getResponse();
 
         if (response != null) {
-            if (response.getStatus() == NodeInformationStatus.OK) {
+            if (response.getStatus() == GetNodeInformationStatus.OK) {
                 updateStatus(ThingStatus.ONLINE);
             } else {
                 updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.COMMUNICATION_ERROR,

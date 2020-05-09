@@ -23,7 +23,7 @@ public enum GatewayState {
     private byte code;
     private String description;
 
-    GatewayState(byte code, String description) {
+    private GatewayState(byte code, String description) {
         this.code = code;
         this.description = description;
     }

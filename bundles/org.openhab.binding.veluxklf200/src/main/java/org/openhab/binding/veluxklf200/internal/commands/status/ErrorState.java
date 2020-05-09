@@ -23,7 +23,7 @@ public enum ErrorState {
     private byte code;
     private String description;
 
-    ErrorState(byte code, String description) {
+    private ErrorState(byte code, String description) {
         this.code = code;
         this.description = description;
     }

@@ -5,21 +5,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @NonNullByDefault
-public enum NodeInformationStatus {
+public enum GetSceneInformationStatus {
     /** OK - Request accepted. */
     OK((byte) 0, "OK - Request accepted"),
-    /** Error – Request rejected. */
-    ERROR_REJECTED((byte) 1, "Error – Request rejected"),
     /** Error – Invalid node index. */
-    ERROR_INVALID_INDEX((byte) 2, "Error – Invalid node index"),
+    ERROR_INVALID_INDEX((byte) 1, "Error – Invalid scene index"),
     /** Reserved. */
     RESERVED((byte) 0xFF, "Reserved");
 
-    private static final Logger logger = LoggerFactory.getLogger(NodeInformationStatus.class);
+    private static final Logger logger = LoggerFactory.getLogger(GetSceneInformationStatus.class);
     private byte code;
     private String description;
 
-    NodeInformationStatus(byte code, String description) {
+    private GetSceneInformationStatus(byte code, String description) {
         this.code = code;
         this.description = description;
     }
@@ -28,8 +26,8 @@ public enum NodeInformationStatus {
         return this.code;
     }
 
-    public static NodeInformationStatus fromCode(byte code) {
-        for (NodeInformationStatus testValue : values()) {
+    public static GetSceneInformationStatus fromCode(byte code) {
+        for (GetSceneInformationStatus testValue : values()) {
             if (testValue.getCode() == code) {
                 return testValue;
             }

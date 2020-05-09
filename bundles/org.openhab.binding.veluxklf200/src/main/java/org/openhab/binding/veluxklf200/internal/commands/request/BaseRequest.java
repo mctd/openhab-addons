@@ -59,6 +59,7 @@ public abstract class BaseRequest<T extends BaseConfirmationResponse> {
         }
 
         if (handled) {
+            // TODO : this will cause troubles in case of "GW_ERROR_NTF" ==> response of bad type
             this.response = castedResponse;
             logger.trace("Command {} acknowledged by {}.", this, response);
         } else {

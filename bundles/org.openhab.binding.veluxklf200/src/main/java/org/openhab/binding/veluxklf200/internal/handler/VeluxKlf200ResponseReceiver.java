@@ -71,7 +71,7 @@ public class VeluxKlf200ResponseReceiver implements Runnable {
                 BaseResponse response = ResponseFactory.createFromCommandFrame(commandFrame,
                         this.klfConnectionManager.getBridgeUID());
                 if (response != null) {
-                    this.klfConnectionManager.HandleResponse(response);
+                    this.klfConnectionManager.handleResponse(response);
                 } else {
                     logger.error("Unable to build the response for code: {}", commandFrame.getCommand());
                     continue;

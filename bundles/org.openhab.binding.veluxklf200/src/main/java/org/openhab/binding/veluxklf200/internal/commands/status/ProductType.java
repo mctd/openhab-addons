@@ -19,7 +19,7 @@ public enum ProductType {
     private byte code;
     private String description;
 
-    ProductType(byte code, String description) {
+    private ProductType(byte code, String description) {
         this.code = code;
         this.description = description;
     }

@@ -17,7 +17,7 @@ public enum GetAllNodesStatus {
     private byte code;
     private String description;
 
-    GetAllNodesStatus(byte code, String description) {
+    private GetAllNodesStatus(byte code, String description) {
         this.code = code;
         this.description = description;
     }

@@ -53,10 +53,11 @@ public abstract class VeluxKlf200BaseThingHandler extends BaseThingHandler {
 
     protected void sendRequest(BaseRequest<?> request) {
         VeluxKlf200BridgeHandler bridgeHandler = this.getBridgeHandler();
+
         if (bridgeHandler != null) {
-            bridgeHandler.getConnection().sendRequest(request);
+            bridgeHandler.sendRequest(request);
         } else {
-            logger.warn("Bridge Handler is null, cannot execute command.");
+            logger.warn("Cannot execute command: bridge handler not set.");
         }
     }
 }

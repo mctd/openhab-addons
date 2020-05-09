@@ -19,7 +19,7 @@ public enum GetAllGroupsStatus {
     private byte code;
     private String description;
 
-    GetAllGroupsStatus(byte code, String description) {
+    private GetAllGroupsStatus(byte code, String description) {
         this.code = code;
         this.description = description;
     }

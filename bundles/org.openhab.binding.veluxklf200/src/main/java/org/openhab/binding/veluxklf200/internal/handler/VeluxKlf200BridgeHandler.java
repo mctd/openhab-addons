@@ -23,6 +23,7 @@ import org.eclipse.smarthome.core.thing.ThingStatusDetail;
 import org.eclipse.smarthome.core.thing.binding.BaseBridgeHandler;
 import org.eclipse.smarthome.core.types.Command;
 import org.openhab.binding.veluxklf200.internal.VeluxKlf200BridgeConfiguration;
+import org.openhab.binding.veluxklf200.internal.commands.request.BaseRequest;
 import org.openhab.binding.veluxklf200.internal.commands.request.GW_REBOOT_REQ;
 import org.openhab.binding.veluxklf200.internal.commands.response.GW_REBOOT_CFM;
 import org.slf4j.Logger;
@@ -40,8 +41,8 @@ public class VeluxKlf200BridgeHandler extends BaseBridgeHandler {
 
     private final static int RECONNECT_INTERVAL = 10;
 
-    private VeluxKlf200BridgeConfiguration bridgeConfig;
-    private VeluxKlf200Connection connection;
+    // private VeluxKlf200BridgeConfiguration bridgeConfig;
+    private @Nullable VeluxKlf200Connection connection;
     private @Nullable ScheduledFuture<?> connectJob;
 
     /**
@@ -52,11 +53,18 @@ public class VeluxKlf200BridgeHandler extends BaseBridgeHandler {
     public VeluxKlf200BridgeHandler(Bridge bridge) {
         super(bridge);
 
-        this.bridgeConfig = getConfigAs(VeluxKlf200BridgeConfiguration.class);
+        // this.bridgeConfig = getConfigAs(VeluxKlf200BridgeConfiguration.class);
 
         // TODO : need to reload config after update ? so don't pass as an argument but make it dynamic
-        this.connection = new VeluxKlf200Connection(this, bridgeConfig.hostname, bridgeConfig.port, bridgeConfig.password,
-                this.scheduler);
+
+    }
+
+    public VeluxKlf200BridgeConfiguration getConfiguration() {
+        return getConfigAs(VeluxKlf200BridgeConfiguration.class);
+    }
+
+    public @Nullable VeluxKlf200Connection getConnection() {
+        return this.connection;
     }
 
     @Override
@@ -68,11 +76,9 @@ public class VeluxKlf200BridgeHandler extends BaseBridgeHandler {
     public void initialize() {
         logger.debug("Initializing bridge handler for bridge Id: {}.", this.getThing().getUID().getId());
 
-        startConnectJob();
-    }
+        this.connection = new VeluxKlf200Connection(this, this.scheduler);
 
-    public VeluxKlf200Connection getConnection() {
-        return this.connection;
+        startConnectJob();
     }
 
     @Override
@@ -97,6 +103,16 @@ public class VeluxKlf200BridgeHandler extends BaseBridgeHandler {
             localJob.cancel(true);
         }
         this.connectJob = null;
+        this.connection = null;
+    }
+
+    public void sendRequest(BaseRequest<?> request) {
+        VeluxKlf200Connection connection = this.getConnection();
+        if (connection == null) {
+            logger.warn("Cannot send request {}: connection down", request);
+        } else {
+            connection.sendRequest(request);
+        }
     }
 
     @Override
@@ -105,7 +121,7 @@ public class VeluxKlf200BridgeHandler extends BaseBridgeHandler {
             logger.warn("Sending reboot command to KLF unit");
 
             GW_REBOOT_REQ rebootReq = new GW_REBOOT_REQ();
-            this.connection.sendRequest(rebootReq);
+            this.sendRequest(rebootReq);
             GW_REBOOT_CFM rebootResponse = rebootReq.getResponse();
             if (rebootResponse != null) {
                 this.dispose();

@@ -17,7 +17,7 @@ public enum CommandStatus {
     private String label;
     private final static Logger logger = LoggerFactory.getLogger(CommandStatus.class);
 
-    CommandStatus(byte status, String statusLabel) {
+    private CommandStatus(byte status, String statusLabel) {
         this.status = status;
         this.label = statusLabel;
     }

@@ -24,10 +24,10 @@ import org.eclipse.smarthome.core.thing.binding.BaseThingHandlerFactory;
 import org.eclipse.smarthome.core.thing.binding.ThingHandler;
 import org.eclipse.smarthome.core.thing.binding.ThingHandlerFactory;
 import org.openhab.binding.veluxklf200.internal.discovery.KLF200DiscoveryService;
-import org.openhab.binding.veluxklf200.internal.handler.VeluxKlf200GroupHandler;
 import org.openhab.binding.veluxklf200.internal.handler.VeluxKlf200BridgeHandler;
-import org.openhab.binding.veluxklf200.internal.handler.VeluxKlf200SceneHandler;
+import org.openhab.binding.veluxklf200.internal.handler.VeluxKlf200GroupHandler;
 import org.openhab.binding.veluxklf200.internal.handler.VeluxKlf200RollerShutterHandler;
+import org.openhab.binding.veluxklf200.internal.handler.VeluxKlf200SceneHandler;
 import org.openhab.binding.veluxklf200.internal.handler.VeluxKlf200WindowOpenerHandler;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.annotations.Component;
@@ -56,7 +56,7 @@ public class VeluxKLF200HandlerFactory extends BaseThingHandlerFactory {
     protected @Nullable ThingHandler createHandler(Thing thing) {
         ThingTypeUID thingTypeUID = thing.getThingTypeUID();
 
-        logger.debug("Trying to create a handler for Thing: {}", thing.getUID());
+        logger.trace("Trying to create a handler for Thing: {}", thing.getUID());
 
         // Creates a Bridge handler
         if (thingTypeUID.equals(VeluxKlf200BindingConstants.THING_TYPE_KLF200)) {

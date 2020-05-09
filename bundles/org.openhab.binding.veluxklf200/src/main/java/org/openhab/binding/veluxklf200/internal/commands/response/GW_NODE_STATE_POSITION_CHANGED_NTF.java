@@ -43,9 +43,8 @@ public class GW_NODE_STATE_POSITION_CHANGED_NTF extends BaseNotificationResponse
         this.remainingTime = this.getCommandFrame().readShortAsInt(15);
         this.timeStamp = this.getCommandFrame().readInt(17);
 
-        logger.debug(
-                "GW_NODE_STATE_POSITION_CHANGED_NTF: nodeId: {}, executionState: {}, currentPosition: {}, target: {}, fp1currentPosition: {}, "
-                        + "fp2currentPosition: {}, fp3currentPosition: {}, fp4currentPosition: {}, remainingTime: {}, timeStamp: {}",
+        logger.debug("nodeId: {}, executionState: {}, currentPosition: {}, target: {}, fp1currentPosition: {}, "
+                + "fp2currentPosition: {}, fp3currentPosition: {}, fp4currentPosition: {}, remainingTime: {}, timeStamp: {}",
                 this.nodeId, this.getExecutionState(), this.currentPosition, this.target, this.fp1currentPosition,
                 this.fp2currentPosition, this.fp3currentPosition, this.fp4currentPosition, this.remainingTime,
                 this.timeStamp);

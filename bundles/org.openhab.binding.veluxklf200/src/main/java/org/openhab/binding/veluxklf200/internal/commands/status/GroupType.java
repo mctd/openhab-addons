@@ -18,13 +18,15 @@ public enum GroupType {
     /** The group type is a Room. */
     ROOM((byte) 1, "Room group"),
     /** The group type is a House. */
-    HOUSE((byte) 2, "House group");
+    HOUSE((byte) 2, "House group"),
+    /** The group type is an All-group */
+    ALL_GROUP((byte) 3, "All-Group");
 
     private static final Logger logger = LoggerFactory.getLogger(GroupType.class);
     private byte code;
     private String description;
 
-    GroupType(byte code, String description) {
+    private GroupType(byte code, String description) {
         this.code = code;
         this.description = description;
     }

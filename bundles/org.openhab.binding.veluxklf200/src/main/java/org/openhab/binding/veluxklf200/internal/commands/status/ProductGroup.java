@@ -19,7 +19,7 @@ public enum ProductGroup {
     private byte code;
     private String description;
 
-    ProductGroup(byte code, String description) {
+    private ProductGroup(byte code, String description) {
         this.code = code;
         this.description = description;
     }

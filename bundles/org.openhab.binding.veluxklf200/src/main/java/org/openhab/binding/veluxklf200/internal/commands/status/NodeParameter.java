@@ -47,7 +47,7 @@ public enum NodeParameter {
     private byte code;
     private String description;
 
-    NodeParameter(byte code, String description) {
+    private NodeParameter(byte code, String description) {
         this.code = code;
         this.description = description;
     }

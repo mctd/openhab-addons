@@ -15,7 +15,7 @@ public enum PowerMode {
     private byte code;
     private String description;
 
-    PowerMode(byte code, String description) {
+    private PowerMode(byte code, String description) {
         this.code = code;
         this.description = description;
     }

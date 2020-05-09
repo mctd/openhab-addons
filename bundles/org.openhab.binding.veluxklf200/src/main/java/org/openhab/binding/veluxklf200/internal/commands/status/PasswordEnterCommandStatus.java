@@ -14,7 +14,7 @@ public enum PasswordEnterCommandStatus {
     private byte code;
     private final static Logger logger = LoggerFactory.getLogger(PasswordEnterCommandStatus.class);
 
-    PasswordEnterCommandStatus(byte code) {
+    private PasswordEnterCommandStatus(byte code) {
         this.code = code;
     }
 

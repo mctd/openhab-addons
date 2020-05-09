@@ -23,7 +23,7 @@ public enum PriorityLevelLock {
     private static final Logger logger = LoggerFactory.getLogger(PriorityLevelLock.class);
     private byte code;
 
-    PriorityLevelLock(byte code) {
+    private PriorityLevelLock(byte code) {
         this.code = code;
     }
 

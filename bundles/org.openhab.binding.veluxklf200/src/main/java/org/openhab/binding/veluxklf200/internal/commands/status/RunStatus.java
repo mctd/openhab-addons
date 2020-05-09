@@ -23,7 +23,7 @@ public enum RunStatus {
     private byte code;
     private String description;
 
-    RunStatus(byte code, String description) {
+    private RunStatus(byte code, String description) {
         this.code = code;
         this.description = description;
     }

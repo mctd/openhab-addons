@@ -36,7 +36,7 @@ public enum CommandOriginator {
     private byte status;
     private final static Logger logger = LoggerFactory.getLogger(CommandOriginator.class);
 
-    CommandOriginator(byte status) {
+    private CommandOriginator(byte status) {
         this.status = status;
     }
 

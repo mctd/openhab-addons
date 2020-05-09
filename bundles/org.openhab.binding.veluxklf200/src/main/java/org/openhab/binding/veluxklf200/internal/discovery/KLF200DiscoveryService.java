@@ -110,20 +110,20 @@ public class KLF200DiscoveryService extends AbstractDiscoveryService implements 
     }
 
     private void discoverNodes() {
-        GW_GET_ALL_NODES_INFORMATION_REQ getAllNodesReq = new GW_GET_ALL_NODES_INFORMATION_REQ();
-        this.bridgeHandler.getConnection().sendRequest(getAllNodesReq);
+        GW_GET_ALL_NODES_INFORMATION_REQ request = new GW_GET_ALL_NODES_INFORMATION_REQ();
+        this.bridgeHandler.sendRequest(request);
     }
 
     private void discoverGroups() {
-        GW_GET_ALL_GROUPS_INFORMATION_REQ getAllGroupsReq = new GW_GET_ALL_GROUPS_INFORMATION_REQ(null);
-        this.bridgeHandler.getConnection().sendRequest(getAllGroupsReq);
+        GW_GET_ALL_GROUPS_INFORMATION_REQ request = new GW_GET_ALL_GROUPS_INFORMATION_REQ(null);
+        this.bridgeHandler.sendRequest(request);
     }
 
     private void discoverScenes() {
-        GW_GET_SCENE_LIST_REQ getSceneListReq = new GW_GET_SCENE_LIST_REQ();
-        this.bridgeHandler.getConnection().sendRequest(getSceneListReq);
+        GW_GET_SCENE_LIST_REQ request = new GW_GET_SCENE_LIST_REQ();
+        this.bridgeHandler.sendRequest(request);
 
-        GW_GET_SCENE_LIST_CFM response = getSceneListReq.getResponse();
+        GW_GET_SCENE_LIST_CFM response = request.getResponse();
         if (response != null && response.getTotalNumberOfScenes() == 0) {
             // Command completed and no scenes defined, KLF won't send NTF message
             this.scenesDiscoveryComplete = true;
